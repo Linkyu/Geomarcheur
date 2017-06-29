@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GEOMARCHEUR</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.pink-indigo.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUN61zqSziMSJtCF5gIwufvJq_8MuqDGg"
+            type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script>
+        var geocoder = new google.maps.Geocoder();
+        var map;
+        var markers = [];
+        var spots = [];
+        var city = "Toulouse";
+        var info = new google.maps.InfoWindow();
+
+        function set_info_content(id) {
+            return "<p style='font-weight: bold'>" + spots[id].name + "</p>" +
+                "<p>" + spots[id].address +"</p>" +
+                "<p>Vélos disponibles : " + spots[id].available_bikes + "/" + spots[id].bike_stands + "<br />" +
+                "Places disponibles : " + spots[id].available_bike_stands + "</p>";
+        }
+
+        function add_velib_markers(data) {
+            var spot;
+            for(var i=0;i<data.length;i++) {
+                spot = data[i];
+                spots[spot.number.toString()] = spot;
+
+                var color = get_marker_color(spot);
+
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(spot.position.lat, spot.position.lng),
+                    icon: color,
+                    title: spot.number.toString()});
+
+                marker.setMap(map);
+
+                markers[marker.title] = marker;
+
+                marker.addListener('click', function() {
+                    info.setContent(set_info_content(this.title));
+                    //console.log(spots[this.title]);
+                    info.open(map, this);
+                });
+            }
+
+            setTimeout(get_stations, 1000);
+        }
+
+        function update_velib_markers(data) {
+            var spot;
+            for(var i=0;i<data.length;i++) {
+                spot = data[i];
+                var color = get_marker_color(spot);
+                var marker = markers[spot.number.toString()];
+                marker.setIcon(color);
+            }
+
+            // setTimeout(get_stations, 1000);
+        }
+
+        function get_marker_color(spot) {
+            if (spot.status !== "OPEN"){
+                return 'http://maps.google.com/mapfiles/ms/icons/grey.png';
+            } else {
+                if (spot.available_bikes < "2") {
+                    return 'http://maps.google.com/mapfiles/ms/icons/red.png';
+                } else if (spot.available_bike_stands < "2") {
+                    return 'http://maps.google.com/mapfiles/ms/icons/orange.png';
+                } else {
+                    return 'http://maps.google.com/mapfiles/ms/icons/green.png';
+                }
+            }
+        }
+
+        function display_map(coords) {
+            var mapOptions = {
+                center: coords,
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+            get_stations();
+        }
+
+        function geocodeCallback(results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                display_map(results[0].geometry.location);
+            } else {
+                alert("Geocode error: " + status);
+            }
+        }
+
+        function get_stations() {
+            $.ajax({
+                url: "https://api.jcdecaux.com/vls/v1/stations?contract=" + city + "&apiKey=90866e021aaa6ed8790cd89b85864c9ab5dbfed3",
+                type: "GET",
+                dataType: "json", // optionnel : format que je souhaite en réponse. si pas le cas je partirai en erreur!
+                success: get_stations_success, // fonction de callback
+                error: function(data) {
+                    console.log("Erreur Ajax :" + data);
+                }
+            });
+        }
+
+        function get_stations_success(data) {
+            // je récupere le résultat de l'appel webservices
+            console.log(data);
+            if (spots.length > 0) {
+                update_velib_markers(data);
+            } else {
+                add_velib_markers(data);
+            }
+        }
+    </script>
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['line']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', 'Day');
+            data.addColumn('number', 'Dave Grohl');
+            data.addColumn('number', 'Eric Clapman');
+            data.addColumn('number', 'Bob Dylan');
+
+            data.addRows([
+                [1,  37.8, 80.8, 41.8],
+                [2,  30.9, 69.5, 32.4],
+                [3,  25.4,   57, 25.7],
+                [4,  11.7, 18.8, 10.5],
+                [5,  11.9, 17.6, 10.4],
+                [6,   8.8, 13.6,  7.7],
+                [7,   7.6, 12.3,  9.6],
+                [8,  12.3, 29.2, 10.6],
+                [9,  16.9, 42.9, 14.8],
+                [10, 12.8, 30.9, 11.6],
+                [11,  5.3,  7.9,  4.7],
+                [12,  6.6,  8.4,  5.2],
+                [13,  4.8,  6.3,  3.6],
+                [14,  4.2,  6.2,  3.4]
+            ]);
+
+            var options = {
+                chart: {
+                    title: 'Crédits des 3 meilleurs joueurs',
+                    subtitle: 'en crédits'
+                },
+                width: 900,
+                height: 500
+            };
+
+            var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+            chart.draw(data, google.charts.Line.convertOptions(options));
+        }
+    </script>
+
+</head>
+<body onload='geocoder.geocode({address:city}, geocodeCallback);'>
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">Géomarcheur</span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation. We hide it in small screens. -->
+                <nav class="mdl-navigation mdl-layout--large-screen-only">
+                    <a class="mdl-navigation__link" href="">Classement</a>
+                    <a class="mdl-navigation__link" href="">Statistiques</a>
+                </nav>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Géomarcheur</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="">Classement</a>
+                <a class="mdl-navigation__link" href="">Statistiques</a>
+            </nav>
+        </div>
+        <main class="mdl-layout__content">
+            <div class="page-content">
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--1-col"></div>
+                    <div class="mdl-grid mdl-cell mdl-cell--10-col">
+                        <div class="mdl-cell mdl-cell--6-col">
+                            <div id="map" style="height: 400px;width:600px"></div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--6-col">
+                            <!-- Textfield with Floating Label -->
+
+                            <form action="#">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="text" id="place_search">
+                                    <label class="mdl-textfield__label" for="place_search">Chercher un lieu</label>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="mdl-cell mdl-cell--6-col">
+                            <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">Nom</th>
+                                    <th>Nombre de lieux</th>
+                                    <th>Crédits possédés</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">Dave Grohl</td>
+                                    <td>25</td>
+                                    <td>¢6985342</td>
+                                </tr>
+                                <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">Eric Clapman</td>
+                                    <td>50</td>
+                                    <td>¢840</td>
+                                </tr>
+                                <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">Bob Dylan</td>
+                                    <td>10</td>
+                                    <td>¢420</td>
+                                </tr>
+                                <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">Slash</td>
+                                    <td>123</td>
+                                    <td>¢359</td>
+                                </tr>
+                                <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">Christophe Mae</td>
+                                    <td>10</td>
+                                    <td>¢200</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mdl-cell mdl-cell--6-col">
+                    <div id="linechart_material" style="width: 900px; height: 500px"></div>
+                </div>
+                    </div>
+                    <div class="mdl-cell mdl-cell--1-col"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
