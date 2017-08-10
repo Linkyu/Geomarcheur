@@ -53,6 +53,21 @@ class Geomarcheur extends CI_Controller {
         echo json_encode($data);
     }
 
+    public function getUserPlaces()
+    {
+        $this->load->model('geomarcheur_db');
+        $place_id=$this->uri->segment(3);
+
+        if ($place_id != null){
+            $data['resultat']=$this->geomarcheur_db->listUserPlaces($place_id);
+        } else {
+            // TODO: figure out how to send an error back
+        }
+
+        header("Content-Type: application/json");
+        echo json_encode($data);
+    }
+
 
     public function create()
     {

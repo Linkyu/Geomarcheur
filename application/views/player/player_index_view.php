@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+$temp_user_id = 1;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,7 +53,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     Classement
                 </div>
                 <div class="col s4 center-align">
-                    <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list">
+                    <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal" id="place_list_button">
                         <i class="material-icons">place</i> 3
                     </a>
                 </div>
@@ -69,13 +70,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </footer>
 
     <!-- Modals -->
-    <div id="place_list" class="modal">
+    <div id="place_list_modal" class="modal modal-fixed-footer">
         <div class="modal-content">
-            <h4>Liste de vos lieux</h4>
-            <p>A bunch of text</p>
+            <div class="col s12 m7" id="place_list_table">
+                <h4>Liste de vos lieux</h4>
+            </div>
         </div>
         <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Fermer</a>
+            <a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Fermer</a>
         </div>
     </div>
 
@@ -87,9 +89,35 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <script type="text/javascript">
         $(document).ready(function() {
             $(".modal").modal({
+                dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                opacity: .5, // Opacity of modal background
+                inDuration: 300, // Transition in duration
+                outDuration: 200, // Transition out duration
+                startingTop: '4%', // Starting top style attribute
+                endingTop: '10%', // Ending top style attribute
                 ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                    alert("Ready");
-                    console.log(modal, trigger);
+                    $.getJSON( "getUserPlaces/<?php echo $temp_user_id ?>", "", function( result ) {
+                        const place_list_table = $("#place_list_table");
+                        $.each(result, function(i, places) {
+                            $.each(places, function(j, place){
+                                place_list_table.append(`
+                                    <div class="card horizontal">
+                                        <div class="card-image">
+                                            <img src="` + ((place["picture"] === null) ? '' : place["picture"]) + `">
+                                        </div>
+                                        <div class="card-stacked">
+                                            <div class="card-content">
+                                                <span class="card-title">` + place["name"] + `</span>
+                                                <p><b>` + ((place["address"] === null) ? '' : place["address"]) + `</b></p>
+                                            <p>¢` + place["value"] + `</p>
+                                        </div>
+                                        <div class="card-action right-align">
+                                            <a href="#" class="pink-text text-darken-3">Vendre</a>
+                                        </div>
+                                    </div>`);
+                            });
+                        });
+                    });
                 }
             });
         });

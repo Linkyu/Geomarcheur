@@ -22,6 +22,13 @@ class Geomarcheur_db extends CI_Model {
 
     }
 
+    public function listUserPlaces($id) {
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM place WHERE id_User='.$id);
+        return $query->result_array();
+
+    }
+
     public function listPlace($id) {
         $this->load->database();
         $query = $this->db->query('SELECT * FROM place WHERE id='.$id);
