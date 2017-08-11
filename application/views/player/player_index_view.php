@@ -14,8 +14,9 @@ $temp_user_id = 2;
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"  media="screen,projection"/>
+    <!--Import custom css files-->
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"  media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/buttons.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/style.css"  media="screen,projection"/>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -72,8 +73,10 @@ $temp_user_id = 2;
 
     <!-- Modals -->
     <div id="place_list_modal" class="modal modal-fixed-footer">
-        <div class="modal-content">
+        <div class="modal-header">
             <h4>Liste de vos lieux</h4>
+        </div>
+        <div class="modal-content">
             <div class="col s12 m7" id="place_list_table"></div>
         </div>
         <div class="modal-footer">
@@ -103,7 +106,6 @@ $temp_user_id = 2;
                             // TODO: Empty message when no result
                             // TODO: Retrieve picture from streetview (https://developers.google.com/maps/documentation/streetview/intro)
                             // TODO: Find a way to keep the image at a consistent size
-                            // TODO: Make the header fixed
                             // TODO: Search function
                             // TODO: Sort function
                             $.each(places, function(j, place){

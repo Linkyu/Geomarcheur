@@ -1,0 +1,15 @@
+.btn-floating.halfway-fab-right {
+
+    position: absolute;
+    right: -20px;
+    bottom: 20px;
+
+}
+
+.modal.modal-fixed-footer .modal-content {
+    position: absolute;
+    height: calc(100% - 104px);
+    max-height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
