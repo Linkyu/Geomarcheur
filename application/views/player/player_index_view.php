@@ -103,11 +103,13 @@ $temp_user_id = 2;
                 ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
                     $.getJSON( "getUserPlaces/<?php echo $temp_user_id ?>", "", function( result ) {
                         $.each(result, function(i, places) {
-                            // TODO: Empty message when no result
                             // TODO: Retrieve picture from streetview (https://developers.google.com/maps/documentation/streetview/intro)
                             // TODO: Find a way to keep the image at a consistent size
                             // TODO: Search function
                             // TODO: Sort function
+                            if (places.length === 0) {
+                                place_list_table.append('<p>Vous ne possédez aucun lieu actuellement! Pour capturer un lieu, approchez-vous de celui-ci, appuyez dessus sur la carte puis appuyez sur Acheter.</p>')
+                            }
                             $.each(places, function(j, place){
                                 place_list_table.append(`
                                     <div class="card horizontal">
@@ -118,7 +120,7 @@ $temp_user_id = 2;
                                         <div class="card-stacked">
                                             <div class="card-content">
                                                 <span class="card-title">` + place["name"] + `</span>
-                                                <p><b>` + ((place["address"] === null) ? '' : place["address"]) + `</b></p>
+                                                <p><b>` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</b></p>
                                                 <p>¢` + place["value"] + `</p>
                                             </div>
                                             <div class="card-action right-align">
