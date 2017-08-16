@@ -8,8 +8,22 @@
 
 .modal.modal-fixed-footer .modal-content {
     position: absolute;
-    height: calc(100% - 104px);
+    height: calc(100% - 112px);
     max-height: 100%;
     width: 100%;
     overflow-y: auto;
+}
+
+.modal.modal-fixed-footer .modal-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 4px 6px;
+    height: 64px;
+}
+
+.place_location {
+    font-weight: bold;
+}
+
+#searchbar-switch1 {
+    margin-top: 10px;
 }
