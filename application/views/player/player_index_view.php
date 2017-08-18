@@ -96,7 +96,7 @@ $temp_user_id = 2;
                     </ul>
                 </div>
             </div>
-            <div class="row valign-wrapper hide animated fadeOut" id="searchbar-switch2">
+            <div class="row valign-wrapper hide animated flipOutX" id="searchbar-switch2">
                 <div class="col s1">
                     <a href="#" class="waves-effect circle pink-text text-darken-3 searchbar-switch" id="search-place-back">
                         <i class="material-icons" style="font-size: large">arrow_back</i>
@@ -179,7 +179,24 @@ $temp_user_id = 2;
                         });
                     });
                 },
-                complete: function() { place_list_table.text(''); } // Empty the div
+                complete: function() {
+                    place_list_table.text('');  // Empty the list
+                    $('#search-input').val(''); // Empty the search
+
+                    // Reset the header
+                    let switch1 = $('#searchbar-switch1');
+                    let switch2 = $('#searchbar-switch2');
+                    const animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+
+                    switch2.addClass('animated flipOutX').one(animationEnd, function () {
+                        $(this).removeClass('animated;');
+                        $(this).addClass('hide');
+                        switch1.removeClass('flipOutX hide');
+                        switch1.addClass('flipInX').one(animationEnd, function () {
+                            $(this).removeClass('animated');
+                        });
+                    });
+                }
             });
 
             $.fn.extend({
@@ -197,11 +214,11 @@ $temp_user_id = 2;
                 let switch2 = $('#searchbar-switch2');
                 const animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
 
-                switch1.addClass('animated fadeOut').one(animationEnd, function () {
+                switch1.addClass('animated flipOutX').one(animationEnd, function () {
                     $(this).removeClass('animated;');
                     $(this).addClass('hide');
-                    switch2.removeClass('fadeOut hide');
-                    switch2.addClass('fadeIn').one(animationEnd, function () {
+                    switch2.removeClass('flipOutX hide');
+                    switch2.addClass('flipInX').one(animationEnd, function () {
                         $(this).removeClass('animated');
                     });
                 });
@@ -212,13 +229,20 @@ $temp_user_id = 2;
                 let switch2 = $('#searchbar-switch2');
                 const animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
 
-                switch2.addClass('animated fadeOut').one(animationEnd, function () {
+                switch2.addClass('animated flipOutX').one(animationEnd, function () {
                     $(this).removeClass('animated;');
                     $(this).addClass('hide');
-                    switch1.removeClass('fadeOut hide');
-                    switch1.addClass('fadeIn').one(animationEnd, function () {
+                    switch1.removeClass('flipOutX hide');
+                    switch1.addClass('flipInX').one(animationEnd, function () {
                         $(this).removeClass('animated');
                     });
+                });
+
+                $('#search-input').val(''); // Empty the search
+
+                // Show all the cards again
+                $(".card").each(function(){
+                    $(this).fadeIn();
                 });
             });
 
@@ -227,16 +251,16 @@ $temp_user_id = 2;
                 // Retrieve the input field text and reset the count to zero
                 let filter = $(this).val();
 
-                // Loop through the comment list
+                // Loop through the list
                 $(".card").each(function(){
 
                     // If the list item does not contain the text phrase fade it out
                     if ($(this).find(".place_name, .place_location").text().search(new RegExp(filter, "i")) < 0) {
                         $(this).fadeOut();
 
-                        // Show the list item if the phrase matches and increase the count by 1
+                        // Show the list item if the phrase matches
                     } else {
-                        $(this).show();
+                        $(this).fadeIn();
                     }
                 });
             });
