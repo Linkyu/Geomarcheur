@@ -75,6 +75,7 @@ $temp_user_id = 2;
     <!-- Modals -->
     <div id="place_list_modal" class="modal modal-fixed-footer">
         <div class="modal-header">
+            <!-- Standard header -->
             <div class="row valign-wrapper" id="searchbar-switch1">
                 <div class="col s10">
                     <h4>Liste de vos lieux</h4>
@@ -89,13 +90,15 @@ $temp_user_id = 2;
                         <i class="material-icons" style="font-size: large">sort</i>
                     </a>
 
-                    <!-- Dropdown Structure -->
+                    <!-- Dropdown Structure for sorting -->
                     <ul id="sort_dropdown" class="dropdown-content">
                         <li><a href="#!" class="grey-text text-darken-4" id="sort_by_name"><i class="material-icons pink-text text-darken-3">sort_by_alpha</i>Trier par nom</a></li>
-                        <li><a href="#!" class="grey-text text-darken-4" id="sort_by_value"><i class="material-icons pink-text text-darken-3">show_chart</i>Trier par valeur</a></li>
+                        <li><a href="#!" class="grey-text text-darken-4" id="sort_by_value"><i class="material-icons pink-text text-darken-3">format_list_numbered</i>Trier par valeur</a></li>
                     </ul>
                 </div>
             </div>
+
+            <!-- Search header -->
             <div class="row valign-wrapper hide animated flipOutX" id="searchbar-switch2">
                 <div class="col s1">
                     <a href="#" class="waves-effect circle pink-text text-darken-3 searchbar-switch" id="search-place-back">
@@ -111,17 +114,19 @@ $temp_user_id = 2;
                         </div>
                     </form>
                 </div>
+                <!-- No sorting on search page for now -->
+                <!--
                 <div class="col s1">
                     <a href="#" class="dropdown-button waves-effect circle pink-text text-darken-3" data-activates="sort_dropdown">
                         <i class="material-icons" style="font-size: large">sort</i>
                     </a>
 
-                    <!-- Dropdown Structure -->
+                    <!-- Dropdown Structure for sorting ->
                     <ul id="sort_dropdown" class="dropdown-content">
-                        <li><a href="#!" class="grey-text text-darken-4" id="sort_by_name"><i class="material-icons pink-text text-darken-3">sort_by_alpha</i>Trier par nom</a></li>
-                        <li><a href="#!" class="grey-text text-darken-4" id="sort_by_value"><i class="material-icons pink-text text-darken-3">show_chart</i>Trier par valeur</a></li>
+                        <li><a href="#!" class="grey-text text-darken-4 sort_by_name"><i class="material-icons pink-text text-darken-3">sort_by_alpha</i>Trier par nom</a></li>
+                        <li><a href="#!" class="grey-text text-darken-4 sort_by_value"><i class="material-icons pink-text text-darken-3">format_list_numbered</i>Trier par valeur</a></li>
                     </ul>
-                </div>
+                </div>-->
             </div>
         </div>
         <div class="modal-content">
@@ -134,12 +139,14 @@ $temp_user_id = 2;
 
     <!--Import jQuery before materialize.js-->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <!-- Compiled and minified JavaScript -->
+    <!-- Compiled and minified Materialize JavaScript -->
     <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
             const place_list_table = $("#place_list_table");
+            const divs = place_list_table.find("div.card");
+            let alpha_order = false;
 
             $(".modal").modal({
                 dismissible: true, // Modal can be dismissed by clicking outside of the modal
@@ -151,9 +158,9 @@ $temp_user_id = 2;
                 ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
                     $.getJSON( "getPlace", "", function( result ) {
                         $.each(result, function(i, places) {
-                            // TODO: Retrieve picture from streetview (https://developers.google.com/maps/documentation/streetview/intro)
                             // TODO: Find a way to keep the image at a consistent size
                             // TODO: Sort function
+                            // TODO: Clean the animation
                             if (places.length === 0) {
                                 place_list_table.append('<p>Vous ne possédez aucun lieu actuellement! Pour capturer un lieu, approchez-vous de celui-ci, appuyez dessus sur la carte puis appuyez sur Acheter.</p>')
                             }
@@ -161,7 +168,7 @@ $temp_user_id = 2;
                                 place_list_table.append(`
                                     <div class="card horizontal">
                                         <div class="card-image">
-                                            <img src="` + ((place["picture"] === null) ? '<?php echo base_url(); ?>static/img/house.png' : place["picture"]) + `">
+                                            <img src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=150x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo STREETVIEW_KEY ?>' : place["picture"]) + `">
                                             <a class="btn-floating halfway-fab-right waves-effect waves-light pink darken-3"><i class="material-icons">visibility</i></a>
                                         </div>
                                         <div class="card-stacked">
@@ -196,16 +203,6 @@ $temp_user_id = 2;
                             $(this).removeClass('animated');
                         });
                     });
-                }
-            });
-
-            $.fn.extend({
-                animateCss: function (animationName) {
-                    const animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-                    this.addClass('animated ' + animationName).one(animationEnd, function() {
-                        $(this).removeClass('animated ' + animationName);
-                    });
-                    return this;
                 }
             });
 
@@ -265,11 +262,16 @@ $temp_user_id = 2;
                 });
             });
 
+            // These don't work well, they have to be replaced.
             $('#sort_by_name').on('click', function () {
-                let alphabeticallyOrderedDivs = $("div.card").sort(function (a, b) {
-                    return $(a).find(".place_name").text() > $(b).find(".place_name").text();
+                alpha_order = !alpha_order;
+                let alphabeticallyOrderedDivs = divs.sort(function (a, b) {
+                    let name1 = $(a).find(".place_name").text().toLowerCase();
+                    let name2 = $(b).find(".place_name").text().toLowerCase();
+                    return (alpha_order ? name1 > name2 : name1 < name2);
                 });
-                $("#container").html(alphabeticallyOrderedDivs);
+                console.log(alphabeticallyOrderedDivs);
+                $("#place_list_table").html(alphabeticallyOrderedDivs);
             });
 
             $('#sort_by_value').on('click', function () {
