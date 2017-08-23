@@ -28,6 +28,11 @@ class Geomarcheur extends CI_Controller {
         $this->load->view('player/player_index_view');
     }
 
+    public function dashboard()
+    {
+        $this->load->view('admin/admin_dashboard');
+    }
+
     public function getUser()
     {
         $this->load->model('geomarcheur_db');

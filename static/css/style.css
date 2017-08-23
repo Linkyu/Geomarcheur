@@ -20,10 +20,22 @@
     height: 64px;
 }
 
-.place_location {
+.card-content .place_location {
+    font-weight: bold;
+}
+
+.collection-item .place_name {
     font-weight: bold;
 }
 
 #searchbar-switch1 {
     margin-top: 10px;
+}
+
+.credit_symbol {
+    font-size: 2em;
+}
+
+.fullwidth {
+    width: 100%;
 }

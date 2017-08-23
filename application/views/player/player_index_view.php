@@ -168,7 +168,7 @@ $temp_user_id = 2;
                                 place_list_table.append(`
                                     <div class="card horizontal">
                                         <div class="card-image">
-                                            <img src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=150x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo STREETVIEW_KEY ?>' : place["picture"]) + `">
+                                            <img src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=150x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `">
                                             <a class="btn-floating halfway-fab-right waves-effect waves-light pink darken-3"><i class="material-icons">visibility</i></a>
                                         </div>
                                         <div class="card-stacked">
