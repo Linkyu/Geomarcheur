@@ -80,8 +80,8 @@
                     <form class="fullwidth">
                         <div class="input-field">
                             <i class="material-icons prefix">search</i>
-                            <input id="icon_prefix" type="text">
-                            <label for="icon_prefix">Rechercher</label>
+                            <input id="search-input" type="text">
+                            <label for="search-input">Rechercher</label>
                         </div>
                     </form>
                     <div id="place_list_container" class="fullwidth">
@@ -89,6 +89,7 @@
                             <!-- Generated content; see script below -->
                         </div>
                     </div>
+                    <div id="place_list_message"></div>
                 </div>
             </div></div>
         <div class="col s6"><div class="card-panel hoverable">
@@ -306,11 +307,11 @@
             $.each(result, function (i, places) {
                 // TODO: Make a better overfllow rule
                 if (places.length === 0) {
-                    $("#place_list_container").append("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
+                    $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
                 } else {
                     $.each(places, function (j, place) {
                         place_list.append(`
-                        <a href="#" class="collection-item avatar grey-text text-darken-4">
+                        <a href="#" class="collection-item avatar grey-text text-darken-4 place_item">
                           <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=150x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
                           <p class="place_name title">` + place["name"] + `</p>
                           <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
@@ -321,7 +322,34 @@
             });
         });
 
-        // TODO: Search function
+        // Search function
+        $("#search-input").keyup(function(){
+
+            // Retrieve the input field text and reset the count to zero
+            let filter = $(this).val();
+            let count = 0;
+            const message_box = $("#place_list_message");
+
+            // Loop through the list
+            $(".place_item").each(function(){
+
+                // If the list item does not contain the text phrase fade it out
+                if ($(this).find(".place_name, .place_location").text().search(new RegExp(filter, "i")) < 0) {
+                    $(this).fadeOut();
+
+                    // Show the list item if the phrase matches
+                } else {
+                    $(this).fadeIn();
+                    count++;
+                }
+            });
+            if (count === 0) {
+                message_box.html("<p>Aucun résultat.</p>");
+                message_box.fadeIn();
+            } else {
+                message_box.html("");
+            }
+        });
     });
 </script>
 <!-- Map placeholder -->
