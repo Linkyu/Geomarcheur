@@ -1,0 +1,41 @@
+.btn-floating.halfway-fab-right {
+
+    position: absolute;
+    right: -20px;
+    bottom: 20px;
+
+}
+
+.modal.modal-fixed-footer .modal-content {
+    position: absolute;
+    height: calc(100% - 112px);
+    max-height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.modal.modal-fixed-footer .modal-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 4px 6px;
+    height: 64px;
+}
+
+.card-content .place_location {
+    font-weight: bold;
+}
+
+.collection-item .place_name {
+    font-weight: bold;
+}
+
+#searchbar-switch1 {
+    margin-top: 10px;
+}
+
+.credit_symbol {
+    font-size: 2em;
+}
+
+.fullwidth {
+    width: 100%;
+}
