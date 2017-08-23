@@ -302,7 +302,7 @@
         const place_list = $("#place_list");
 
         // Place data retrieval
-        $.getJSON("getPlace", "", function (result) {
+        $.getJSON("getPlace/asc", "", function (result) {
             $.each(result, function (i, places) {
                 // TODO: Make a better overfllow rule
                 if (places.length === 0) {

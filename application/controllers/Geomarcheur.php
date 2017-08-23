@@ -53,7 +53,9 @@ class Geomarcheur extends CI_Controller {
         $this->load->model('geomarcheur_db');
         $place_id=$this->uri->segment(3);
 
-        if ($place_id != null){
+        if ($place_id == 'asc') {
+            $data['resultat']=$this->geomarcheur_db->listAllPlacesAsc();
+        } else if($place_id != null){
             $data['resultat']=$this->geomarcheur_db->listPlace($place_id);
         } else {
             $data['resultat']=$this->geomarcheur_db->listAllPlaces();

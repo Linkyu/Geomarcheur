@@ -22,6 +22,14 @@ class Geomarcheur_db extends CI_Model {
 
     }
 
+    // TODO: This could benefit from some polymorphism
+    public function listAllPlacesAsc() {
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM place ORDER BY name');
+        return $query->result_array();
+
+    }
+
     public function listUserPlaces($id) {
         $this->load->database();
         $query = $this->db->query('SELECT * FROM place WHERE id_User='.$id.' ORDER BY name');
