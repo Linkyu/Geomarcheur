@@ -28,6 +28,10 @@
     font-weight: bold;
 }
 
+.place_id {
+    display: none;
+}
+
 #searchbar-switch1 {
     margin-top: 10px;
 }
@@ -38,4 +42,12 @@
 
 .fullwidth {
     width: 100%;
+}
+
+.brand-logo {
+    text-shadow: 0 0 5px #FFF;
+}
+
+.bold {
+    font-weight: bold;
 }

@@ -44,18 +44,40 @@
         .map {
             height: 100%;
         }
+
+        .modal_place_picture_block{
+            max-width: 250px;
+            height: 100%;
+            max-height: 500px;
+            overflow: hidden;
+            display:inline-block;
+            background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(250, 250, 250, .75) 100%); /* W3C version */
+            border-right: rgba(0, 0, 0, 0.3) solid 1px;
+        }
+
+        .modal_place_picture {
+            width: auto;
+            height: auto;
+            position:relative;
+            z-index:-1;
+            display:block;
+        }
+
+        .modal_place_stats_block {
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body onload='geocoder.geocode({address:city}, geocodeCallback);'>
 <header>
     <nav class="nav-extended pink darken-3">
         <div class="nav-wrapper">
-            <a href="#" class="brand-logo">Logo</a>
+            <a href="#" class="brand-logo">Géomarcheur</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="#">Lien 1</a></li>
-                <li><a href="#">Lien 2</a></li>
-                <li><a href="#">Lien 3</a></li>
+                <li><a href="#">Tableau de bord</a></li>
+                <li><a href="#">Classement</a></li>
+                <li><a href="#">Statistiques</a></li>
             </ul>
         </div>
         <div class="nav-content">
@@ -80,8 +102,8 @@
                     <form class="fullwidth">
                         <div class="input-field">
                             <i class="material-icons prefix">search</i>
-                            <input id="search-input" type="text">
-                            <label for="search-input">Rechercher</label>
+                            <input id="modal_place_name_input" type="text">
+                            <label for="modal_place_name_input">Rechercher</label>
                         </div>
                     </form>
                     <div id="place_list_container" class="fullwidth">
@@ -141,6 +163,81 @@
                 <div id="linechart_material"></div>
             </div></div>
     </div>
+
+
+    <!-- Modal Placeholder Trigger -->
+    <a class="waves-effect waves-light btn modal-trigger" href="#place_modal">Modal</a>
+
+    <!-- Place detail Modal Structure -->
+    <div id="place_modal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <div class="row">
+                <!-- Place picture -->
+                <div class="col s3 modal_place_picture_block">
+                    <img class="modal_place_picture" src="http://i.imgur.com/kzmgUyK.jpg">
+                </div>
+
+                <!-- Place form -->
+                <form class="col s6">
+                    <div class="input-field">
+                        <i class="material-icons prefix">local_offer</i>
+                        <input id="modal_place_name_input" type="text">
+                        <label for="modal_place_name_input">Nom</label>
+                    </div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">place</i>
+                        <input id="modal_place_address_input" type="text">
+                        <label for="modal_place_address_input">Adresse</label>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <i class="material-icons prefix">gps_fixed</i>
+                            <input id="modal_place_latitude_input" type="text">
+                            <label for="modal_place_latitude_input">Latitude</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="modal_place_longitude_input" type="text">
+                            <label for="modal_place_longitude_input">Longitude</label>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input disabled id="modal_place_owner_input" type="text">
+                        <label for="modal_place_owner_input">Propriétaire</label>
+                    </div>
+                    <div class="input-field">
+                        <span class="credit_symbol prefix">¢</span>
+                        <input id="modal_place_value_input" type="text">
+                        <label for="modal_place_value_input">Valeur</label>
+                    </div>
+                </form>
+
+                <!-- Place delete button + stats preview -->
+                <div class="col s3">
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+
+                    <!-- Stats preview -->
+                    <div class="card small modal_place_stats_block">
+                        <div class="card-image">
+                            <img src="http://i.imgur.com/0uABqwN.png">
+                            <span class="card-title">_ 3,045 ¢</span> <!-- Current amount of credits gained from this place -->
+                        </div>
+                        <div class="card-content">
+                            <p class="bold">Crédits obtenus ici</p>
+                        </div>
+                        <div class="card-action">
+                            <a href="#" class="pink-text text-darken-3">Détails</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Retour</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
+        </div>
+    </div>
+
 </div>
 
 <div id="leaderboard" class="container">
@@ -312,7 +409,8 @@
                     $.each(places, function (j, place) {
                         place_list.append(`
                         <a href="#" class="collection-item avatar grey-text text-darken-4 place_item">
-                          <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=150x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
+                          <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
+                          <span class="place_id">` + place["id"] + `</span>
                           <p class="place_name title">` + place["name"] + `</p>
                           <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
                           <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
@@ -321,6 +419,10 @@
                 }
             });
         });
+
+        // Place details display
+        $('.modal').modal();
+        $('#place_modal').modal('open');
 
         // Search function
         $("#search-input").keyup(function(){
