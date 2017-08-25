@@ -391,7 +391,10 @@
     }
 </script>
 
-<!-- Custom scripts -->
+<!-- Custom tools -->
+<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+
+<!-- Custom local scripts -->
 <script>
     $(document).ready(function() {
         const place_list = $("#place_list");
@@ -455,74 +458,45 @@
         get_place(id, function (result) {
             const place = result;
             if (place === 1) {
-                // TODO: display error message if place is null
-                return 1
+                alert("Ce lieu n'existe pas!");
+            } else {
+
+                get_user(place  ["id_User"], function (result) {
+                    const owner = result;
+
+                    place_modal.modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%', // Ending top style attribute
+                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#modal_place_name_input").val(place["name"]);
+                            if (place["address"] !== null) {
+                                $("#modal_place_address_input").val(place["address"]);
+                            }
+                            if (place["id_User"] !== null) {
+                                $("#modal_place_owner_input").val(owner["pseudo"]);
+                            }
+                            $("#modal_place_value_input").val(place["value"]);
+
+                            Materialize.updateTextFields();
+                        },
+                        complete: function (modal, trigger) {
+                            $("#modal_place_name_input").val("");
+                            $("#modal_place_address_input").val("");
+                            $("#modal_place_owner_input").val("");
+                            $("#modal_place_value_input").val("");
+
+                            Materialize.updateTextFields();
+                        }
+                    });
+
+                    place_modal.modal('open');
+                });
             }
 
-            get_user(place["id_User"], function (result) {
-                const owner = result;
-
-                place_modal.modal({
-                    dismissible: true, // Modal can be dismissed by clicking outside of the modal
-                    opacity: .5, // Opacity of modal background
-                    inDuration: 300, // Transition in duration
-                    outDuration: 200, // Transition out duration
-                    startingTop: '4%', // Starting top style attribute
-                    endingTop: '10%', // Ending top style attribute
-                    ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                        $("#modal_place_name_input").val(place["name"]);
-                        if (place["address"] !== null) {
-                            $("#modal_place_address_input").val(place["address"]);
-                        }
-                        if (place["id_User"] !== null) {
-                            $("#modal_place_owner_input").val(owner["pseudo"]);
-                        }
-                        $("#modal_place_value_input").val(place["value"]);
-
-                        Materialize.updateTextFields();
-                    },
-                    complete: function (modal, trigger) {
-                        $("#modal_place_name_input").val("");
-                        $("#modal_place_address_input").val("");
-                        $("#modal_place_owner_input").val("");
-                        $("#modal_place_value_input").val("");
-
-                        Materialize.updateTextFields();
-                    }
-                });
-
-                place_modal.modal('open');
-            });
-
-        });
-    }
-
-    // TODO: move this to utils.js
-    function get_user(id, callback) {
-        $.getJSON( "getUser/" + id, "", function( result ) {
-            $.each(result, function(i, users) {
-                // If somehow the place doesn't exist
-                if (users.length === 0) {
-                    console.error('The user at id:' + id + ' does not exist.');
-                    callback(null);   // TODO: Create dedicated exceptions
-                }
-
-                callback(users[0]);
-            });
-        });
-    }
-
-    function get_place(id, callback) {
-        $.getJSON( "getPlace/" + id, "", function( result ) {
-            $.each(result, function(i, places) {
-                // If somehow the place doesn't exist
-                if (places.length === 0) {
-                    console.error('The place at id:' + id + ' does not exist.');
-                    callback(null);   // TODO: Create dedicated exceptions
-                }
-
-                callback(places[0]);
-            });
         });
     }
 </script>
