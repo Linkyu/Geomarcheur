@@ -44,18 +44,40 @@
         .map {
             height: 100%;
         }
+
+        .modal_place_picture_block{
+            max-width: 250px;
+            height: 100%;
+            max-height: 500px;
+            overflow: hidden;
+            display:inline-block;
+            background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(250, 250, 250, .75) 100%); /* W3C version */
+            border-right: rgba(0, 0, 0, 0.3) solid 1px;
+        }
+
+        .modal_place_picture {
+            width: auto;
+            height: auto;
+            position:relative;
+            z-index:-1;
+            display:block;
+        }
+
+        .modal_place_stats_block {
+            margin-top: 50px;
+        }
     </style>
 </head>
-<body onload='geocoder.geocode({address:city}, geocodeCallback);'>
+<body>
 <header>
     <nav class="nav-extended pink darken-3">
         <div class="nav-wrapper">
-            <a href="#" class="brand-logo">Logo</a>
+            <a href="#" class="brand-logo">Géomarcheur</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="#">Lien 1</a></li>
-                <li><a href="#">Lien 2</a></li>
-                <li><a href="#">Lien 3</a></li>
+                <li><a href="#">Tableau de bord</a></li>
+                <li><a href="#">Classement</a></li>
+                <li><a href="#">Statistiques</a></li>
             </ul>
         </div>
         <div class="nav-content">
@@ -69,8 +91,8 @@
 </header>
 
 <div id="dashboard" class="container">
-    <!-- Page Content goes here -->
 
+    <!-- The 4 dashboard cards -->
     <div class="row">
         <div class="col s6"><div class="card-panel hoverable map_block">
                 <div class="valign-wrapper center-align map"><h1>M A P</h1></div>
@@ -80,8 +102,8 @@
                     <form class="fullwidth">
                         <div class="input-field">
                             <i class="material-icons prefix">search</i>
-                            <input id="search-input" type="text">
-                            <label for="search-input">Rechercher</label>
+                            <input id="place_input_search" type="text">
+                            <label for="place_input_search">Rechercher</label>
                         </div>
                     </form>
                     <div id="place_list_container" class="fullwidth">
@@ -113,7 +135,7 @@
                         <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
                         <td>Eric Clapman</td>
                         <td>50</td>
-                        <td>¢840</td>
+                        <td>¢985342</td>
                     </tr>
                     <tr>
                         <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
@@ -141,6 +163,79 @@
                 <div id="linechart_material"></div>
             </div></div>
     </div>
+
+    <!-- Place detail Modal Structure -->
+    <div id="place_modal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <div class="row">
+                <!-- Place picture -->
+                <div class="col s3 modal_place_picture_block">
+                    <img class="modal_place_picture" src="http://i.imgur.com/kzmgUyK.jpg">
+                </div>
+
+                <!-- Place form -->
+                <form class="col s6">
+                    <div class="input-field">
+                        <i class="material-icons prefix">local_offer</i>
+                        <input id="modal_place_name_input" name="modal_place_name_input" type="text">
+                        <label for="modal_place_name_input">Nom</label>
+                    </div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">place</i>
+                        <input id="modal_place_address_input" name="modal_place_address_input" type="text">
+                        <label for="modal_place_address_input">Adresse</label>
+                    </div>
+                    <!--    No need to show these
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <i class="material-icons prefix">gps_fixed</i>
+                            <input id="modal_place_latitude_input" name="modal_place_latitude_input" type="text">
+                            <label for="modal_place_latitude_input">Latitude</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="modal_place_longitude_input" name="modal_place_longitude_input" type="text">
+                            <label for="modal_place_longitude_input">Longitude</label>
+                        </div>
+                    </div>
+                    -->
+                    <div class="input-field">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input disabled id="modal_place_owner_input" name="modal_place_owner_input" type="text">
+                        <label for="modal_place_owner_input">Propriétaire</label>
+                    </div>
+                    <div class="input-field">
+                        <span class="credit_symbol prefix">¢</span>
+                        <input id="modal_place_value_input" name="modal_place_value_input" type="text">
+                        <label for="modal_place_value_input">Valeur</label>
+                    </div>
+                </form>
+
+                <!-- Place delete button + stats preview -->
+                <div class="col s3">
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+
+                    <!-- Stats preview -->
+                    <div class="card small modal_place_stats_block">
+                        <div class="card-image">
+                            <img src="http://i.imgur.com/0uABqwN.png">
+                            <span class="card-title">_ 3,045 ¢</span> <!-- Current amount of credits gained from this place -->
+                        </div>
+                        <div class="card-content">
+                            <p class="bold">Crédits obtenus ici</p>
+                        </div>
+                        <div class="card-action">
+                            <a href="#" class="pink-text text-darken-3">Détails</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Retour</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
+        </div>
+    </div>
+
 </div>
 
 <div id="leaderboard" class="container">
@@ -243,7 +338,6 @@
         </div>
     </div>
 </footer>
-</body>
 
 <!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -272,14 +366,14 @@
             [4,  11.7, 18.8, 10.5],
             [5,  11.9, 17.6, 10.4],
             [6,   8.8, 13.6,  7.7],
-            [7,   7.6, 12.3,  9.6],
-            [8,  12.3, 29.2, 10.6],
-            [9,  16.9, 42.9, 14.8],
-            [10, 12.8, 30.9, 11.6],
-            [11,  5.3,  7.9,  4.7],
-            [12,  6.6,  8.4,  5.2],
-            [13,  4.8,  6.3,  3.6],
-            [14,  4.2,  6.2,  3.4]
+            [7,   42, 12.3,  9.6],
+            [8,  342, 29.2, 10.6],
+            [9,  5342, 42.9, 14.8],
+            [10, 85342, 30.9, 25],
+            [11, 985342,  342,  50],
+            [12, 1985342,  5342,  500],
+            [13, 3920342, 85342,  400],
+            [14, 6985342, 985342,  420]
         ]);
 
         const options = {
@@ -297,8 +391,11 @@
     }
 </script>
 
-<!-- Custom scripts -->
-<script type="application/javascript">
+<!-- Custom tools -->
+<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+
+<!-- Custom local scripts -->
+<script>
     $(document).ready(function() {
         const place_list = $("#place_list");
 
@@ -311,8 +408,9 @@
                 } else {
                     $.each(places, function (j, place) {
                         place_list.append(`
-                        <a href="#" class="collection-item avatar grey-text text-darken-4 place_item">
-                          <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=150x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
+                        <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
+                          <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
+                          <span class="place_id">` + place["id"] + `</span>
                           <p class="place_name title">` + place["name"] + `</p>
                           <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
                           <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
@@ -323,7 +421,7 @@
         });
 
         // Search function
-        $("#search-input").keyup(function(){
+        $("#place_input_search").keyup(function(){
 
             // Retrieve the input field text and reset the count to zero
             let filter = $(this).val();
@@ -351,6 +449,56 @@
             }
         });
     });
+
+    // Place details display
+    function display_place(id) {
+        // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
+        const place_modal = $("#place_modal");
+
+        get_place(id, function (result) {
+            const place = result;
+            if (place === 1) {
+                alert("Ce lieu n'existe pas!");
+            } else {
+
+                get_user(place  ["id_User"], function (result) {
+                    const owner = result;
+
+                    place_modal.modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%', // Ending top style attribute
+                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#modal_place_name_input").val(place["name"]);
+                            if (place["address"] !== null) {
+                                $("#modal_place_address_input").val(place["address"]);
+                            }
+                            if (place["id_User"] !== null) {
+                                $("#modal_place_owner_input").val(owner["pseudo"]);
+                            }
+                            $("#modal_place_value_input").val(place["value"]);
+
+                            Materialize.updateTextFields();
+                        },
+                        complete: function (modal, trigger) {
+                            $("#modal_place_name_input").val("");
+                            $("#modal_place_address_input").val("");
+                            $("#modal_place_owner_input").val("");
+                            $("#modal_place_value_input").val("");
+
+                            Materialize.updateTextFields();
+                        }
+                    });
+
+                    place_modal.modal('open');
+                });
+            }
+
+        });
+    }
 </script>
 <!-- Map placeholder -->
 <script>
@@ -463,4 +611,5 @@
         }
     }
 </script>
+</body>
 </html>
