@@ -159,6 +159,16 @@ $temp_user_id = 2;
 
 <!-- Custom local scripts -->
 <script type="text/javascript">
+
+
+    function sellPlace(id) {
+        $.ajax({
+            url: "sellPlace/" + id,
+            success: function () {
+                alert("vendu!")
+            }
+        })
+    }
     $(document).ready(function() {
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
@@ -212,7 +222,7 @@ $temp_user_id = 2;
                                             if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
                                                 action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
                                             } else if (playerId === place.id_User) {
-                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                                action = "<a href='#' id='sell-button' onclick='sellPlace(place.id)' class='btn waves-effect pink darken-3'>Vendre</a> ";
                                             }
 
                                             const contentString =
@@ -254,10 +264,7 @@ $temp_user_id = 2;
             )
         }
 
-
-
         actualisePoint();
-
 
 
         $(".modal").modal({
