@@ -162,12 +162,16 @@ $temp_user_id = 2;
 
 
     function sellPlace(id) {
-        $.ajax({
-            url: "sellPlace/" + id,
-            success: function () {
-                alert("vendu!")
-            }
-        })
+        if (confirm("Êtes-vous sûr?")) {
+            $.ajax({
+                url: "sellPlace/" + id,
+                success: function () {
+                    alert("Vendu!");
+                    // TODO: Display these with modals?
+                    // TODO: Update infowindow bubble
+                }
+            });
+        }
     }
     $(document).ready(function() {
         const place_list_table = $("#place_list_table");
@@ -222,7 +226,7 @@ $temp_user_id = 2;
                                             if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
                                                 action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
                                             } else if (playerId === place.id_User) {
-                                                action = "<a href='#' id='sell-button' onclick='sellPlace(place.id)' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
                                             }
 
                                             const contentString =
