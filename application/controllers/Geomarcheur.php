@@ -80,7 +80,27 @@ class Geomarcheur extends CI_Controller {
         echo json_encode($data);
     }
 
+    public function sellPlace() {
+        $this->load->model('geomarcheur_db');
+        $place_id=$this->uri->segment(3);
 
+        if($place_id != null){
+            $result=$this->geomarcheur_db->sellPlace($place_id);
+
+            // TODO: echo an actual output that can serve for DEBUG mode
+            /*foreach ($result as $item) {
+                foreach ($item as $row) {
+                    echo $row;
+                }
+            }*/
+        } else {
+            echo "ERROR - Was expecting place, received nothing instead.";
+        }
+    }
+
+
+
+    // references
     public function create()
     {
         if ($this->input->server('REQUEST_METHOD') == 'GET'){

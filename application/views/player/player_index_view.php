@@ -154,21 +154,42 @@ $temp_user_id = 2;
 <!-- Compiled and minified Materialize JavaScript -->
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 
+<!-- Custom tools -->
+<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+
+<!-- Custom local scripts -->
 <script type="text/javascript">
+
+
+    function sellPlace(id) {
+        if (confirm("Êtes-vous sûr?")) {
+            $.ajax({
+                url: "sellPlace/" + id,
+                success: function () {
+                    alert("Vendu!");
+                    // TODO: Display these with modals?
+                    // TODO: Update infowindow bubble
+                }
+            });
+        }
+    }
     $(document).ready(function() {
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
         let alpha_order = false;
 
-        var carte;
-        var marqueur = [];
-        var latlng = new google.maps.LatLng(43.600000, 1.433333);
-        var options = {
+        // WIP: Remove this once authentification is developped
+        const playerId = "<?php echo $temp_user_id ?>";
+
+        let map;
+        let marqueur = [];
+        const latlng = new google.maps.LatLng(43.600000, 1.433333);
+        const options = {
             center: latlng,
             zoom: 13,
             mapTypeId: google.maps.MapTypeId.roadmap
         };
-        carte = new google.maps.Map(document.getElementById("map"), options);
+        map = new google.maps.Map(document.getElementById("map"), options);
 
         let infowindow = new google.maps.InfoWindow();
 
@@ -176,7 +197,6 @@ $temp_user_id = 2;
         function actualisePoint() {
 
             $.getJSON( "getPlace", "", function( result ) {
-                    console.log(result);
                     $.each(result, function(i, places) {
                         $.each(places, function(j, place) {
 
@@ -185,36 +205,54 @@ $temp_user_id = 2;
                                         position: new google.maps.LatLng(place.lat, place.lng),
                                         title:'Nom du lieu : ' + place.name
                                     }
-                                )
-                                marqueur[j].setMap(carte);
-                                console.log(marqueur[j]);
+                                );
+                                marqueur[j].setMap(map);
 
 
                                 // Closure => création de la function au moment de la création du marqueur
-                                var macallback = function callbackSpecificiqueMarqueur(ev) {
-                                    //console.log("Callback appelée", ev, marqueur[j]);
-                                    //console.log("la position est : " +marqueur[j].getPosition());
-                                    var proprio = "<?php echo $temp_user_id; ?>"
+                                let macallback = function callbackSpecificiqueMarqueur(ev) {
+                                    let action = "";
+                                    get_user(place.id_User, function (owner) {
+                                        get_user(playerId, function (player) {
+                                            /*console.log("ownerId : " + ownerId);
+                                            console.log("place.id_User : " + place.id_User);
+                                            console.log("owner['credits'] : " + owner["credits"]);
+                                            console.log("place.value : " + place.value);
+                                            console.log("");
+                                            console.log("place.id_User === null : " + place.id_User === null);
+                                            console.log("owner['credits'] >= place.value : " + owner['credits'] >= place.value);
+                                            console.log("ownerId === place.id_User : " + ownerId === place.id_User);
+                                            console.log("###");*/
+                                            if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                            } else if (playerId === place.id_User) {
+                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                            }
 
-                                    if (proprio != place.id_User) {
-                                        var action = "<a href='#'>Acheter le lieu</a>"
-                                    } else {
-                                        var action = "<a href='#'>Vendre le lieu</a> "
-                                    }
+                                            const contentString =
+                                                '<div id="content">' +
+                                                    '<div class="row">' +
+                                                        '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
+                                                        '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
+                                                    '</div>' +
+                                                    '<div class="row">' +
+                                                        (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;">' + owner.pseudo + '</span></div>') +
+                                                    '</div>' +
+                                                    '<div class="row"> ' +
+                                                        '<div class="col s6">' +
+                                                            '<p style="font-weight: bold"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
+                                                            '<p>' + action + '</p>' +
+                                                        '</div>' +
+                                                        '<div class="col s6">' +
+                                                            '<img class="infowindow_place_picture" src="http://i.imgur.com/kzmgUyK.jpg" style="width: 100px;">' +
+                                                        '</div>' +
+                                                    '</div>' +
+                                                '</div>';
 
-                                    var contentString =
-                                        '<div id="content">' +
-                                        '<p> Nom du lieu : ' + place.name + '</p>' +
-                                        '<p> Valeur : ' + place.value + '</p>' +
-                                        '<a href="#">Plus de détails</a><br><br>'+
-                                   action+
-
-                                        '<p>ID proprio : '+place.id_User+'</p>'+
-                                    '</div>';
-
-                                    infowindow.setContent(contentString);
-                                    infowindow.open(map, marqueur[j]);
-
+                                            infowindow.setContent(contentString);
+                                            infowindow.open(map, marqueur[j]);
+                                        });
+                                    });
                                 };
 
                                 // creation de listener qui apelle la function ...
@@ -230,10 +268,7 @@ $temp_user_id = 2;
             )
         }
 
-
-
         actualisePoint();
-
 
 
         $(".modal").modal({
