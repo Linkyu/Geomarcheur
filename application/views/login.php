@@ -62,6 +62,13 @@ $temp_user_id = 2;
                         <label for="password">Password</label>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="switch col s12 white-text">
+                        <!-- TODO: Make this functional -->
+                        <input type="checkbox" id="showPassword" class="white-text" />
+                        <label for="showPassword">Afficher le mot de passe</label>
+                    </div>
+                </div>
             </form>
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="btn right indigo darken-4 waves-effect waves-light ">Connection</a></p>
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="white-text underline">S'inscrire</a></p>
