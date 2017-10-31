@@ -167,8 +167,8 @@ $temp_user_id = 2;
                 url: "sellPlace/" + id,
                 success: function () {
                     alert("Vendu!");
-                    // TODO: Display these with modals?
-                    // TODO: Update infowindow bubble
+                    // TODO: Display these with modals? See issue #57
+                    // TODO: Update infowindow bubble. See issue #58
                 }
             });
         }
@@ -284,7 +284,7 @@ $temp_user_id = 2;
                         console.log("lieu" + places);
                         // TODO: Find a way to keep the image at a consistent size => normaliser le fichier d'entrée pour le wrapper dans un div
                         // TODO: Sort function
-                        // TODO: Clean the animation
+                        // TODO: Clean the animation. See issue #59
                         if (places.length === 0) {
                             place_list_table.append('<p>Vous ne possédez aucun lieu actuellement! Pour capturer un lieu, approchez-vous de celui-ci, appuyez dessus sur la carte puis appuyez sur Acheter.</p>')
                         }
@@ -411,7 +411,7 @@ $temp_user_id = 2;
 
 <div id="carte" style="height: 800px;width:800px"></div>
 <div id="resultat" style="height: 500px;width:500px"></div>
-<!-- Todo : verifier la taille de la page  -->
+<!-- Todo : verifier la taille de la page. See issue #60  -->
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
 

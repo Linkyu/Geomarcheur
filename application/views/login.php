@@ -8,7 +8,7 @@ $temp_user_id = 2;
     <meta charset="utf-8">
     <title>Géomarcheur</title>
 
-    <!-- TODO: Include all these from a separate file to prevent missing links -->
+    <!-- TODO: Include all these from a separate file to prevent missing links. See issue #54 -->
 
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
@@ -53,7 +53,7 @@ $temp_user_id = 2;
 <main class="valign-wrapper pink darken-3">
     <div class="container">
         <div class="row">
-            <!-- TODO: Find a way to keep both at h1 for consistency -->
+            <!-- TODO: Find a way to keep both at h1 for consistency. See issue #55 -->
             <h1 class="col m12 white-text center-align full hide-on-small-only">Géomarcheur</h1>    <!-- Desktop -->
             <h2 class="col s12 white-text center-align full hide-on-med-and-up">Géomarcheur</h2>    <!-- Mobile -->
         </div>
@@ -75,7 +75,7 @@ $temp_user_id = 2;
                 </div>
                 <div class="row">
                     <div class="switch col s12 white-text">
-                        <!-- TODO: Make this functional -->
+                        <!-- TODO: Make this functional. See issue #56 -->
                         <input type="checkbox" id="showPassword" class="white-text" />
                         <label for="showPassword">Afficher le mot de passe</label>
                     </div>
