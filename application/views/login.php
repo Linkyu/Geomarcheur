@@ -36,8 +36,15 @@ $temp_user_id = 2;
         }
 
         .full {
-            width: 100%;
             text-shadow: 0 0 5px #FFF;
+        }
+
+        .warning-alert .text {
+            margin: 15px; !important;
+        }
+
+        .warning-alert .material-icons {
+            margin-left: 15px; !important;
         }
     </style>
 </head>
@@ -45,8 +52,12 @@ $temp_user_id = 2;
 
 <main class="valign-wrapper pink darken-3">
     <div class="container">
-        <h1 class="white-text center-align full">Géomarcheur</h1>
-        <div class="row animated fadeInUp">
+        <div class="row">
+            <!-- TODO: Find a way to keep both at h1 for consistency -->
+            <h1 class="col m12 white-text center-align full hide-on-small-only">Géomarcheur</h1>    <!-- Desktop -->
+            <h2 class="col s12 white-text center-align full hide-on-med-and-up">Géomarcheur</h2>    <!-- Mobile -->
+        </div>
+        <div class="row aanimated fadeInUp">
             <form class="col s12 m8 l6 offset-m2 offset-l3">
                 <div class="row">
                     <div class="input-field col s12 white-text">
@@ -69,6 +80,10 @@ $temp_user_id = 2;
                         <label for="showPassword">Afficher le mot de passe</label>
                     </div>
                 </div>
+                <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="capslock_warning">
+                    <i class="material-icons">keyboard_capslock</i>
+                    <div class="text">La touche Verr. Maj. est active.</div>
+                </div>
             </form>
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="btn right indigo darken-4 waves-effect waves-light ">Connection</a></p>
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="white-text underline">S'inscrire</a></p>
@@ -81,6 +96,9 @@ $temp_user_id = 2;
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <!-- Compiled and minified Materialize JavaScript -->
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
+
+<!-- Caps Lock detector -->
+<script src="<?php echo base_url(); ?>static/js/capslock_detector.js"></script>
 
 <script type="text/javascript">
     // Custom scripts
