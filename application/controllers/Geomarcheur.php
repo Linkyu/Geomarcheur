@@ -81,6 +81,22 @@ class Geomarcheur extends CI_Controller {
     }
 
 
+    public function delete()
+    {
+        $id_place=$this->uri->segment(3);
+
+        if ($id_place ==null) {
+
+        } else {
+            $this->load->model('geomarcheur_db');
+            $data['resultat']=$this->geomarcheur_db->delete($id_place);
+        }
+        $this->load->view('admin/admin_dashboard');
+    }
+
+
+
+
     public function create()
     {
         if ($this->input->server('REQUEST_METHOD') == 'GET'){
@@ -99,22 +115,7 @@ class Geomarcheur extends CI_Controller {
     }
 
 
-    public function delete()
-    {
-        $idproduit=$this->uri->segment(3);
 
-        if ($idproduit ==null) {
-            $data['erreur']="Id produit introuvable";
-            $data['message']="";
-            $data['resultat']="";
-        } else {
-            $this->load->model('actualite_db');
-            $data['resultat']=$this->actualite_db->delete($idproduit);
-            $data['erreur']="";
-            $data['message']="Produit n° ".$idproduit." supprimé.";
-        }
-        $this->load->view('delete_view',$data);
-    }
 
 
 
@@ -128,6 +129,8 @@ class Geomarcheur extends CI_Controller {
     }
 
 
+
+
     /*
     public function operation()
      {
@@ -136,7 +139,7 @@ class Geomarcheur extends CI_Controller {
         // 3- transmettre les données à la vue pour génération de la réponse HTTP
      }
      */
-}
+ }
 
 
 

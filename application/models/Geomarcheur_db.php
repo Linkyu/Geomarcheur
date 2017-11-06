@@ -3,7 +3,7 @@ class Geomarcheur_db extends CI_Model {
 
     public function listAllUsers() {
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM user');
+        $query = $this->db->query('SELECT * FROM user ORDER BY credits desc');
         return $query->result_array();
 
     }
@@ -43,5 +43,14 @@ class Geomarcheur_db extends CI_Model {
         return $query->result_array();
 
     }
+
+
+    public function delete($id) {
+     $this->load->database();
+     $query = $this->db->query('DELETE FROM place WHERE id='.$id);
+
+     echo json_encode(['success'=>true]);
+
+ }
 
 }
