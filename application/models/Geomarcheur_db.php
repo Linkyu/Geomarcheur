@@ -63,4 +63,29 @@ class Geomarcheur_db extends CI_Model {
 
         return array($refund_query, $sell_place_query);
     }
+
+    public function login($username, $password) {
+        $this->load->database();
+        $get_place_user_query = $this->db->select('pseudo, password')
+            ->from('user')
+            ->where('pseudo=' . $username)
+            ->get();
+        $return_message = "";
+
+        if ($get_place_user_query->result_array().length() > 0) {
+            $return_message .= "User " . $username . " found. \n";
+        }
+
+        foreach ($get_place_user_query->result_array() as $user) {
+            $return_message .= "Password " . $password . " is ";
+            if ($password == $user['password']) {
+                $return_message .= "correct. \n";
+            } else {
+                // DEBUG
+                $return_message .= "wrong. It should have been " . $user['password'] . "\n";
+            }
+        }
+
+        return $return_message;
+    }
 }

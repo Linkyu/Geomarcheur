@@ -18,20 +18,20 @@ $(function() {
         $(document).keydown(function(e) {
             if (e.which === 20 && capsLockEnabled !== null) {
                 capsLockEnabled = !capsLockEnabled;
-                console.log("Keydown. CapsLock enabled: " + capsLockEnabled.toString());
+                //console.log("Keydown. CapsLock enabled: " + capsLockEnabled.toString());
             } else if (e.which === 20) {
-                console.log("Keydown. Initial state not set.");
+                //console.log("Keydown. Initial state not set.");
             }
         });
 
         $(document).keypress(function(e) {
             const str = String.fromCharCode(e.which);
             if (!str || str.toLowerCase() === str.toUpperCase()) {
-                console.log("Keypress. Some control key pressed.");
+                //console.log("Keypress. Some control key pressed.");
                 return;
             }
             capsLockEnabled = (str.toLowerCase() === str && e.shiftKey) || (str.toUpperCase() === str && !e.shiftKey);
-            console.log("Keypress. CapsLock enabled: " + capsLockEnabled.toString());
+            //console.log("Keypress. CapsLock enabled: " + capsLockEnabled.toString());
         });
 
         const passwordField = $("#password");
@@ -45,7 +45,7 @@ $(function() {
         });
 
         passwordField.on("blur", function(e) {
-            console.log("Hiding warning");
+            //console.log("Hiding warning");
             $("#warning").hide();
         });
     }

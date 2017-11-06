@@ -98,6 +98,17 @@ class Geomarcheur extends CI_Controller {
         }
     }
 
+    public function login() {
+        $this->load->model('geomarcheur_db');
+        $username = $this->input->post('username');
+        $password = $this->input->post('password');
+
+        // Assuming the data received is valid (TODO: Assume it is not)
+        $result = $this->geomarcheur_db->login($username, $password);
+
+        echo $result;
+    }
+
 
 
     // references

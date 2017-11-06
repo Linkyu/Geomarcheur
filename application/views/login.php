@@ -58,12 +58,12 @@ $temp_user_id = 2;
             <h2 class="col s12 white-text center-align full hide-on-med-and-up">Géomarcheur</h2>    <!-- Mobile -->
         </div>
         <div class="row aanimated fadeInUp">
-            <form class="col s12 m8 l6 offset-m2 offset-l3">
+            <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="<?php echo base_url(); ?>/login/">
                 <div class="row">
                     <div class="input-field col s12 white-text">
                         <i class="material-icons prefix">account_circle</i>
-                        <input id="pseudo" type="text" class="validate" autofocus>
-                        <label for="pseudo">Pseudo</label>
+                        <input id="username" type="text" class="validate" autofocus>
+                        <label for="username">Pseudo</label>
                     </div>
                 </div>
                 <div class="row">
@@ -85,7 +85,7 @@ $temp_user_id = 2;
                     <div class="text">La touche Verr. Maj. est active.</div>
                 </div>
             </form>
-            <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="btn right indigo darken-4 waves-effect waves-light ">Connection</a></p>
+            <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" onclick="login()" class="btn right indigo darken-4 waves-effect waves-light ">Connection</a></p>
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="white-text underline">S'inscrire</a></p>
         </div>
     </div>
@@ -101,7 +101,18 @@ $temp_user_id = 2;
 <script src="<?php echo base_url(); ?>static/js/capslock_detector.js"></script>
 
 <script type="text/javascript">
-    // Custom scripts
+    function login() {
+        // DEBUG
+        //console.log($("#username").val());
+        //console.log($("#password").val());
+
+        $.post(
+            "./login/",
+            {username: $("#username").val(), password: $("#password").val()}
+            ).done(function(data){
+                console.log(data)
+            });
+    }
 </script>
 </body>
 </html>
