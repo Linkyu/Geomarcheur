@@ -19,85 +19,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
     <style>
-    body {
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-    }
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
 
-    main {
-        flex: 1 0 auto;
-    }
+        main {
+            flex: 1 0 auto;
+        }
 
-    .map_block, .place_list_block {
-        height: 400px !important;
-    }
+        .map_block, .place_list_block {
+            height: 400px !important;
+        }
 
-    .place_list_block {
-        overflow-y: scroll;
-    }
+        .place_list_block {
+            overflow-y: scroll;
+        }
 
-    .map_block h1{
-        width: 100%;
-    }
+        .map_block h1{
+            width: 100%;
+        }
 
-    .map {
-        height: 100%;
-    }
+        .map {
+            height: 100%;
+        }
 
-    .modal_place_picture_block{
-        max-width: 250px;
-        height: 100%;
-        max-height: 500px;
-        overflow: hidden;
-        display:inline-block;
-        background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(250, 250, 250, .75) 100%); /* W3C version */
-        border-right: rgba(0, 0, 0, 0.3) solid 1px;
-    }
+        .modal_place_picture_block{
+            max-width: 250px;
+            height: 100%;
+            max-height: 500px;
+            overflow: hidden;
+            display:inline-block;
+            background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(250, 250, 250, .75) 100%); /* W3C version */
+            border-right: rgba(0, 0, 0, 0.3) solid 1px;
+        }
 
-    .modal_place_picture {
-        width: auto;
-        height: auto;
-        position:relative;
-        z-index:-1;
-        display:block;
-    }
+        .modal_place_picture {
+            width: auto;
+            height: auto;
+            position:relative;
+            z-index:-1;
+            display:block;
+        }
 
-    .modal_place_stats_block {
-        margin-top: 50px;
-    }
-</style>
+        .modal_place_stats_block {
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="nav-extended pink darken-3">
-            <div class="nav-wrapper">
-                <a href="#" class="brand-logo">Géomarcheur</a>
-                <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-                <ul id="nav-mobile" class="right hide-on-med-and-down">
-                    <li><a href="#">Tableau de bord</a></li>
-                    <li><a href="#">Classement</a></li>
-                    <li><a href="#">Statistiques</a></li>
-                </ul>
-            </div>
-            <div class="nav-content">
-                <ul class="tabs tabs-transparent">
-                    <li class="tab"><a href="#dashboard">Tableau de bord</a></li>
-                    <li class="tab"><a href="#leaderboard">Classement</a></li>
-                    <li class="tab"><a href="#statistics">Statistiques</a></li>
-                </ul>
-            </div>
-        </nav>
-    </header>
+<header>
+    <nav class="nav-extended pink darken-3">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Géomarcheur</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="#">Tableau de bord</a></li>
+                <li><a href="#">Classement</a></li>
+                <li><a href="#">Statistiques</a></li>
+            </ul>
+        </div>
+        <div class="nav-content">
+            <ul class="tabs tabs-transparent">
+                <li class="tab"><a href="#dashboard">Tableau de bord</a></li>
+                <li class="tab"><a href="#leaderboard">Classement</a></li>
+                <li class="tab"><a href="#statistics">Statistiques</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
 
-    <div id="dashboard" class="container">
+<div id="dashboard" class="container">
 
-        <!-- The 4 dashboard cards -->
-        <div class="row">
-            <div class="col s6"><div class="card-panel hoverable map_block">
+    <!-- The 4 dashboard cards -->
+    <div class="row">
+        <div class="col s6"><div class="card-panel hoverable map_block">
                 <div class="valign-wrapper center-align map" id="map"><h1>M A P</h1></div>
             </div></div>
-            <div class="col s6"><div class="card-panel hoverable place_list_block">
+        <div class="col s6"><div class="card-panel hoverable place_list_block">
                 <div class="row">
                     <form class="fullwidth">
                         <div class="input-field">
@@ -114,48 +114,46 @@
                     <div id="place_list_message"></div>
                 </div>
             </div></div>
-            <div class="col s6"><div class="card-panel hoverable">
-                <table class="highlight responsive-table" id="user_list">
+        <div class="col s6"><div class="card-panel hoverable">
+                <table class="highlight responsive-table" >
                     <thead>
-                        <tr>
-                            <th><!-- Avatar --></th>
-                            <th>Nom</th>
-                            <th>Nombre de lieux</th>
-                            <th>Crédits possédés</th>
-                        </tr>
+                    <tr>
+                        <th><!-- Avatar --></th>
+                        <th>Nom</th>
+                        <th>Nombre de lieux</th>
+                        <th>Crédits possédés</th>
+                    </tr>
                     </thead>
-                    <tbody>
-
-                    </tbody>
+                    <tbody id="user_list"></tbody>
                 </table>
                 <div class="right-align"><a class="waves-effect waves-light btn indigo darken-4">Voir le classement</a></div>
             </div></div>
-            <div class="col s6"><div class="card-panel hoverable">
+        <div class="col s6"><div class="card-panel hoverable">
                 <div id="linechart_material"></div>
             </div></div>
-        </div>
+    </div>
 
-        <!-- Place detail Modal Structure -->
-        <div id="place_modal" class="modal modal-fixed-footer">
-            <div class="modal-content">
-                <div class="row">
-                    <!-- Place picture -->
-                    <div class="col s3 modal_place_picture_block">
-                        <img class="modal_place_picture" src="http://i.imgur.com/kzmgUyK.jpg">
+    <!-- Place detail Modal Structure -->
+    <div id="place_modal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <div class="row">
+                <!-- Place picture -->
+                <div class="col s3 modal_place_picture_block">
+                    <img class="modal_place_picture" src="http://i.imgur.com/kzmgUyK.jpg">
+                </div>
+
+                <!-- Place form -->
+                <form class="col s6">
+                    <div class="input-field">
+                        <i class="material-icons prefix">local_offer</i>
+                        <input id="modal_place_name_input" name="modal_place_name_input" type="text">
+                        <label for="modal_place_name_input">Nom</label>
                     </div>
-
-                    <!-- Place form -->
-                    <form class="col s6">
-                        <div class="input-field">
-                            <i class="material-icons prefix">local_offer</i>
-                            <input id="modal_place_name_input" name="modal_place_name_input" type="text">
-                            <label for="modal_place_name_input">Nom</label>
-                        </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">place</i>
-                            <input id="modal_place_address_input" name="modal_place_address_input" type="text">
-                            <label for="modal_place_address_input">Adresse</label>
-                        </div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">place</i>
+                        <input id="modal_place_address_input" name="modal_place_address_input" type="text">
+                        <label for="modal_place_address_input">Adresse</label>
+                    </div>
                     <!--    No need to show these
                     <div class="row">
                         <div class="input-field col s6">
@@ -169,72 +167,75 @@
                         </div>
                     </div>
                 -->
-                <div class="input-field">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input disabled id="modal_place_owner_input" name="modal_place_owner_input" type="text">
-                    <label for="modal_place_owner_input">Propriétaire</label>
-                </div>
-                <div class="input-field">
-                    <span class="credit_symbol prefix">¢</span>
-                    <input id="modal_place_value_input" name="modal_place_value_input" type="text">
-                    <label for="modal_place_value_input">Valeur</label>
-                </div>
-            </form>
-
-            <!-- Place delete button + stats preview -->
-            <div class="col s3">
-                <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth" 
-                onclick="deletePlace();"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
-
-                <!-- Stats preview -->
-                <div class="card small modal_place_stats_block">
-                    <div class="card-image">
-                        <img src="http://i.imgur.com/0uABqwN.png">
-                        <span class="card-title">_ 3,045 ¢</span> <!-- Current amount of credits gained from this place -->
+                    <div class="input-field">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input disabled id="modal_place_owner_input" name="modal_place_owner_input" type="text">
+                        <label for="modal_place_owner_input">Propriétaire</label>
                     </div>
-                    <div class="card-content">
-                        <p class="bold">Crédits obtenus ici</p>
+                    <div class="input-field">
+                        <span class="credit_symbol prefix">¢</span>
+                        <input id="modal_place_value_input" name="modal_place_value_input" type="text">
+                        <label for="modal_place_value_input">Valeur</label>
                     </div>
-                    <div class="card-action">
-                        <a href="#" class="pink-text text-darken-3">Détails</a>
+                </form>
+
+                <!-- Place delete button + stats preview -->
+                <div class="col s3">
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"
+                       onclick="deletePlace();"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+
+                    <!-- Stats preview -->
+                    <div class="card small modal_place_stats_block">
+                        <div class="card-image">
+                            <img src="http://i.imgur.com/0uABqwN.png">
+                            <span class="card-title">_ 3,045 ¢</span> <!-- Current amount of credits gained from this place -->
+                        </div>
+                        <div class="card-content">
+                            <p class="bold">Crédits obtenus ici</p>
+                        </div>
+                        <div class="card-action">
+                            <a href="#" class="pink-text text-darken-3">Détails</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3" onclick="idPlace = ''; console.log('id de la place : ' + idPlace); ">Retour</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
+        </div>
     </div>
-    <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3" onclick="idPlace = ''; console.log('id de la place : ' + idPlace); ">Retour</a>
-        <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
-    </div>
-</div>
 
 </div>
 
 <div id="leaderboard" class="container">
     <div class="card-panel hoverable">
-        <div class="row"><table class="highlight responsive-table col s12">
-            <thead>
+        <div class="row">
+
+            <table id="leaderboard_container" cellspacing="0" width="100%">
+                <thead>
                 <tr>
-                    <th><!-- Avatar --></th>
+                    <th></th>
                     <th>Nom</th>
-                    <th>Nombre de lieux</th>
-                    <th>Crédits possédés</th>
+                    <th>Crédits</th>
+                    <th>Lieux possédés</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
 
-            </tbody>
-        </table>
 
-        <ul class="pagination center-align col s12">
-            <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
-            <li class="active pink darken-3"><a href="#!">1</a></li>
-            <li class="waves-effect"><a href="#!">2</a></li>
-            <li class="waves-effect"><a href="#!">3</a></li>
-            <li class="waves-effect"><a href="#!">4</a></li>
-            <li class="waves-effect"><a href="#!">5</a></li>
-            <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-        </ul></div>
+                <tbody id="datatable_leaderboard">
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th></th>
+                    <th>Nom</th>
+                    <th>Crédits</th>
+                    <th>Lieux possédés</th>
+                </tr>
+
+            </table>
+
+
 
     </div>
 </div>
@@ -242,17 +243,17 @@
 <div id="statistics" class="container">
     <div class="row">
         <div class="col s6"><div class="card-panel hoverable">
-            <div id="linechart_material1"></div>
-        </div></div>
+                <div id="linechart_material1"></div>
+            </div></div>
         <div class="col s6"><div class="card-panel hoverable">
-            <div id="linechart_material2"></div>
-        </div></div>
+                <div id="linechart_material2"></div>
+            </div></div>
         <div class="col s6"><div class="card-panel hoverable">
-            <div id="linechart_material3"></div>
-        </div></div>
+                <div id="linechart_material3"></div>
+            </div></div>
         <div class="col s6"><div class="card-panel hoverable">
-            <div id="linechart_material4"></div>
-        </div></div>
+                <div id="linechart_material4"></div>
+            </div></div>
     </div>
 </div>
 
@@ -285,12 +286,17 @@
 <!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <!-- Compiled and minified Materialize JavaScript -->
-<script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 <!-- Google Maps API -->
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
 <!-- Charts API + placeholder data -->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+
 <script type="text/javascript">
+
     google.charts.load('current', {'packages':['line']});
     google.charts.setOnLoadCallback(drawChart);
 
@@ -317,7 +323,7 @@
             [12, 1985342,  5342,  500],
             [13, 3920342, 85342,  400],
             [14, 6985342, 985342,  420]
-            ]);
+        ]);
 
         const options = {
             chart: {
@@ -340,7 +346,7 @@
 <!-- Custom local scripts -->
 <script>
     $(document).ready(function() {
-
+        const userListDatatable =  $("#datatable_leaderboard");
         const user_list = $("#user_list");
         var idPlace;
 
@@ -354,21 +360,28 @@
                     $("#user_list_message").html("<p>Il n'existe aucun utilisateur actuellement!</p>")
 
                 } else {
+
+                    //userListDatatable.html("");
+
                     $.each(users, function(j, user) {
-                        user_list.append(`
+
+                       const user_data = `
                            <tr>
                            <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
                            <td>`+user["pseudo"]+`</td>
                            <td>¢ `+user["credits"]+`</td>
                            <td>`+user["is_admin"]+`</td>
-                           </tr>                      
-                           `);
-                    }
+                           </tr>
+                           `;
+
+                            user_list.append(user_data);
+
+                            //userListDatatable.append(user_data);
+                        }
                     )
                 }
 
             })})
-
 
 
 
@@ -476,34 +489,43 @@
         });
     }
 
-</script>
-<!-- Map placeholder -->
-<script>
-    const place_list_table = $("#place_list_table");
-    const divs = place_list_table.find("div.card");
-    let alpha_order = false;
-
-    var carte;
-    var marqueur = [];
-    var latlng = new google.maps.LatLng(43.600000, 1.433333);
-    var options = {
-        center: latlng,
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.roadmap
-    };
-    carte = new google.maps.Map(document.getElementById("map"), options);
-
-    //todo =>  verifier que la popup du lieu cliqué se ferme et s'affiche bien
-    // todo => comiter sur le git
-    // todo => pusher le projet
-    let infowindow = new google.maps.InfoWindow();
+    function deletePlace(idPlace) {
 
 
+        if (confirm("Vous désirez vraiment supprimer?")) {
+            document.location.href="delete/"+idPlace;
+
+            /* $.ajax({
+                dataType: 'json',
+                type:'delete',
+                url: url + '/' + id
+
+               /* type: "GET",
+                url: "../../controllers/Geomarcheur.php",
+                data: 'id='+ idPlace*/
+        }
+    } //reload la page);
+
+
+    $(document).ready(function() {
+        const place_list_table = $("#place_list_table");
+        const divs = place_list_table.find("div.card");
+        let alpha_order = false;
+
+        var carte;
+        var marqueur = [];
+        var latlng = new google.maps.LatLng(43.600000, 1.433333);
+        var options = {
+            center: latlng,
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.roadmap
+        };
+        carte = new google.maps.Map(document.getElementById("map"), options);
+        let infowindow = new google.maps.InfoWindow();
         $.getJSON( "getPlace", "", function( result ) {
                 console.log(result);
                 $.each(result, function(i, places) {
                     $.each(places, function(j, place) {
-
                             marqueur[j] = new google.maps.Marker (
                                 {
                                     position: new google.maps.LatLng(place.lat, place.lng),
@@ -512,7 +534,6 @@
                             )
                             marqueur[j].setMap(carte);
                             console.log(marqueur[j]);
-
                             // Closure => création de la function au moment de la création du marqueur
                             var macallback = function callbackSpecificiqueMarqueur(ev) {
                                 //console.log("Callback appelée", ev, marqueur[j]);
@@ -528,22 +549,65 @@
 
                                 infowindow.setContent(contentString);
                                 infowindow.open(map, marqueur[j]);
-
                             };
-
                             // creation de listener qui apelle la function ...
                             //console.log("Creation du listener", carte);
                             google.maps.event.addListener(
                                 marqueur[j], "click", macallback
                             );
-
                         }
                     )
                 })
             }
-        );
+        )});
+
+
+
+
+
+    $(document).ready(function() {
+        $('#leaderboard_container').DataTable( {
+            "language": {
+                url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
+            },
+            ajax: {
+                url: 'getUser',
+                dataSrc: "resultat"
+            },
+            columns: [
+                {data: "id"},
+                {data: "pseudo"},
+                {data: "credits"},
+                {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
+            ]
+        } );
+
+        $('.dataTable').on('click', 'tbody tr', function() {
+
+            //get textContent of the TD
+            console.log('TD cell textContent : ', this.textContent);
+    var id;
+            // Filter for only numbers
+            id = this.textContent.replace(/\D/g, '');
+            // Transform to numeric value
+            id = parseInt(id, 10);
+            
+        })
+
+
+
+    } );
+
+
+
+
+
+
+
 
 
 </script>
+<!-- Map placeholder -->
+
 </body>
 </html>
