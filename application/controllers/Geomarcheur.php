@@ -96,6 +96,47 @@ class Geomarcheur extends CI_Controller {
 
 
 
+    public function disablePlace() {
+        $this->load->model('geomarcheur_db');
+        $id_place = $this->input->post('id_place');
+
+        // Assuming the data received is valid (TODO: Assume it is not)
+        $result = $this->geomarcheur_db->disablePlace($id_place);
+    }
+
+
+    public function createDatatable()
+    {
+        $this->load->model('geomarcheur_db');
+        $data['resultat']=$this->geomarcheur_db->listAllUsers();
+
+        foreach ($data as $value) {
+
+
+            echo "<tr>";
+            echo "<td><i class='material-icons circle orange accent-4 grey-text text-lighten-5'>account_circle</i></td>";
+            echo "<td>" . $value['pseudo'] . "</td>";
+            echo "<td>" . $value['credits'] . "</td>";
+            echo "<td>" . $value['is_admin'] . "</td>";
+            echo "</tr>";
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function create()
     {

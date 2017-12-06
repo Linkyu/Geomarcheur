@@ -215,7 +215,7 @@
             <table id="leaderboard_container" cellspacing="0" width="100%">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th>ID</th>
                     <th>Nom</th>
                     <th>Crédits</th>
                     <th>Lieux possédés</th>
@@ -227,7 +227,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th></th>
+                    <th>ID</th>
                     <th>Nom</th>
                     <th>Crédits</th>
                     <th>Lieux possédés</th>
@@ -561,12 +561,10 @@
             }
         )});
 
-
-
-
-
     $(document).ready(function() {
         $('#leaderboard_container').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
             "language": {
                 url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
             },
@@ -582,21 +580,21 @@
             ]
         } );
 
-        $('.dataTable').on('click', 'tbody tr', function() {
+        var table = $('#leaderboard_container').DataTable();
 
-            //get textContent of the TD
-            console.log('TD cell textContent : ', this.textContent);
-    var id;
-            // Filter for only numbers
-            id = this.textContent.replace(/\D/g, '');
-            // Transform to numeric value
-            id = parseInt(id, 10);
-            
-        })
+        $('#leaderboard_container').on('click', function() {
 
+            console.log( table.row().data() );
+            console.log( table.row().data().pseudo );
+
+            var $row = $(this).closest("tr"),        // Finds the closest row <tr>
+                $tds = $row.find("td:nth-child(2)").val();
+            console.log($tds);
 
 
-    } );
+
+
+        })});
 
 
 
