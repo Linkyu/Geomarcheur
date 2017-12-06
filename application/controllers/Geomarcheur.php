@@ -18,6 +18,13 @@ class Geomarcheur extends CI_Controller {
      * map to /index.php/welcome/<method_name>
      * @see https://codeigniter.com/user_guide/general/urls.html
      */
+    function __construct()
+    {
+        parent:: __construct();
+        $this->load->helper('form'); //loading form helper
+        $this->load->model('geomarcheur_db');
+    }
+
     public function index()
     {
 
@@ -35,7 +42,6 @@ class Geomarcheur extends CI_Controller {
 
     public function getUser()
     {
-        $this->load->model('geomarcheur_db');
         $user_id=$this->uri->segment(3);
 
         if ($user_id != null){
@@ -50,7 +56,6 @@ class Geomarcheur extends CI_Controller {
 
     public function getPlace()
     {
-        $this->load->model('geomarcheur_db');
         $place_id=$this->uri->segment(3);
 
         if ($place_id == 'asc') {
@@ -67,7 +72,6 @@ class Geomarcheur extends CI_Controller {
 
     public function getUserPlaces()
     {
-        $this->load->model('geomarcheur_db');
         $place_id=$this->uri->segment(3);
 
         if ($place_id != null){
@@ -78,6 +82,35 @@ class Geomarcheur extends CI_Controller {
 
         header("Content-Type: application/json");
         echo json_encode($data);
+    }
+
+    public function sellPlace() {
+        $place_id=$this->uri->segment(3);
+
+        if($place_id != null){
+            $result=$this->geomarcheur_db->sellPlace($place_id);
+
+            // TODO: echo an actual output that can serve for DEBUG mode
+            /*foreach ($result as $item) {
+                foreach ($item as $row) {
+                    echo $row;
+                }
+            }*/
+        } else {
+            echo "ERROR - Was expecting place, received nothing instead.";
+        }
+    }
+
+    public function login() {
+        $username = $this->input->post('username');
+        $password = $this->input->post('password');
+
+        // Assuming the data received is valid (TODO: Assume it is not)
+        $result = $this->geomarcheur_db->login($username, $password);
+
+        echo "u: " . $username;
+        echo "p: " . $password;
+        //echo $result;
     }
 
 
@@ -125,26 +158,13 @@ class Geomarcheur extends CI_Controller {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // references
     public function create()
     {
         if ($this->input->server('REQUEST_METHOD') == 'GET'){
             $this->load->view('create_view');
         }
         else if ($this->input->server('REQUEST_METHOD') == 'POST'){
-            $this->load->model('actualite_db');
 
             $data['title'] = $this->input->post('news_title');
             $data['image'] = $this->input->post('news_image');

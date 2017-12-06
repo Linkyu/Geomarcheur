@@ -72,9 +72,9 @@ class Geomarcheur_db extends CI_Model {
             ->from('user')
             ->where('pseudo=' . $username)
             ->get();
-        $return_message = "";
+        $return_message = "u: " . $username . "\np: " . $password;
 
-        if ($get_place_user_query->result_array().length() > 0) {
+        if (sizeof($get_place_user_query->result_array()) > 0) {
             $return_message .= "User " . $username . " found. \n";
         }
 
@@ -83,7 +83,7 @@ class Geomarcheur_db extends CI_Model {
             if ($password == $user['password']) {
                 $return_message .= "correct. \n";
             } else {
-                // DEBUG
+                // TODO: REMOVE THIS DEBUG MESSAGE
                 $return_message .= "wrong. It should have been " . $user['password'] . "\n";
             }
         }
