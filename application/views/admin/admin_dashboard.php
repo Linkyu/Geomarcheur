@@ -507,100 +507,94 @@
     } //reload la page);
 
 
-    $(document).ready(function() {
-        const place_list_table = $("#place_list_table");
-        const divs = place_list_table.find("div.card");
-        let alpha_order = false;
+    const place_list_table = $("#place_list_table");
+    const divs = place_list_table.find("div.card");
+    let alpha_order = false;
 
-        var carte;
-        var marqueur = [];
-        var latlng = new google.maps.LatLng(43.600000, 1.433333);
-        var options = {
-            center: latlng,
-            zoom: 13,
-            mapTypeId: google.maps.MapTypeId.roadmap
-        };
-        carte = new google.maps.Map(document.getElementById("map"), options);
-        let infowindow = new google.maps.InfoWindow();
-        $.getJSON( "getPlace", "", function( result ) {
-                console.log(result);
-                $.each(result, function(i, places) {
-                    $.each(places, function(j, place) {
-                            marqueur[j] = new google.maps.Marker (
-                                {
-                                    position: new google.maps.LatLng(place.lat, place.lng),
-                                    title:'Nom du lieu : ' + place.name
-                                }
-                            )
-                            marqueur[j].setMap(carte);
-                            console.log(marqueur[j]);
-                            // Closure => création de la function au moment de la création du marqueur
-                            var macallback = function callbackSpecificiqueMarqueur(ev) {
-                                //console.log("Callback appelée", ev, marqueur[j]);
-                                //console.log("la position est : " +marqueur[j].getPosition());
+    var carte;
+    var marqueur = [];
+    var latlng = new google.maps.LatLng(43.600000, 1.433333);
+    var options = {
+        center: latlng,
+        zoom: 13,
+        mapTypeId: google.maps.MapTypeId.roadmap
+    };
+    carte = new google.maps.Map(document.getElementById("map"), options);
+    let infowindow = new google.maps.InfoWindow();
+    $.getJSON( "getPlace", "", function( result ) {
+            console.log(result);
+            $.each(result, function(i, places) {
+                $.each(places, function(j, place) {
+                        marqueur[j] = new google.maps.Marker (
+                            {
+                                position: new google.maps.LatLng(place.lat, place.lng),
+                                title:'Nom du lieu : ' + place.name
+                            }
+                        );
+                        marqueur[j].setMap(carte);
+                        console.log(marqueur[j]);
+                        // Closure => création de la function au moment de la création du marqueur
+                        var macallback = function callbackSpecificiqueMarqueur(ev) {
+                            //console.log("Callback appelée", ev, marqueur[j]);
+                            //console.log("la position est : " +marqueur[j].getPosition());
 
-                                var contentString =
-                                    '<div id="content">' +
-                                    '<p> Nom du lieu : ' + place.name + '</p>' +
-                                    '<p> Valeur : ' + place.value + '</p>' +
-                                    '<a href="#">Plus de détails</a><br><br>' +
-                                    '<a href="#">Vendre le lieu</a>'
+                            var contentString =
+                                '<div id="content">' +
+                                '<p> Nom du lieu : ' + place.name + '</p>' +
+                                '<p> Valeur : ' + place.value + '</p>' +
+                                '<a href="#">Plus de détails</a><br><br>' +
+                                '<a href="#">Vendre le lieu</a>' +
                                 '</div>';
 
-                                infowindow.setContent(contentString);
-                                infowindow.open(map, marqueur[j]);
-                            };
-                            // creation de listener qui apelle la function ...
-                            //console.log("Creation du listener", carte);
-                            google.maps.event.addListener(
-                                marqueur[j], "click", macallback
-                            );
-                        }
-                    )
-                })
-            }
-        )});
+                            infowindow.setContent(contentString);
+                            infowindow.open(map, marqueur[j]);
+                        };
+                        // creation de listener qui apelle la function ...
+                        //console.log("Creation du listener", carte);
+                        google.maps.event.addListener(
+                            marqueur[j], "click", macallback
+                        );
+                    }
+                )
+            })
+        }
+    );
 
-    $(document).ready(function() {
-        $('#leaderboard_container').DataTable( {
-            "bProcessing": true,
-            "bServerSide": true,
-            "language": {
-                url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
-            },
-            ajax: {
-                url: 'getUser',
-                dataSrc: "resultat"
-            },
-            columns: [
-                {data: "id"},
-                {data: "pseudo"},
-                {data: "credits"},
-                {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
-            ]
-        } );
+    // Datatable setup
+    let container = $('#leaderboard_container');
+    container.DataTable( {
+        "bProcessing": true,
+        "bServerSide": true,
+        "language": {
+            url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
+        },
+        ajax: {
+            url: 'getUser',
+            dataSrc: "resultat"
+        },
+        columns: [
+            {data: "id"},
+            {data: "pseudo"},
+            {data: "credits"},
+            {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
+        ]
+    } );
 
-        var table = $('#leaderboard_container').DataTable();
+    let table = container.DataTable();
 
-        $('#leaderboard_container').on('click', function() {
+    container.on('click', function() {
 
-            console.log( table.row().data() );
-            console.log( table.row().data().pseudo );
+        console.log( table.row().data() );
+        console.log( table.row().data().pseudo );
 
-            var $row = $(this).closest("tr"),        // Finds the closest row <tr>
-                $tds = $row.find("td:nth-child(2)").val();
-            console.log($tds);
-
-
-
-
-        })});
+        let $row = $(this).closest("tr"),        // Finds the closest row <tr>
+            $tds = $row.find("td:nth-child(2)").val();
+        console.log($tds);
 
 
 
 
-
-
+    })
 
 
 
