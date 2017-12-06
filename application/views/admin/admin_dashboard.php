@@ -450,7 +450,7 @@
                 alert("Ce lieu n'existe pas!");
             } else {
 
-                get_user(place  ["id_User"], function (result) {
+                get_user(place["id_User"], function (result) {
                     const owner = result;
 
                     place_modal.modal({
