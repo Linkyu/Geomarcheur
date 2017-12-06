@@ -367,10 +367,10 @@
 
                        const user_data = `
                            <tr>
-                           <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
-                           <td>`+user["pseudo"]+`</td>
-                           <td>¢ `+user["credits"]+`</td>
-                           <td>`+user["is_admin"]+`</td>
+                           <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                           <td class="leaderboard_pseudo">`+user["pseudo"]+`</td>
+                           <td class="leaderboard_credits">¢ `+user["credits"]+`</td>
+                           <td class="leaderboard_is_admin">`+user["is_admin"]+`</td>
                            </tr>
                            `;
 
@@ -577,22 +577,22 @@
             {data: "pseudo"},
             {data: "credits"},
             {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
-        ]
+        ],
+        createdRow: function( row, data, dataIndex ) {
+            $(row).addClass( 'leaderboard_line' );
+        }
     } );
 
     let table = container.DataTable();
+    let rows = $('#datatable_leaderboard');
 
-    container.on('click', function() {
+    rows.on('click', 'tr', function() {
+        //console.log( table.row().data() );
+        //console.log( table.row().data().pseudo );
 
-        console.log( table.row().data() );
-        console.log( table.row().data().pseudo );
-
-        let $row = $(this).closest("tr"),        // Finds the closest row <tr>
-            $tds = $row.find("td:nth-child(2)").val();
-        console.log($tds);
-
-
-
+        let row = $(this),
+            tds = row[0].childNodes[1].textContent; // TODO: replace index with functional search
+        console.log(tds);
 
     })
 
