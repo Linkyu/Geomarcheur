@@ -205,13 +205,13 @@
             <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
         </div>
     </div>
-
 </div>
+
+
 
 <div id="leaderboard" class="container">
     <div class="card-panel hoverable">
         <div class="row">
-
             <table id="leaderboard_container" cellspacing="0" width="100%">
                 <thead>
                 <tr>
@@ -221,8 +221,6 @@
                     <th>Lieux possédés</th>
                 </tr>
                 </thead>
-
-
                 <tbody id="datatable_leaderboard">
                 </tbody>
                 <tfoot>
@@ -234,54 +232,56 @@
                 </tr>
 
             </table>
-
-
-
+        </div>
     </div>
-</div>
 
-<div id="statistics" class="container">
-    <div class="row">
-        <div class="col s6"><div class="card-panel hoverable">
-                <div id="linechart_material1"></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
-                <div id="linechart_material2"></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
-                <div id="linechart_material3"></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
-                <div id="linechart_material4"></div>
-            </div></div>
-    </div>
-</div>
+    <!-- la modale des détails d'un utilisateur -->
 
-<footer class="page-footer pink darken-3">
-    <div class="container">
+    <div id="modal1" class="modal"></div>
+
+    <div id="statistics" class="container">
         <div class="row">
-            <div class="col l6 s12">
-                <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
-            </div>
-            <div class="col l4 offset-l2 s12">
-                <h5 class="grey-text text-lighten-5">Links</h5>
-                <ul>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
-                </ul>
-            </div>
+            <div class="col s6"><div class="card-panel hoverable">
+                    <div id="linechart_material1"></div>
+                </div></div>
+            <div class="col s6"><div class="card-panel hoverable">
+                    <div id="linechart_material2"></div>
+                </div></div>
+            <div class="col s6"><div class="card-panel hoverable">
+                    <div id="linechart_material3"></div>
+                </div></div>
+            <div class="col s6"><div class="card-panel hoverable">
+                    <div id="linechart_material4"></div>
+                </div></div>
         </div>
     </div>
-    <div class="footer-copyright">
+
+    <footer class="page-footer pink darken-3">
         <div class="container">
-            © 2017 Kiantic
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="grey-text text-lighten-5">Footer Content</h5>
+                    <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="grey-text text-lighten-5">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
-</footer>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2017 Kiantic
+                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            </div>
+        </div>
+    </footer>
+</div>
 
 <!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -491,7 +491,6 @@
 
     function deletePlace(idPlace) {
 
-
         if (confirm("Vous désirez vraiment supprimer?")) {
             document.location.href="delete/"+idPlace;
 
@@ -510,7 +509,7 @@
     const place_list_table = $("#place_list_table");
     const divs = place_list_table.find("div.card");
     let alpha_order = false;
-
+    var idUser;
     var carte;
     var marqueur = [];
     var latlng = new google.maps.LatLng(43.600000, 1.433333);
@@ -560,11 +559,20 @@
         }
     );
 
+    const users_detail_modal = $("#modal1");
+    users_detail_modal.modal({
+                    dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                    opacity: .5, // Opacity of modal background
+                    inDuration: 300, // Transition in duration
+                    outDuration: 200, // Transition out duration
+                    startingTop: '4%', // Starting top style attribute
+                    endingTop: '10%'
+                });
+
+
     // Datatable setup
     let container = $('#leaderboard_container');
     container.DataTable( {
-        "bProcessing": true,
-        "bServerSide": true,
         "language": {
             url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
         },
@@ -578,28 +586,65 @@
             {data: "credits"},
             {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
         ],
-        createdRow: function( row, data, dataIndex ) {
-            $(row).addClass( 'leaderboard_line' );
-        }
+
     } );
 
-    let table = container.DataTable();
     let rows = $('#datatable_leaderboard');
 
     rows.on('click', 'tr', function() {
-        //console.log( table.row().data() );
-        //console.log( table.row().data().pseudo );
 
-        let row = $(this),
-            tds = row[0].childNodes[1].textContent; // TODO: replace index with functional search
-        console.log(tds);
+        let row = $(this);
+        idUser = row[0].childNodes[0].textContent;
+        console.log(idUser);
 
+        var user_data;
+
+        $.getJSON("getUser/"+idUser, "", function (result) {
+            $.each(result, function (i, users) {
+                $.each(users, function(j, user) {
+
+                    users_detail_modal.removeData();
+
+
+                    console.log(user.pseudo);
+                    console.log(user.credits);
+
+                    // au click sur le tableau, ouvrir la modale qui s'apelle modal
+                    users_detail_modal.modal('open');
+                    console.log(users_detail_modal);
+
+
+
+                    users_detail_modal.append(`
+                           <tr>
+                           <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                           <td class="leaderboard_pseudo">`+user["pseudo"]+`</td>
+                           <td class="leaderboard_credits">¢ `+user["credits"]+`</td>
+                           <td class="leaderboard_is_admin">`+user["is_admin"]+`</td>
+                           </tr></div>
+                           `);
+                    //users_detail_modal.modal.remove(user_data);
+                    users_detail_modal.remove();
+
+                    console.log(users_detail_modal);
+
+
+
+                   /*userDetails.append(`
+                    <p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
+                    <p>Nom de l'utilisateur : ` + user.credits + ` </p>
+                    `);*/
+
+                })
+            })
+        });
     })
 
 
 
+
 </script>
-<!-- Map placeholder -->
+
 
 </body>
 </html>
