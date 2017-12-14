@@ -64,28 +64,17 @@ class Geomarcheur_db extends CI_Model {
         return array($refund_query, $sell_place_query);
     }
 
-    public function login($username, $password) {
+    public function login($data) {
+        $username = $data['username'];
+        $password = $data['password'];
+
         $this->load->database();
-        $get_place_user_query = $this->db->select('pseudo, password')
-            ->from('user')
-            ->where('pseudo=' . $username)
-            ->get();
-        $return_message = "";
+        $get_user_query = $this->db->query("SELECT pseudo, is_admin FROM user WHERE pseudo='".$username."' AND password='".$password."'");
 
-        if ($get_place_user_query->result_array().length() > 0) {
-            $return_message .= "User " . $username . " found. \n";
+        if (sizeof($get_user_query->result_array()) > 0) {
+            return $get_user_query->result();
+        } else {
+            return false;
         }
-
-        foreach ($get_place_user_query->result_array() as $user) {
-            $return_message .= "Password " . $password . " is ";
-            if ($password == $user['password']) {
-                $return_message .= "correct. \n";
-            } else {
-                // DEBUG
-                $return_message .= "wrong. It should have been " . $user['password'] . "\n";
-            }
-        }
-
-        return $return_message;
     }
 }

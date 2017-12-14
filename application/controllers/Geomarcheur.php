@@ -1,16 +1,17 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Geomarcheur extends CI_Controller {
+class Geomarcheur extends CI_Controller
+{
 
     /**
      * Index Page for this controller.
      *
      * Maps to the following URL
-     * 		http://example.com/index.php/welcome
-     *	- or -
-     * 		http://example.com/index.php/welcome/index
-     *	- or -
+     *        http://example.com/index.php/welcome
+     *    - or -
+     *        http://example.com/index.php/welcome/index
+     *    - or -
      * Since this controller is set as the default controller in
      * config/routes.php, it's displayed at http://example.com/
      *
@@ -18,9 +19,22 @@ class Geomarcheur extends CI_Controller {
      * map to /index.php/welcome/<method_name>
      * @see https://codeigniter.com/user_guide/general/urls.html
      */
+    function __construct()
+    {
+        parent:: __construct();
+        // Load helpers
+        $this->load->helper('form');
+        $this->load->library('form_validation');
+        $this->load->library('session');
+
+        // Load database
+        $this->load->model('geomarcheur_db');
+    }
+
     public function index()
     {
-
+        // TODO: Show login page if not logged in
+        phpinfo();
     }
 
     public function player()
@@ -35,13 +49,12 @@ class Geomarcheur extends CI_Controller {
 
     public function getUser()
     {
-        $this->load->model('geomarcheur_db');
-        $user_id=$this->uri->segment(3);
+        $user_id = $this->uri->segment(3);
 
-        if ($user_id != null){
-            $data['resultat']=$this->geomarcheur_db->listUser($user_id);
+        if ($user_id != null) {
+            $data['resultat'] = $this->geomarcheur_db->listUser($user_id);
         } else {
-            $data['resultat']=$this->geomarcheur_db->listAllUsers();
+            $data['resultat'] = $this->geomarcheur_db->listAllUsers();
         }
 
         header("Content-Type: application/json");
@@ -50,15 +63,14 @@ class Geomarcheur extends CI_Controller {
 
     public function getPlace()
     {
-        $this->load->model('geomarcheur_db');
-        $place_id=$this->uri->segment(3);
+        $place_id = $this->uri->segment(3);
 
         if ($place_id == 'asc') {
-            $data['resultat']=$this->geomarcheur_db->listAllPlacesAsc();
-        } else if($place_id != null){
-            $data['resultat']=$this->geomarcheur_db->listPlace($place_id);
+            $data['resultat'] = $this->geomarcheur_db->listAllPlacesAsc();
+        } else if ($place_id != null) {
+            $data['resultat'] = $this->geomarcheur_db->listPlace($place_id);
         } else {
-            $data['resultat']=$this->geomarcheur_db->listAllPlaces();
+            $data['resultat'] = $this->geomarcheur_db->listAllPlaces();
         }
 
         header("Content-Type: application/json");
@@ -67,11 +79,10 @@ class Geomarcheur extends CI_Controller {
 
     public function getUserPlaces()
     {
-        $this->load->model('geomarcheur_db');
-        $place_id=$this->uri->segment(3);
+        $place_id = $this->uri->segment(3);
 
-        if ($place_id != null){
-            $data['resultat']=$this->geomarcheur_db->listUserPlaces($place_id);
+        if ($place_id != null) {
+            $data['resultat'] = $this->geomarcheur_db->listUserPlaces($place_id);
         } else {
             // TODO: figure out how to send an error back
         }
@@ -80,12 +91,12 @@ class Geomarcheur extends CI_Controller {
         echo json_encode($data);
     }
 
-    public function sellPlace() {
-        $this->load->model('geomarcheur_db');
-        $place_id=$this->uri->segment(3);
+    public function sellPlace()
+    {
+        $place_id = $this->uri->segment(3);
 
-        if($place_id != null){
-            $result=$this->geomarcheur_db->sellPlace($place_id);
+        if ($place_id != null) {
+            $result = $this->geomarcheur_db->sellPlace($place_id);
 
             // TODO: echo an actual output that can serve for DEBUG mode
             /*foreach ($result as $item) {
@@ -98,64 +109,93 @@ class Geomarcheur extends CI_Controller {
         }
     }
 
-    public function login() {
-        $this->load->model('geomarcheur_db');
-        $username = $this->input->post('username');
-        $password = $this->input->post('password');
 
-        // Assuming the data received is valid (TODO: Assume it is not)
-        $result = $this->geomarcheur_db->login($username, $password);
+    public function login()
+    {
+        // Set up the data to be validated
+        $this->form_validation->set_rules('username', 'Username', 'required');
+        $this->form_validation->set_rules('password', 'Password', 'required');
 
-        echo $result;
+        // No need to log in if the session is still active
+        if (isset($_SESSION['logged_in'])) {
+            // TODO: load the right page based on status
+            echo "henlo";
+            exit();
+        }
+
+        // The run function will fail if there's no data to validate
+        // (i.e., the form has not been filled out yet)
+        if ($this->form_validation->run() == FALSE) {
+            echo validation_errors();
+        } else {
+            // Retrieve the data from the POST array
+            $data = array(
+                'username' => $this->input->post('username'),
+                'password' => $this->input->post('password')
+            );
+
+            // Call to the login model function
+            // Assuming the data received is safe (TODO: Assume it is not)
+            $is_login_valid = $this->geomarcheur_db->login($data);
+
+            if ($is_login_valid) {
+                // Add user data in session
+                $this->session->set_userdata('logged_in', true);
+                $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
+                $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
+                foreach ($_SESSION as $key => $item) {
+                    echo $key . ": " . $item . "\n";
+                }
+            } else {
+                // TODO: Display error message
+                echo "Bad login";
+            }
+        }
     }
-
 
 
     // references
     public function create()
     {
-        if ($this->input->server('REQUEST_METHOD') == 'GET'){
+        if ($this->input->server('REQUEST_METHOD') == 'GET') {
             $this->load->view('create_view');
-        }
-        else if ($this->input->server('REQUEST_METHOD') == 'POST'){
-            $this->load->model('actualite_db');
+        } else if ($this->input->server('REQUEST_METHOD') == 'POST') {
 
             $data['title'] = $this->input->post('news_title');
             $data['image'] = $this->input->post('news_image');
             $data['text'] = $this->input->post('news_text');
             $id = $this->actualite_db->create($data);
-            $data2['resultat']=$this->actualite_db->display($id);
-            $this->load->view('index_view',$data2);
+            $data2['resultat'] = $this->actualite_db->display($id);
+            $this->load->view('index_view', $data2);
         }
     }
 
 
     public function delete()
     {
-        $idproduit=$this->uri->segment(3);
+        $idproduit = $this->uri->segment(3);
 
-        if ($idproduit ==null) {
-            $data['erreur']="Id produit introuvable";
-            $data['message']="";
-            $data['resultat']="";
+        if ($idproduit == null) {
+            $data['erreur'] = "Id produit introuvable";
+            $data['message'] = "";
+            $data['resultat'] = "";
         } else {
             $this->load->model('actualite_db');
-            $data['resultat']=$this->actualite_db->delete($idproduit);
-            $data['erreur']="";
-            $data['message']="Produit n° ".$idproduit." supprimé.";
+            $data['resultat'] = $this->actualite_db->delete($idproduit);
+            $data['erreur'] = "";
+            $data['message'] = "Produit n° " . $idproduit . " supprimé.";
         }
-        $this->load->view('delete_view',$data);
+        $this->load->view('delete_view', $data);
     }
-
 
 
     public function display()
     {
         $this->load->model('produitbdd');
 
-        $data['resultat']=$this->produitbdd->listerTous();
+        $data['resultat'] = $this->produitbdd->listerTous();
 
-        $this->load->view('vuelistertous',$data);
+        $this->load->view('vuelistertous', $data);
     }
 
 
