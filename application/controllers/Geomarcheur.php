@@ -173,59 +173,56 @@ class Geomarcheur extends CI_Controller
         $this->load->view('login_view', $data);
     }
 
-    // references
-    public function create()
-    {
-        if ($this->input->server('REQUEST_METHOD') == 'GET') {
-            $this->load->view('create_view');
-        } else if ($this->input->server('REQUEST_METHOD') == 'POST') {
-
-            $data['title'] = $this->input->post('news_title');
-            $data['image'] = $this->input->post('news_image');
-            $data['text'] = $this->input->post('news_text');
-            $id = $this->actualite_db->create($data);
-            $data2['resultat'] = $this->actualite_db->display($id);
-            $this->load->view('index_view', $data2);
-        }
-    }
-
-
-    public function delete()
-    {
-        $idproduit = $this->uri->segment(3);
-
-        if ($idproduit == null) {
-            $data['erreur'] = "Id produit introuvable";
-            $data['message'] = "";
-            $data['resultat'] = "";
-        } else {
-            $this->load->model('actualite_db');
-            $data['resultat'] = $this->actualite_db->delete($idproduit);
-            $data['erreur'] = "";
-            $data['message'] = "Produit n° " . $idproduit . " supprimé.";
-        }
-        $this->load->view('delete_view', $data);
-    }
-
-
-    public function display()
-    {
-        $this->load->model('produitbdd');
-
-        $data['resultat'] = $this->produitbdd->listerTous();
-
-        $this->load->view('vuelistertous', $data);
-    }
-
-
-    /*
-    public function operation()
-     {
-        // 1- récupérer les parametres / données de la requete HTTP, et faire les vérifications nécessaires (session etc.)
-        // 2- faire éventuellement appel à la couche Base de données (requetes SQL)
-        // 3- transmettre les données à la vue pour génération de la réponse HTTP
-     }
+    /**
+     * @param $type: The log type determined in @class LogType
+     * @param $message! The message to write in the log
      */
+    private function logger($type, $message){
+        $log_dir = base_url() . "/logs/" . date("Y-m-d");
+
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir);
+        }
+
+        if ($type == LogType::DEBUG) {
+            $filename = date("Y-m-d") . " - DEBUG.log";
+            if (!file_exists($filename)) {
+                echo $filename . " created. Message: " . $message;
+            }
+
+        } elseif ($type == LogType::WARNING) {
+            $filename = date("Y-m-d") . " - WARNING.log";
+            if (!file_exists($filename)) {
+                echo $filename . " created. Message: " . $message;
+            }
+
+        } elseif ($type == LogType::ERROR) {
+            $filename = date("Y-m-d") . " - ERROR.log";
+            if (!file_exists($filename)) {
+                echo $filename . " created. Message: " . $message;
+            }
+
+        } else {
+            // This should not happen
+            $sub_message = get_prefix($type) . "A log was sent with the wrong parameters. Original message: " . $message;
+            $this->logger(LogType::WARNING, $sub_message);
+        }
+
+        function get_prefix($type) {
+            return "PREFIX";
+        }
+    }
+
+    public function log_tester() {
+        $this->logger(LogType::DEBUG, "Test");
+    }
+
+}
+
+abstract class LogType {
+    const DEBUG = 0;
+    const WARNING = 1;
+    const ERROR = 2;
 }
 
 
