@@ -237,50 +237,65 @@
 
     <!-- la modale des détails d'un utilisateur -->
 
-    <div id="modal1" class="modal"></div>
-
-    <div id="statistics" class="container">
-        <div class="row">
-            <div class="col s6"><div class="card-panel hoverable">
-                    <div id="linechart_material1"></div>
-                </div></div>
-            <div class="col s6"><div class="card-panel hoverable">
-                    <div id="linechart_material2"></div>
-                </div></div>
-            <div class="col s6"><div class="card-panel hoverable">
-                    <div id="linechart_material3"></div>
-                </div></div>
-            <div class="col s6"><div class="card-panel hoverable">
-                    <div id="linechart_material4"></div>
-                </div></div>
-        </div>
-    </div>
-
-    <footer class="page-footer pink darken-3">
-        <div class="container">
+    <div id="modal_detail_user" class="modal modal-fixed-footer">
+        <div class="modal-content">
             <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                    <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+                <div class="col s3">
+                    <div class="card small modal_place_stats_block">
+                        <div class="card-content">
+                            <p class="bold">Photo de l'utilisateur</p>
+                        </div>
+                        <div style="text-align: center;">
+                        Blablitu
+                        </div>
+                    </div>
                 </div>
-                <div class="col l4 offset-l2 s12">
-                    <h5 class="grey-text text-lighten-5">Links</h5>
-                    <ul>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
-                    </ul>
+
+                    <div class="col s9">
+
+                        <div class="row">
+
+                            <div class="col s8">
+                                Nom
+                            </div>
+                            <div class="col s2">
+                                #
+                            </div>
+                            <div class="col s2">
+                                Crédits
+                            </div>
+
+                        </div>
+
+                    <div class="row">
+                        <div class="col s4">
+                        <!-- TODO: gerer le nombre de lieux (pluriel / singulier) -->
+                        Nombre de lieux <span><!-- inserer le nombre de lieux disponibles --></span>
+                        </div>
+                            <div class="col s4">
+                                <a href="#" class="pink-text text-darken-3">Lieux possédés</a>
+                            </div>
+                        </div>
+                    <div class="row"></div>
+
+                    <div class="col s12">
+                        <!-- TODO: gerer le nombre de lieux (pluriel / singulier) -->
+                        Bio
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="footer-copyright">
-            <div class="container">
-                © 2017 Kiantic
-                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
-            </div>
+
+
+
+        <div class="modal-footer">
+            <a class="waves-effect waves-light btn-large #f44336 red">BANNIR</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3" onclick="idPlace = ''; console.log('id de la place : ' + idPlace); ">Retour</a>
+
         </div>
-    </footer>
+
+
 </div>
 
 <!--Import jQuery before materialize.js-->
@@ -521,7 +536,6 @@
     carte = new google.maps.Map(document.getElementById("map"), options);
     let infowindow = new google.maps.InfoWindow();
     $.getJSON( "getPlace", "", function( result ) {
-            console.log(result);
             $.each(result, function(i, places) {
                 $.each(places, function(j, place) {
                         marqueur[j] = new google.maps.Marker (
@@ -559,7 +573,7 @@
         }
     );
 
-    const users_detail_modal = $("#modal1");
+    const users_detail_modal = $("#modal_detail_user");
     users_detail_modal.modal({
                     dismissible: true, // Modal can be dismissed by clicking outside of the modal
                     opacity: .5, // Opacity of modal background
@@ -568,7 +582,6 @@
                     startingTop: '4%', // Starting top style attribute
                     endingTop: '10%'
                 });
-
 
     // Datatable setup
     let container = $('#leaderboard_container');
@@ -603,37 +616,29 @@
             $.each(result, function (i, users) {
                 $.each(users, function(j, user) {
 
-                    users_detail_modal.removeData();
+                    //users_detail_modal.html("");
 
-
-                    console.log(user.pseudo);
-                    console.log(user.credits);
-
-                    // au click sur le tableau, ouvrir la modale qui s'apelle modal
                     users_detail_modal.modal('open');
                     console.log(users_detail_modal);
 
 
+                    //users_detail_modal.append(`
+                    //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
+                    //<p>Nom de l'utilisateur : ` + user.credits + ` </p>
+                    //`);
+                    // recuperer les lieux de l'utilisateur where ID => machin
+                    $.getJSON("getUserPlaces/"+idUser, "", function (result) {
+                        $.each(result, function (i, places) {
+                            $.each(places, function(j, place) {
+                                //users_detail_modal.append(`
+                        //<p>Lieux :` + place.name +`  </p>
+                          // `);
+                    })
+                        })
+                    })
+    //TODO: améliorer l'affichage de la modale
 
-                    users_detail_modal.append(`
-                           <tr>
-                           <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
-                           <td class="leaderboard_pseudo">`+user["pseudo"]+`</td>
-                           <td class="leaderboard_credits">¢ `+user["credits"]+`</td>
-                           <td class="leaderboard_is_admin">`+user["is_admin"]+`</td>
-                           </tr></div>
-                           `);
-                    //users_detail_modal.modal.remove(user_data);
-                    users_detail_modal.remove();
 
-                    console.log(users_detail_modal);
-
-
-
-                   /*userDetails.append(`
-                    <p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
-                    <p>Nom de l'utilisateur : ` + user.credits + ` </p>
-                    `);*/
 
                 })
             })
