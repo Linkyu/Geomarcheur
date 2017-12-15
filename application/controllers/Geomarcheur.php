@@ -112,8 +112,8 @@ class Geomarcheur extends CI_Controller
     public function login()
     {
         // Set up the data to be validated
-        $this->form_validation->set_rules('username', 'Username', 'required');
-        $this->form_validation->set_rules('password', 'Password', 'required');
+        $this->form_validation->set_rules('username', 'Username', 'trim|required');
+        $this->form_validation->set_rules('password', 'Password', 'trim|required');
 
         // No need to log in if the session is still active
         if (isset($_SESSION['logged_in'])) {
