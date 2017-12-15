@@ -146,6 +146,7 @@ class Geomarcheur extends CI_Controller
                 // Add user data in session
                 $this->session->set_userdata('logged_in', true);
                 $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
+                $this->session->set_userdata('user_id', $is_login_valid[0]->id);
                 $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
 
                 $this->redirect_after_login($_SESSION['is_admin']);
@@ -157,12 +158,19 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    private function redirect_after_login($user_status) {
-        if ($user_status) {
+    private function redirect_after_login($is_admin) {
+        if ($is_admin) {
             $this->dashboard();
         } else {
             $this->player();
         }
+    }
+
+    public function logout () {
+        // Removing session data
+        session_destroy();
+        $data['message_display'] = 'Bye bye';
+        $this->load->view('login_view', $data);
     }
 
     // references

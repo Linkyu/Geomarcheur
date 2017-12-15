@@ -69,7 +69,7 @@ class Geomarcheur_db extends CI_Model {
         $password = $data['password'];
 
         $this->load->database();
-        $get_user_query = $this->db->query("SELECT pseudo, is_admin FROM user WHERE pseudo='".$username."' AND password='".$password."'");
+        $get_user_query = $this->db->query("SELECT id, pseudo, is_admin FROM user WHERE pseudo='".$username."' AND password='".$password."'");
 
         if (sizeof($get_user_query->result_array()) > 0) {
             return $get_user_query->result();
