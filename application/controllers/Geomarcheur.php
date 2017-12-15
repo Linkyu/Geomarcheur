@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+// TODO: Document this file
+
 class Geomarcheur extends CI_Controller
 {
 
@@ -55,6 +57,7 @@ class Geomarcheur extends CI_Controller
         } else {
             $data['resultat'] = $this->geomarcheur_db->listAllUsers();
         }
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data) . "line" . sizeof($data) > 1 ? "s" : "" . " from User table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -71,6 +74,7 @@ class Geomarcheur extends CI_Controller
         } else {
             $data['resultat'] = $this->geomarcheur_db->listAllPlaces();
         }
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data) . "line" . sizeof($data) > 1 ? "s" : "" . " from Place table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -83,8 +87,12 @@ class Geomarcheur extends CI_Controller
         if ($place_id != null) {
             $data['resultat'] = $this->geomarcheur_db->listUserPlaces($place_id);
         } else {
-            // TODO: figure out how to send an error back
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no parameter.");
+            http_response_code(400);
+            echo "Missing parameter: place_id";
+            exit();
         }
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data) . "line" . sizeof($data) > 1 ? "s" : "" . " from PLace table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -98,13 +106,14 @@ class Geomarcheur extends CI_Controller
             $result = $this->geomarcheur_db->sellPlace($place_id);
 
             // TODO: echo an actual output that can serve for DEBUG mode
-            /*foreach ($result as $item) {
-                foreach ($item as $row) {
-                    echo $row;
-                }
-            }*/
+            $this->logger(LogType::DEBUG, __FUNCTION__ . ": Place " . $place_id . " was sold.");
+            http_response_code(200);
+            echo "PLace sold.";
         } else {
-            echo "ERROR - Was expecting place, received nothing instead.";
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no parameter.");
+            http_response_code(400);
+            echo "Missing parameter: place_id.";
+            exit();
         }
     }
 
@@ -149,9 +158,10 @@ class Geomarcheur extends CI_Controller
                 $this->session->set_userdata('user_id', $is_login_valid[0]->id);
                 $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
 
+                $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $data['username'] . " logged in successfully.");
                 $this->redirect_after_login($_SESSION['is_admin']);
             } else {
-                // TODO: Display error message
+                $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
                 http_response_code(401);
                 echo "Bad login";
             }
@@ -167,55 +177,87 @@ class Geomarcheur extends CI_Controller
     }
 
     public function logout () {
+        $username = $_SESSION['username'];
         // Removing session data
         session_destroy();
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $username . " logged out successfully.");
+
         $data['message_display'] = 'Bye bye';
-        $this->load->view('login_view', $data);
+        $this->load->view('login_view', $data);   // TODO: Process the exit message
     }
 
     /**
+     * Simple logging method
+     *
+     * This method will log messages in a readable format in the logs folder. The possible types are DEBUG, WARNING and ERROR.<br />
+     * DEBUG messages should be used whenever an action is taken by the server with no error.<br />
+     * WARNING messages are when there is a non-blocking error.<br />
+     * ERROR messages are ONLY for blocking errors that prevent the server from performing its given task.
+     *
      * @param $type: The log type determined in @class LogType
-     * @param $message! The message to write in the log
+     * @param $message: The message to write in the log
      */
     private function logger($type, $message){
-        $log_dir = base_url() . "/logs/" . date("Y-m-d");
+        $log_dir = "./application/logs/" . date("Y-m-d") . "/";
+        $handler = null;
 
+        // Create the logs subdirectory if it doesn't exist yet
         if (!is_dir($log_dir)) {
             mkdir($log_dir);
         }
 
-        if ($type == LogType::DEBUG) {
-            $filename = date("Y-m-d") . " - DEBUG.log";
+        // Handle (very slightly) differently depending on the type of the message
+        // TODO: DRY this
+        if ($type === LogType::DEBUG) {
+            $filename = $log_dir . date("Y-m-d") . "_DEBUG.log";
             if (!file_exists($filename)) {
-                echo $filename . " created. Message: " . $message;
+                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
             }
-
-        } elseif ($type == LogType::WARNING) {
-            $filename = date("Y-m-d") . " - WARNING.log";
+            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $data = $this->log_format($type, $message);
+            fwrite($handler, $data);
+        } elseif ($type === LogType::WARNING) {
+            $filename = $log_dir . date("Y-m-d") . "_WARNING.log";
             if (!file_exists($filename)) {
-                echo $filename . " created. Message: " . $message;
+                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
             }
-
-        } elseif ($type == LogType::ERROR) {
-            $filename = date("Y-m-d") . " - ERROR.log";
+            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $data = $this->log_format($type, $message);
+            fwrite($handler, $data);
+        } elseif ($type === LogType::ERROR) {
+            $filename = $log_dir . date("Y-m-d") . "_ERROR.log";
             if (!file_exists($filename)) {
-                echo $filename . " created. Message: " . $message;
+                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
             }
-
+            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $data = $this->log_format($type, $message);
+            fwrite($handler, $data);
         } else {
             // This should not happen
-            $sub_message = get_prefix($type) . "A log was sent with the wrong parameters. Original message: " . $message;
+            $sub_message = "A log was sent with the wrong parameters. Original message: " . $message;
             $this->logger(LogType::WARNING, $sub_message);
         }
 
-        function get_prefix($type) {
-            return "PREFIX";
+        if ($handler != null) {
+            fclose($handler);
         }
     }
 
-    public function log_tester() {
-        $this->logger(LogType::DEBUG, "Test");
+    private function log_format($type, $message) {
+        if ($type === LogType::DEBUG) {
+            return date("[h:i:s] ") . "[DEBUG] " . $message . "\r\n";
+        } elseif ($type === LogType::WARNING) {
+            return date("[h:i:s] ") . "[WARNING] " . $message . "\r\n";
+        } elseif ($type === LogType::ERROR) {
+            return date("[h:i:s] ") . "[ERROR] " . $message . "\r\n";
+        }
+        return date("[h:i:s] ") . "[???] " . $message . "\r\n";
     }
+
+    // Debugging function
+    /*public function log_tester() {
+        $this->logger(LogType::WARNING, "ATTENCIONE");
+    }*/
 
 }
 
