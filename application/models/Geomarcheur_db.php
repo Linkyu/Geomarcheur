@@ -28,11 +28,11 @@ class Geomarcheur_db extends CI_Model {
         return $query->result_array();
     }
 
-    /*public function listUserPlaces($id) {
+    public function listUserPlaces($id) {
         $this->load->database();
         $query = $this->db->query('SELECT * FROM place WHERE id_User='.$id.' ORDER BY name');
         return $query->result_array();
-    }*/
+    }
 
     public function listPlace($id) {
         $this->load->database();
