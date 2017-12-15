@@ -9,11 +9,15 @@
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"  media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"
+          media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"
+          media="screen,projection"/>
     <!--Import custom css files-->
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"  media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/style.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"
+          media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/style.css"
+          media="screen,projection"/>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -37,7 +41,7 @@
             overflow-y: scroll;
         }
 
-        .map_block h1{
+        .map_block h1 {
             width: 100%;
         }
 
@@ -45,27 +49,36 @@
             height: 100%;
         }
 
-        .modal_place_picture_block{
+        .modal_place_picture_block {
             max-width: 250px;
             height: 100%;
             max-height: 500px;
             overflow: hidden;
-            display:inline-block;
-            background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(250, 250, 250, .75) 100%); /* W3C version */
+            display: inline-block;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(250, 250, 250, .75) 100%); /* W3C version */
             border-right: rgba(0, 0, 0, 0.3) solid 1px;
         }
 
         .modal_place_picture {
             width: auto;
             height: auto;
-            position:relative;
-            z-index:-1;
-            display:block;
+            position: relative;
+            z-index: -1;
+            display: block;
         }
 
         .modal_place_stats_block {
             margin-top: 50px;
         }
+
+        #card_user_pic {
+            height: 150px;
+        }
+
+        #little_credit_symbol {
+            font-size: 18px;
+        }
+
     </style>
 </head>
 <body>
@@ -94,10 +107,13 @@
 
     <!-- The 4 dashboard cards -->
     <div class="row">
-        <div class="col s6"><div class="card-panel hoverable map_block">
+        <div class="col s6">
+            <div class="card-panel hoverable map_block">
                 <div class="valign-wrapper center-align map" id="map"><h1>M A P</h1></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable place_list_block">
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable place_list_block">
                 <div class="row">
                     <form class="fullwidth">
                         <div class="input-field">
@@ -113,9 +129,11 @@
                     </div>
                     <div id="place_list_message"></div>
                 </div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
-                <table class="highlight responsive-table" >
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
+                <table class="highlight responsive-table">
                     <thead>
                     <tr>
                         <th><!-- Avatar --></th>
@@ -126,11 +144,15 @@
                     </thead>
                     <tbody id="user_list"></tbody>
                 </table>
-                <div class="right-align"><a class="waves-effect waves-light btn indigo darken-4">Voir le classement</a></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
+                <div class="right-align"><a class="waves-effect waves-light btn indigo darken-4">Voir le classement</a>
+                </div>
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <div id="linechart_material"></div>
-            </div></div>
+            </div>
+        </div>
     </div>
 
     <!-- Place detail Modal Structure -->
@@ -188,7 +210,8 @@
                     <div class="card small modal_place_stats_block">
                         <div class="card-image">
                             <img src="http://i.imgur.com/0uABqwN.png">
-                            <span class="card-title">_ 3,045 ¢</span> <!-- Current amount of credits gained from this place -->
+                            <span class="card-title">_ 3,045 ¢</span>
+                            <!-- Current amount of credits gained from this place -->
                         </div>
                         <div class="card-content">
                             <p class="bold">Crédits obtenus ici</p>
@@ -201,12 +224,13 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3" onclick="idPlace = ''; console.log('id de la place : ' + idPlace); ">Retour</a>
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
+               onclick="idPlace = '';">Retour</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les
+                modifications</a>
         </div>
     </div>
 </div>
-
 
 
 <div id="leaderboard" class="container">
@@ -236,51 +260,58 @@
     </div>
 
     <!-- la modale des détails d'un utilisateur -->
-
     <div id="modal_detail_user" class="modal modal-fixed-footer">
         <div class="modal-content">
             <div class="row">
                 <div class="col s3">
-                    <div class="card small modal_place_stats_block">
+                    <div id="card_user_pic" class="card small modal_place_stats_block">
                         <div class="card-content">
                             <p class="bold">Photo de l'utilisateur</p>
                         </div>
-                        <div style="text-align: center;">
-                        Blablitu
-                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <span id="player_quote"></span>
                     </div>
                 </div>
 
-                    <div class="col s9">
-
-                        <div class="row">
-
-                            <div class="col s8">
-                                Nom
-                            </div>
-                            <div class="col s2">
-                                #
-                            </div>
-                            <div class="col s2">
-                                Crédits
-                            </div>
+                <div class="col s9">
+                    <div class="row">
+                        <div class="col s6">
+                            <span class="bold">Nom</span>
+                            <br>
+                            <span id="player_name"></span>
+                        </div>
+                        <div class="col s2">
+                            <span class="bold">#</span>
+                            <br>
+                            <span id="player_position"></span>
+                        </div>
+                        <div class="col s2">
+                            <span class="bold">Crédits</span>
+                            <br>
+                            <span id="player_credits"></span> <span id="little_credit_symbol" class="credit_symbol prefix">¢</span>
 
                         </div>
+
+                    </div>
 
                     <div class="row">
-                        <div class="col s4">
-                        <!-- TODO: gerer le nombre de lieux (pluriel / singulier) -->
-                        Nombre de lieux <span><!-- inserer le nombre de lieux disponibles --></span>
-                        </div>
-                            <div class="col s4">
-                                <a href="#" class="pink-text text-darken-3">Lieux possédés</a>
-                            </div>
-                        </div>
-                    <div class="row"></div>
 
-                    <div class="col s12">
-                        <!-- TODO: gerer le nombre de lieux (pluriel / singulier) -->
-                        Bio
+
+                        <div class="row"></div>
+
+                        <div class="col s8">
+                            <span class="bold">Bio</span>
+                            <br>
+                            <span id="player_bio"></span>
+                        </div>
+
+                        <div class="col s4">
+                            <span class="bold">Lieu(x) possédé(s)</span>
+                            <br>
+                            <span id="player_places"></span>
+                            <!-- liste sur les lieux possédés -->
+                        </div>
                     </div>
 
                 </div>
@@ -288,129 +319,129 @@
         </div>
 
 
-
         <div class="modal-footer">
             <a class="waves-effect waves-light btn-large #f44336 red">BANNIR</a>
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3" onclick="idPlace = ''; console.log('id de la place : ' + idPlace); ">Retour</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
+               onclick="idPlace = '';">Retour</a>
 
         </div>
 
 
-</div>
+    </div>
 
-<!--Import jQuery before materialize.js-->
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<!-- Compiled and minified Materialize JavaScript -->
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- Compiled and minified Materialize JavaScript -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
     <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
-<!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
-<!-- Charts API + placeholder data -->
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>"
+            type="text/javascript"></script>
+    <!-- Charts API + placeholder data -->
 
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-    google.charts.load('current', {'packages':['line']});
-    google.charts.setOnLoadCallback(drawChart);
+        google.charts.load('current', {'packages': ['line']});
+        google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart() {
+        function drawChart() {
 
-        let data = new google.visualization.DataTable();
-        data.addColumn('number', 'Day');
-        data.addColumn('number', 'Dave Grohl');
-        data.addColumn('number', 'Eric Clapman');
-        data.addColumn('number', 'Bob Dylan');
+            let data = new google.visualization.DataTable();
+            data.addColumn('number', 'Day');
+            data.addColumn('number', 'Dave Grohl');
+            data.addColumn('number', 'Eric Clapman');
+            data.addColumn('number', 'Bob Dylan');
 
-        data.addRows([
-            [1,  37.8, 80.8, 41.8],
-            [2,  30.9, 69.5, 32.4],
-            [3,  25.4,   57, 25.7],
-            [4,  11.7, 18.8, 10.5],
-            [5,  11.9, 17.6, 10.4],
-            [6,   8.8, 13.6,  7.7],
-            [7,   42, 12.3,  9.6],
-            [8,  342, 29.2, 10.6],
-            [9,  5342, 42.9, 14.8],
-            [10, 85342, 30.9, 25],
-            [11, 985342,  342,  50],
-            [12, 1985342,  5342,  500],
-            [13, 3920342, 85342,  400],
-            [14, 6985342, 985342,  420]
-        ]);
+            data.addRows([
+                [1, 37.8, 80.8, 41.8],
+                [2, 30.9, 69.5, 32.4],
+                [3, 25.4, 57, 25.7],
+                [4, 11.7, 18.8, 10.5],
+                [5, 11.9, 17.6, 10.4],
+                [6, 8.8, 13.6, 7.7],
+                [7, 42, 12.3, 9.6],
+                [8, 342, 29.2, 10.6],
+                [9, 5342, 42.9, 14.8],
+                [10, 85342, 30.9, 25],
+                [11, 985342, 342, 50],
+                [12, 1985342, 5342, 500],
+                [13, 3920342, 85342, 400],
+                [14, 6985342, 985342, 420]
+            ]);
 
-        const options = {
-            chart: {
-                title: 'Crédits des 3 meilleurs joueurs',
-                subtitle: 'en crédits'
-            },
-            width: '100%',
-            height: 'auto'
-        };
+            const options = {
+                chart: {
+                    title: 'Crédits des 3 meilleurs joueurs',
+                    subtitle: 'en crédits'
+                },
+                width: '100%',
+                height: 'auto'
+            };
 
-        let chart = new google.charts.Line(document.getElementById('linechart_material'));
+            let chart = new google.charts.Line(document.getElementById('linechart_material'));
 
-        chart.draw(data, google.charts.Line.convertOptions(options));
-    }
-</script>
+            chart.draw(data, google.charts.Line.convertOptions(options));
+        }
+    </script>
 
-<!-- Custom tools -->
-<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+    <!-- Custom tools -->
+    <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
-<!-- Custom local scripts -->
-<script>
-    $(document).ready(function() {
-        const userListDatatable =  $("#datatable_leaderboard");
-        const user_list = $("#user_list");
-        var idPlace;
+    <!-- Custom local scripts -->
+    <script>
+        $(document).ready(function () {
+            const userListDatatable = $("#datatable_leaderboard");
+            const user_list = $("#user_list");
+            var idPlace;
 
+            $.getJSON("getUser", "", function (result) {
+                console.log(result);
+                $.each(result, function (i, users) {
 
-        $.getJSON( "getUser", "", function( result ) {
-            console.log(result);
-            $.each(result, function(i, users) {
+                    if (users.length === 0) {
 
-                if (users.length === 0) {
+                        $("#user_list_message").html("<p>Il n'existe aucun utilisateur actuellement!</p>")
 
-                    $("#user_list_message").html("<p>Il n'existe aucun utilisateur actuellement!</p>")
+                    } else {
 
-                } else {
+                        //userListDatatable.html("");
 
-                    //userListDatatable.html("");
+                        $.each(users, function (j, user) {
 
-                    $.each(users, function(j, user) {
-
-                       const user_data = `
+                                const user_data = `
                            <tr>
                            <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
-                           <td class="leaderboard_pseudo">`+user["pseudo"]+`</td>
-                           <td class="leaderboard_credits">¢ `+user["credits"]+`</td>
-                           <td class="leaderboard_is_admin">`+user["is_admin"]+`</td>
+                           <td class="leaderboard_pseudo">` + user["pseudo"] + `</td>
+                           <td class="leaderboard_credits">¢ ` + user["credits"] + `</td>
+                           <td class="leaderboard_is_admin">` + user["is_admin"] + `</td>
                            </tr>
                            `;
 
-                            user_list.append(user_data);
+                                user_list.append(user_data);
 
-                            //userListDatatable.append(user_data);
-                        }
-                    )
-                }
+                                //userListDatatable.append(user_data);
+                            }
+                        )
+                    }
 
-            })})
+                })
+            })
 
 
+            const place_list = $("#place_list");
 
-        const place_list = $("#place_list");
-
-        // Place data retrieval
-        $.getJSON("getPlace/asc", "", function (result) {
-            $.each(result, function (i, places) {
-                // TODO: Make a better overfllow rule
-                if (places.length === 0) {
-                    $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
-                } else {
-                    $.each(places, function (j, place) {
-                        place_list.append(`
+            // Place data retrieval
+            $.getJSON("getPlace/asc", "", function (result) {
+                $.each(result, function (i, places) {
+                    // TODO: Make a better overfllow rule
+                    if (places.length === 0) {
+                        $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
+                    } else {
+                        $.each(places, function (j, place) {
+                            place_list.append(`
                             <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
                             <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
                             <span class="place_id">` + place["id"] + `</span>
@@ -418,237 +449,251 @@
                             <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
                             <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
                             </a>`);
-                    });
-                }
-            });
-        });
-
-        // Search function
-        $("#place_input_search").keyup(function(){
-
-            // Retrieve the input field text and reset the count to zero
-            let filter = $(this).val();
-            let count = 0;
-            const message_box = $("#place_list_message");
-
-            // Loop through the list
-            $(".place_item").each(function(){
-
-                // If the list item does not contain the text phrase fade it out
-                if ($(this).find(".place_name, .place_location").text().search(new RegExp(filter, "i")) < 0) {
-                    $(this).fadeOut();
-
-                    // Show the list item if the phrase matches
-                } else {
-                    $(this).fadeIn();
-                    count++;
-                }
-            });
-            if (count === 0) {
-                message_box.html("<p>Aucun résultat.</p>");
-                message_box.fadeIn();
-            } else {
-                message_box.html("");
-            }
-        });
-    });
-
-    // Place details display
-    function display_place(id) {
-        // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
-        const place_modal = $("#place_modal");
-        idPlace = id;
-        console.log("id de la place :  " +idPlace)
-        get_place(id, function (result) {
-            const place = result;
-            if (place === 1) {
-                alert("Ce lieu n'existe pas!");
-            } else {
-
-                get_user(place["id_User"], function (result) {
-                    const owner = result;
-
-                    place_modal.modal({
-                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
-                        opacity: .5, // Opacity of modal background
-                        inDuration: 300, // Transition in duration
-                        outDuration: 200, // Transition out duration
-                        startingTop: '4%', // Starting top style attribute
-                        endingTop: '10%', // Ending top style attribute
-                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                            $("#modal_place_name_input").val(place["name"]);
-                            if (place["address"] !== null) {
-                                $("#modal_place_address_input").val(place["address"]);
-                            }
-                            if (place["id_User"] !== null) {
-                                $("#modal_place_owner_input").val(owner["pseudo"]);
-                            }
-                            $("#modal_place_value_input").val(place["value"]);
-
-                            Materialize.updateTextFields();
-                        },
-                        complete: function (modal, trigger) {
-                            $("#modal_place_name_input").val("");
-                            $("#modal_place_address_input").val("");
-                            $("#modal_place_owner_input").val("");
-                            $("#modal_place_value_input").val("");
-
-                            Materialize.updateTextFields();
-                        }
-                    });
-
-                    place_modal.modal('open');
-                });
-            }
-
-        });
-    }
-
-    function deletePlace(idPlace) {
-
-        if (confirm("Vous désirez vraiment supprimer?")) {
-            document.location.href="delete/"+idPlace;
-
-            /* $.ajax({
-                dataType: 'json',
-                type:'delete',
-                url: url + '/' + id
-
-               /* type: "GET",
-                url: "../../controllers/Geomarcheur.php",
-                data: 'id='+ idPlace*/
-        }
-    } //reload la page);
-
-
-    const place_list_table = $("#place_list_table");
-    const divs = place_list_table.find("div.card");
-    let alpha_order = false;
-    var idUser;
-    var carte;
-    var marqueur = [];
-    var latlng = new google.maps.LatLng(43.600000, 1.433333);
-    var options = {
-        center: latlng,
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.roadmap
-    };
-    carte = new google.maps.Map(document.getElementById("map"), options);
-    let infowindow = new google.maps.InfoWindow();
-    $.getJSON( "getPlace", "", function( result ) {
-            $.each(result, function(i, places) {
-                $.each(places, function(j, place) {
-                        marqueur[j] = new google.maps.Marker (
-                            {
-                                position: new google.maps.LatLng(place.lat, place.lng),
-                                title:'Nom du lieu : ' + place.name
-                            }
-                        );
-                        marqueur[j].setMap(carte);
-                        console.log(marqueur[j]);
-                        // Closure => création de la function au moment de la création du marqueur
-                        var macallback = function callbackSpecificiqueMarqueur(ev) {
-                            //console.log("Callback appelée", ev, marqueur[j]);
-                            //console.log("la position est : " +marqueur[j].getPosition());
-
-                            var contentString =
-                                '<div id="content">' +
-                                '<p> Nom du lieu : ' + place.name + '</p>' +
-                                '<p> Valeur : ' + place.value + '</p>' +
-                                '<a href="#">Plus de détails</a><br><br>' +
-                                '<a href="#">Vendre le lieu</a>' +
-                                '</div>';
-
-                            infowindow.setContent(contentString);
-                            infowindow.open(map, marqueur[j]);
-                        };
-                        // creation de listener qui apelle la function ...
-                        //console.log("Creation du listener", carte);
-                        google.maps.event.addListener(
-                            marqueur[j], "click", macallback
-                        );
+                        });
                     }
-                )
-            })
-        }
-    );
-
-    const users_detail_modal = $("#modal_detail_user");
-    users_detail_modal.modal({
-                    dismissible: true, // Modal can be dismissed by clicking outside of the modal
-                    opacity: .5, // Opacity of modal background
-                    inDuration: 300, // Transition in duration
-                    outDuration: 200, // Transition out duration
-                    startingTop: '4%', // Starting top style attribute
-                    endingTop: '10%'
                 });
+            });
 
-    // Datatable setup
-    let container = $('#leaderboard_container');
-    container.DataTable( {
-        "language": {
-            url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
-        },
-        ajax: {
-            url: 'getUser',
-            dataSrc: "resultat"
-        },
-        columns: [
-            {data: "id"},
-            {data: "pseudo"},
-            {data: "credits"},
-            {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
-        ],
+            // Search function
+            $("#place_input_search").keyup(function () {
 
-    } );
+                // Retrieve the input field text and reset the count to zero
+                let filter = $(this).val();
+                let count = 0;
+                const message_box = $("#place_list_message");
 
-    let rows = $('#datatable_leaderboard');
+                // Loop through the list
+                $(".place_item").each(function () {
 
-    rows.on('click', 'tr', function() {
+                    // If the list item does not contain the text phrase fade it out
+                    if ($(this).find(".place_name, .place_location").text().search(new RegExp(filter, "i")) < 0) {
+                        $(this).fadeOut();
 
-        let row = $(this);
-        idUser = row[0].childNodes[0].textContent;
-        console.log(idUser);
-
-        var user_data;
-
-        $.getJSON("getUser/"+idUser, "", function (result) {
-            $.each(result, function (i, users) {
-                $.each(users, function(j, user) {
-
-                    //users_detail_modal.html("");
-
-                    users_detail_modal.modal('open');
-                    console.log(users_detail_modal);
-
-
-                    //users_detail_modal.append(`
-                    //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
-                    //<p>Nom de l'utilisateur : ` + user.credits + ` </p>
-                    //`);
-                    // recuperer les lieux de l'utilisateur where ID => machin
-                    $.getJSON("getUserPlaces/"+idUser, "", function (result) {
-                        $.each(result, function (i, places) {
-                            $.each(places, function(j, place) {
-                                //users_detail_modal.append(`
-                        //<p>Lieux :` + place.name +`  </p>
-                          // `);
-                    })
-                        })
-                    })
-    //TODO: améliorer l'affichage de la modale
-
-
-
-                })
-            })
+                        // Show the list item if the phrase matches
+                    } else {
+                        $(this).fadeIn();
+                        count++;
+                    }
+                });
+                if (count === 0) {
+                    message_box.html("<p>Aucun résultat.</p>");
+                    message_box.fadeIn();
+                } else {
+                    message_box.html("");
+                }
+            });
         });
-    })
+
+        // Place details display
+        function display_place(id) {
+            // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
+            const place_modal = $("#place_modal");
+            idPlace = id;
+            console.log("id de la place :  " + idPlace)
+            get_place(id, function (result) {
+                const place = result;
+                if (place === 1) {
+                    alert("Ce lieu n'existe pas!");
+                } else {
+
+                    get_user(place["id_User"], function (result) {
+                        const owner = result;
+
+                        place_modal.modal({
+                            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                            opacity: .5, // Opacity of modal background
+                            inDuration: 300, // Transition in duration
+                            outDuration: 200, // Transition out duration
+                            startingTop: '4%', // Starting top style attribute
+                            endingTop: '10%', // Ending top style attribute
+                            ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                                $("#modal_place_name_input").val(place["name"]);
+                                if (place["address"] !== null) {
+                                    $("#modal_place_address_input").val(place["address"]);
+                                }
+                                if (place["id_User"] !== null) {
+                                    $("#modal_place_owner_input").val(owner["pseudo"]);
+                                }
+                                $("#modal_place_value_input").val(place["value"]);
+
+                                Materialize.updateTextFields();
+                            },
+                            complete: function (modal, trigger) {
+                                $("#modal_place_name_input").val("");
+                                $("#modal_place_address_input").val("");
+                                $("#modal_place_owner_input").val("");
+                                $("#modal_place_value_input").val("");
+
+                                Materialize.updateTextFields();
+                            }
+                        });
+
+                        place_modal.modal('open');
+                    });
+                }
+
+            });
+        }
+
+        function deletePlace(idPlace) {
+
+            if (confirm("Vous désirez vraiment supprimer?")) {
+                document.location.href = "delete/" + idPlace;
+
+                /* $.ajax({
+                    dataType: 'json',
+                    type:'delete',
+                    url: url + '/' + id
+
+                   /* type: "GET",
+                    url: "../../controllers/Geomarcheur.php",
+                    data: 'id='+ idPlace*/
+            }
+        } //reload la page);
 
 
+        const place_list_table = $("#place_list_table");
+        const divs = place_list_table.find("div.card");
+        let alpha_order = false;
+        var idUser;
+        var carte;
+        var marqueur = [];
+        var latlng = new google.maps.LatLng(43.600000, 1.433333);
+        var options = {
+            center: latlng,
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.roadmap
+        };
+        carte = new google.maps.Map(document.getElementById("map"), options);
+        let infowindow = new google.maps.InfoWindow();
+        $.getJSON("getPlace", "", function (result) {
+                $.each(result, function (i, places) {
+                    $.each(places, function (j, place) {
+                            marqueur[j] = new google.maps.Marker(
+                                {
+                                    position: new google.maps.LatLng(place.lat, place.lng),
+                                    title: 'Nom du lieu : ' + place.name
+                                }
+                            );
+                            marqueur[j].setMap(carte);
+                            console.log(marqueur[j]);
+                            // Closure => création de la function au moment de la création du marqueur
+                            var macallback = function callbackSpecificiqueMarqueur(ev) {
+                                //console.log("Callback appelée", ev, marqueur[j]);
+                                //console.log("la position est : " +marqueur[j].getPosition());
+
+                                var contentString =
+                                    '<div id="content">' +
+                                    '<p> Nom du lieu : ' + place.name + '</p>' +
+                                    '<p> Valeur : ' + place.value + '</p>' +
+                                    '<a href="#">Plus de détails</a><br><br>' +
+                                    '<a href="#">Vendre le lieu</a>' +
+                                    '</div>';
+
+                                infowindow.setContent(contentString);
+                                infowindow.open(map, marqueur[j]);
+                            };
+                            // creation de listener qui apelle la function ...
+                            //console.log("Creation du listener", carte);
+                            google.maps.event.addListener(
+                                marqueur[j], "click", macallback
+                            );
+                        }
+                    )
+                })
+            }
+        );
+
+        const users_detail_modal = $("#modal_detail_user");
+        users_detail_modal.modal({
+            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+            opacity: .5, // Opacity of modal background
+            inDuration: 300, // Transition in duration
+            outDuration: 200, // Transition out duration
+            startingTop: '4%', // Starting top style attribute
+            endingTop: '10%'
+        });
+
+        // Datatable setup
+        let container = $('#leaderboard_container');
+        container.DataTable({
+            "language": {
+                url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
+            },
+            ajax: {
+                url: 'getUser',
+                dataSrc: "resultat"
+            },
+            columns: [
+                {data: "id"},
+                {data: "pseudo"},
+                {data: "credits"},
+                {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
+            ],
+
+        });
+
+        let rows = $('#datatable_leaderboard');
+
+        rows.on('click', 'tr', function () {
+
+            let row = $(this);
+            idUser = row[0].childNodes[0].textContent;
+            console.log(idUser);
+
+            var user_data;
+
+            $.getJSON("getUser/" + idUser, "", function (result) {
+                $.each(result, function (i, users) {
+                    $.each(users, function (j, user) {
+                        //users_detail_modal.html("");
+                        let player_name = $("#player_name").html(user.pseudo);
+                        //TODO : creer la fonction + requete de qui va positionner le joueur
+                        $("#player_position").html(user.credits);
+                        $("#player_credits").html(user.credits)
+                        $("#player_quote").html(user.quote);
+                        $("#player_bio").html(user.bio);
+    // TODO : recupérer la photo des joueurs
 
 
-</script>
+                        //users_detail_modal.append(`
+                        //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
+                        //<p>Nom de l'utilisateur : ` + user.credits + ` </p>
+                        //`);
+                        // recuperer les lieux de l'utilisateur where ID => machin
+                        $.getJSON("getUserPlaces/" + idUser, "", function (result) {
+                            let texte;
+
+                            texte = "<ul>";
+                            $.each(result, function (i, places) {
+                                $.each(places, function (j, place) {
+                                   console.log("infos tableau" + places.length);
+
+                                        texte += "<li>" + place.name + "</li>";
+                                    });
+                                if (places.length !== 0) {
+                                    return;
+                                }
+                                texte = "Aucun lieu."
+                            });
+
+                            texte += "</ul>";
+                            $("#player_places").html(texte);
+                            $("#player_number_place").html(places.length);
+
+
+                        });
+
+
+                        users_detail_modal.modal('open');
+
+                    })
+                })
+            });
+        })
+
+
+    </script>
 
 
 </body>
