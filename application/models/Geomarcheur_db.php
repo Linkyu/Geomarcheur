@@ -63,4 +63,18 @@ class Geomarcheur_db extends CI_Model {
 
         return array($refund_query, $sell_place_query);
     }
+
+    public function login($data) {
+        $username = $data['username'];
+        $password = $data['password'];
+
+        $this->load->database();
+        $get_user_query = $this->db->query("SELECT id, pseudo, is_admin FROM user WHERE pseudo='".$username."' AND password='".$password."'");
+
+        if (sizeof($get_user_query->result_array()) > 0) {
+            return $get_user_query->result();
+        } else {
+            return false;
+        }
+    }
 }

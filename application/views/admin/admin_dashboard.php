@@ -9,11 +9,15 @@
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"  media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"
+          media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"
+          media="screen,projection"/>
     <!--Import custom css files-->
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"  media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/style.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"
+          media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/style.css"
+          media="screen,projection"/>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -37,7 +41,7 @@
             overflow-y: scroll;
         }
 
-        .map_block h1{
+        .map_block h1 {
             width: 100%;
         }
 
@@ -45,22 +49,22 @@
             height: 100%;
         }
 
-        .modal_place_picture_block{
+        .modal_place_picture_block {
             max-width: 250px;
             height: 100%;
             max-height: 500px;
             overflow: hidden;
-            display:inline-block;
-            background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(250, 250, 250, .75) 100%); /* W3C version */
+            display: inline-block;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(250, 250, 250, .75) 100%); /* W3C version */
             border-right: rgba(0, 0, 0, 0.3) solid 1px;
         }
 
         .modal_place_picture {
             width: auto;
             height: auto;
-            position:relative;
-            z-index:-1;
-            display:block;
+            position: relative;
+            z-index: -1;
+            display: block;
         }
 
         .modal_place_stats_block {
@@ -78,6 +82,7 @@
                 <li><a href="#">Tableau de bord</a></li>
                 <li><a href="#">Classement</a></li>
                 <li><a href="#">Statistiques</a></li>
+                <li><a href="#" onclick="logout()">Se déconnecter</a></li>
             </ul>
         </div>
         <div class="nav-content">
@@ -94,10 +99,13 @@
 
     <!-- The 4 dashboard cards -->
     <div class="row">
-        <div class="col s6"><div class="card-panel hoverable map_block">
+        <div class="col s6">
+            <div class="card-panel hoverable map_block">
                 <div class="valign-wrapper center-align map"><h1>M A P</h1></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable place_list_block">
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable place_list_block">
                 <div class="row">
                     <form class="fullwidth">
                         <div class="input-field">
@@ -113,8 +121,10 @@
                     </div>
                     <div id="place_list_message"></div>
                 </div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <table class="highlight responsive-table">
                     <thead>
                     <tr>
@@ -126,42 +136,51 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                        </td>
                         <td>Dave Grohl</td>
                         <td>25</td>
                         <td>¢6985342</td>
                     </tr>
                     <tr>
-                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                        </td>
                         <td>Eric Clapman</td>
                         <td>50</td>
                         <td>¢985342</td>
                     </tr>
                     <tr>
-                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                        </td>
                         <td>Bob Dylan</td>
                         <td>10</td>
                         <td>¢420</td>
                     </tr>
                     <tr>
-                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                        </td>
                         <td>Slash</td>
                         <td>123</td>
                         <td>¢359</td>
                     </tr>
                     <tr>
-                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                        <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                        </td>
                         <td>Christophe Mae</td>
                         <td>10</td>
                         <td>¢200</td>
                     </tr>
                     </tbody>
                 </table>
-                <div class="right-align"><a class="waves-effect waves-light btn indigo darken-4">Voir le classement</a></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
+                <div class="right-align"><a class="waves-effect waves-light btn indigo darken-4">Voir le classement</a>
+                </div>
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <div id="linechart_material"></div>
-            </div></div>
+            </div>
+        </div>
     </div>
 
     <!-- Place detail Modal Structure -->
@@ -212,13 +231,15 @@
 
                 <!-- Place delete button + stats preview -->
                 <div class="col s3">
-                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"><i
+                                class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
 
                     <!-- Stats preview -->
                     <div class="card small modal_place_stats_block">
                         <div class="card-image">
                             <img src="http://i.imgur.com/0uABqwN.png">
-                            <span class="card-title">_ 3,045 ¢</span> <!-- Current amount of credits gained from this place -->
+                            <span class="card-title">_ 3,045 ¢</span>
+                            <!-- Current amount of credits gained from this place -->
                         </div>
                         <div class="card-content">
                             <p class="bold">Crédits obtenus ici</p>
@@ -232,7 +253,8 @@
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Retour</a>
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les modifications</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les
+                modifications</a>
         </div>
     </div>
 
@@ -240,7 +262,8 @@
 
 <div id="leaderboard" class="container">
     <div class="card-panel hoverable">
-        <div class="row"><table class="highlight responsive-table col s12">
+        <div class="row">
+            <table class="highlight responsive-table col s12">
                 <thead>
                 <tr>
                     <th><!-- Avatar --></th>
@@ -251,31 +274,36 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                    </td>
                     <td>Dave Grohl</td>
                     <td>25</td>
                     <td>¢6985342</td>
                 </tr>
                 <tr>
-                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                    </td>
                     <td>Eric Clapman</td>
                     <td>50</td>
                     <td>¢840</td>
                 </tr>
                 <tr>
-                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                    </td>
                     <td>Bob Dylan</td>
                     <td>10</td>
                     <td>¢420</td>
                 </tr>
                 <tr>
-                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                    </td>
                     <td>Slash</td>
                     <td>123</td>
                     <td>¢359</td>
                 </tr>
                 <tr>
-                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
+                    <td><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i>
+                    </td>
                     <td>Christophe Mae</td>
                     <td>10</td>
                     <td>¢200</td>
@@ -291,25 +319,34 @@
                 <li class="waves-effect"><a href="#!">4</a></li>
                 <li class="waves-effect"><a href="#!">5</a></li>
                 <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-            </ul></div>
+            </ul>
+        </div>
 
     </div>
 </div>
 
 <div id="statistics" class="container">
     <div class="row">
-        <div class="col s6"><div class="card-panel hoverable">
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <div id="linechart_material1"></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <div id="linechart_material2"></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <div id="linechart_material3"></div>
-            </div></div>
-        <div class="col s6"><div class="card-panel hoverable">
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel hoverable">
                 <div id="linechart_material4"></div>
-            </div></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -318,7 +355,8 @@
         <div class="row">
             <div class="col l6 s12">
                 <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
+                    content.</p>
             </div>
             <div class="col l4 offset-l2 s12">
                 <h5 class="grey-text text-lighten-5">Links</h5>
@@ -348,7 +386,7 @@
 <!-- Charts API + placeholder data -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-    google.charts.load('current', {'packages':['line']});
+    google.charts.load('current', {'packages': ['line']});
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
@@ -360,20 +398,20 @@
         data.addColumn('number', 'Bob Dylan');
 
         data.addRows([
-            [1,  37.8, 80.8, 41.8],
-            [2,  30.9, 69.5, 32.4],
-            [3,  25.4,   57, 25.7],
-            [4,  11.7, 18.8, 10.5],
-            [5,  11.9, 17.6, 10.4],
-            [6,   8.8, 13.6,  7.7],
-            [7,   42, 12.3,  9.6],
-            [8,  342, 29.2, 10.6],
-            [9,  5342, 42.9, 14.8],
+            [1, 37.8, 80.8, 41.8],
+            [2, 30.9, 69.5, 32.4],
+            [3, 25.4, 57, 25.7],
+            [4, 11.7, 18.8, 10.5],
+            [5, 11.9, 17.6, 10.4],
+            [6, 8.8, 13.6, 7.7],
+            [7, 42, 12.3, 9.6],
+            [8, 342, 29.2, 10.6],
+            [9, 5342, 42.9, 14.8],
             [10, 85342, 30.9, 25],
-            [11, 985342,  342,  50],
-            [12, 1985342,  5342,  500],
-            [13, 3920342, 85342,  400],
-            [14, 6985342, 985342,  420]
+            [11, 985342, 342, 50],
+            [12, 1985342, 5342, 500],
+            [13, 3920342, 85342, 400],
+            [14, 6985342, 985342, 420]
         ]);
 
         const options = {
@@ -396,7 +434,7 @@
 
 <!-- Custom local scripts -->
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         const place_list = $("#place_list");
 
         // Place data retrieval
@@ -421,7 +459,7 @@
         });
 
         // Search function
-        $("#place_input_search").keyup(function(){
+        $("#place_input_search").keyup(function () {
 
             // Retrieve the input field text and reset the count to zero
             let filter = $(this).val();
@@ -429,7 +467,7 @@
             const message_box = $("#place_list_message");
 
             // Loop through the list
-            $(".place_item").each(function(){
+            $(".place_item").each(function () {
 
                 // If the list item does not contain the text phrase fade it out
                 if ($(this).find(".place_name, .place_location").text().search(new RegExp(filter, "i")) < 0) {
@@ -449,6 +487,13 @@
             }
         });
     });
+
+    function logout() {
+        $.ajax({url: "<?php echo base_url(); ?>logout/"}
+        ).done(function () {
+            location.reload();
+        });
+    }
 
     // Place details display
     function display_place(id) {
@@ -511,14 +556,14 @@
 
     function set_info_content(id) {
         return "<p style='font-weight: bold'>" + spots[id].name + "</p>" +
-            "<p>" + spots[id].address +"</p>" +
+            "<p>" + spots[id].address + "</p>" +
             "<p>Vélos disponibles : " + spots[id].available_bikes + "/" + spots[id].bike_stands + "<br />" +
             "Places disponibles : " + spots[id].available_bike_stands + "</p>";
     }
 
     function add_velib_markers(data) {
         let spot;
-        for(let i=0;i<data.length;i++) {
+        for (let i = 0; i < data.length; i++) {
             spot = data[i];
             spots[spot.number.toString()] = spot;
 
@@ -527,13 +572,14 @@
             let marker = new google.maps.Marker({
                 position: new google.maps.LatLng(spot.position.lat, spot.position.lng),
                 icon: color,
-                title: spot.number.toString()});
+                title: spot.number.toString()
+            });
 
             marker.setMap(map);
 
             markers[marker.title] = marker;
 
-            marker.addListener('click', function() {
+            marker.addListener('click', function () {
                 info.setContent(set_info_content(this.title));
                 //console.log(spots[this.title]);
                 info.open(map, this);
@@ -545,7 +591,7 @@
 
     function update_velib_markers(data) {
         let spot;
-        for(let i=0;i<data.length;i++) {
+        for (let i = 0; i < data.length; i++) {
             spot = data[i];
             let color = get_marker_color(spot);
             let marker = markers[spot.number.toString()];
@@ -556,7 +602,7 @@
     }
 
     function get_marker_color(spot) {
-        if (spot.status !== "OPEN"){
+        if (spot.status !== "OPEN") {
             return 'http://maps.google.com/mapfiles/ms/icons/grey.png';
         } else {
             if (spot.available_bikes < "2") {
@@ -595,7 +641,7 @@
             type: "GET",
             dataType: "json", // optionnel : format que je souhaite en réponse. si pas le cas je partirai en erreur!
             success: get_stations_success, // fonction de callback
-            error: function(data) {
+            error: function (data) {
                 console.log("Erreur Ajax :" + data);
             }
         });
