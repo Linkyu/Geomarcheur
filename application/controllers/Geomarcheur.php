@@ -57,7 +57,7 @@ class Geomarcheur extends CI_Controller
         } else {
             $data['resultat'] = $this->geomarcheur_db->listAllUsers();
         }
-        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data) . "line" . sizeof($data) > 1 ? "s" : "" . " from User table.");
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from User table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -74,7 +74,7 @@ class Geomarcheur extends CI_Controller
         } else {
             $data['resultat'] = $this->geomarcheur_db->listAllPlaces();
         }
-        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data) . "line" . sizeof($data) > 1 ? "s" : "" . " from Place table.");
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from Place table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -92,7 +92,7 @@ class Geomarcheur extends CI_Controller
             echo "Missing parameter: place_id";
             exit();
         }
-        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data) . "line" . sizeof($data) > 1 ? "s" : "" . " from PLace table.");
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from PLace table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -177,7 +177,7 @@ class Geomarcheur extends CI_Controller
     }
 
     public function logout () {
-        $username = $_SESSION['username'];
+        $username = $_SESSION['user'];
         // Removing session data
         session_destroy();
         $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $username . " logged out successfully.");
