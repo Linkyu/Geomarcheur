@@ -102,13 +102,9 @@ $temp_user_id = 2;
 
 <script type="text/javascript">
     function login() {
-        // DEBUG
-        //console.log($("#username").val());
-        //console.log($("#password").val());
-
         $.ajax({
             type: "POST",
-            url: "./login/",
+            url: "<?php echo base_url(); ?>login/",
             data: {
                 username: $("#username").val(),
                 password: $("#password").val()
