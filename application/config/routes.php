@@ -52,3 +52,5 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'geomarcheur';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+$route['place'] = "place/index";
+$route['placeDelete/(:any)']['delete'] = "place/delete/$1";
