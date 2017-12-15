@@ -33,8 +33,7 @@ class Geomarcheur extends CI_Controller
 
     public function index()
     {
-        // TODO: Show login page if not logged in
-        phpinfo();
+        $this->login();
     }
 
     public function player()
@@ -118,15 +117,19 @@ class Geomarcheur extends CI_Controller
 
         // No need to log in if the session is still active
         if (isset($_SESSION['logged_in'])) {
-            // TODO: load the right page based on status
-            echo "henlo";
-            exit();
+            http_response_code(400);
+            $this->redirect_after_login($_SESSION['is_admin']);
         }
 
         // The run function will fail if there's no data to validate
-        // (i.e., the form has not been filled out yet)
+        // (i.e., the form has not been filled out yet, or not correctly)
         if ($this->form_validation->run() == FALSE) {
-            echo validation_errors();
+            if (isset($_SESSION['logged_in'])) {
+                // TODO: This part of the logic doesn't make sense
+                echo validation_errors();
+            } else {
+                $this->load->view('login_view');
+            }
         } else {
             // Retrieve the data from the POST array
             $data = array(
@@ -139,20 +142,28 @@ class Geomarcheur extends CI_Controller
             $is_login_valid = $this->geomarcheur_db->login($data);
 
             if ($is_login_valid) {
+                http_response_code(200);
                 // Add user data in session
                 $this->session->set_userdata('logged_in', true);
                 $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
                 $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
-                foreach ($_SESSION as $key => $item) {
-                    echo $key . ": " . $item . "\n";
-                }
+
+                $this->redirect_after_login($_SESSION['is_admin']);
             } else {
                 // TODO: Display error message
+                http_response_code(401);
                 echo "Bad login";
             }
         }
     }
 
+    private function redirect_after_login($user_status) {
+        if ($user_status) {
+            $this->dashboard();
+        } else {
+            $this->player();
+        }
+    }
 
     // references
     public function create()

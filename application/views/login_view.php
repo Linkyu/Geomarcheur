@@ -106,12 +106,29 @@ $temp_user_id = 2;
         //console.log($("#username").val());
         //console.log($("#password").val());
 
-        $.post(
-            "./login/",
-            {username: $("#username").val(), password: $("#password").val()}
-            ).done(function(data){
-                console.log(data)
-            });
+        $.ajax({
+            type: "POST",
+            url: "./login/",
+            data: {
+                username: $("#username").val(),
+                password: $("#password").val()
+            },
+            statusCode: {
+                200: function (data) {
+                    // TODO: Find a cleaner way?
+                    location.reload();
+                    // $("html").html(data); // much quicker but breaks the next page
+                },
+                400: function (data) {
+                    // TODO: Display this as an error bar in the form
+                    alert(data.responseText);
+                },
+                401: function (data) {
+                    // TODO: Display this as an error bar in the form
+                    alert(data.responseText);
+                }
+            }
+        });
     }
 </script>
 </body>
