@@ -1,13 +1,11 @@
 <?php
 class Geomarcheur_db extends CI_Model {
 
-    public function listAllUsers()
-    {
+    public function listAllUsers() {
         $this->load->database();
         $query = $this->db->query('SELECT * FROM user');
         return $query->result_array();
-
-            }
+    }
 
     public function listUser($id) {
         $this->load->database();
@@ -66,47 +64,17 @@ class Geomarcheur_db extends CI_Model {
         return array($refund_query, $sell_place_query);
     }
 
-    public function login($username, $password) {
+    public function login($data) {
+        $username = $data['username'];
+        $password = $data['password'];
+
         $this->load->database();
-        $get_place_user_query = $this->db->select('pseudo, password')
-            ->from('user')
-            ->where('pseudo=' . $username)
-            ->get();
-        $return_message = "u: " . $username . "\np: " . $password;
+        $get_user_query = $this->db->query("SELECT id, pseudo, is_admin FROM user WHERE pseudo='".$username."' AND password='".$password."'");
 
-        if (sizeof($get_place_user_query->result_array()) > 0) {
-            $return_message .= "User " . $username . " found. \n";
+        if (sizeof($get_user_query->result_array()) > 0) {
+            return $get_user_query->result();
+        } else {
+            return false;
         }
-
-        foreach ($get_place_user_query->result_array() as $user) {
-            $return_message .= "Password " . $password . " is ";
-            if ($password == $user['password']) {
-                $return_message .= "correct. \n";
-            } else {
-                // TODO: REMOVE THIS DEBUG MESSAGE
-                $return_message .= "wrong. It should have been " . $user['password'] . "\n";
-            }
-        }
-
-        return $return_message;
     }
-
-
-    public function disablePlace($id_place) {
-        $this->load->database();
-        $disable_place_query = $this->db->query('UPDATE place SET status = 0 WHERE id=' . $id_place);
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 }
