@@ -27,7 +27,6 @@ $temp_user_id = 2;
     <style>
         body {
             display: flex;
-            min-height: 100vh;
             flex-direction: column;
         }
 
@@ -36,12 +35,18 @@ $temp_user_id = 2;
         }
 
         #map {
-            height: 800px;
+            height: 83vh;
+            width: 100%;
+        }
+
+        #player_page_footer {
+            position: absolute;
+            bottom: 0;
             width: 100%;
         }
     </style>
 </head>
-<body>
+<body class="pink darken-3">
 <!-- Header navbar -->
 <header class="navbar-fixed">
     <nav>
@@ -61,7 +66,7 @@ $temp_user_id = 2;
 </main>
 
 <!-- Footer navbar -->
-<footer class="page-footer pink darken-3">
+<footer id="player_page_footer" class="page-footer pink darken-3">
     <div class="container">
         <div class="row">
             <div class="col s3 center-align">
@@ -90,7 +95,7 @@ $temp_user_id = 2;
         <!-- Standard header -->
         <div class="row valign-wrapper" id="searchbar-switch1">
             <div class="col s10">
-                <h4>Liste de vos lieux</h4>
+                <h5>Liste de vos lieux</h5>
             </div>
             <div class="col s1">
                 <a href="#" class="waves-effect circle pink-text text-darken-3" id="search-place">
@@ -178,16 +183,65 @@ $temp_user_id = 2;
         const divs = place_list_table.find("div.card");
         let alpha_order = false;
 
-        // WIP: Remove this once authentification is developped
-        const playerId = "<?php echo $temp_user_id ?>";
+        const playerId = "<?php echo $_SESSION['user_id'] ?>";
 
         let map;
         let marqueur = [];
         const latlng = new google.maps.LatLng(43.600000, 1.433333);
         const options = {
             center: latlng,
-            zoom: 13,
-            mapTypeId: google.maps.MapTypeId.roadmap
+            zoom: 14,
+            mapTypeId: google.maps.MapTypeId.roadmap,
+            backgroundColor: "#AD1457",
+            disableDefaultUI: true,
+            clickableIcons: false,
+            styles: [
+                {
+                    "featureType": "all",
+                    "stylers": [
+                        { "visibility": "off" }
+                    ]
+                },{
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "color": "#A18A95" },
+                        { "visibility": "on" }
+                    ]
+                },{
+                    "featureType": "landscape.man_made",
+                    "elementType": "geometry",
+                    "stylers": [
+                        //{ "color": "#aaAD1457" },
+                        { "visibility": "on" },
+                        { "hue": "#AD1457" },
+                        { "saturation": "90" },
+                        { "lightness": "-60" },
+                        { "weight": "3" }
+                    ]
+                },{
+                    "featureType": "landscape.natural",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "color": "#4E6D44" },
+                        { "visibility": "on" }
+                    ]
+                },{
+                    "featureType": "transit",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "color": "#FF7F00" },
+                        { "visibility": "on" }
+                    ]
+                },{
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "color": "#384E79" },
+                        { "visibility": "on" }
+                    ]
+                }
+            ]
         };
         map = new google.maps.Map(document.getElementById("map"), options);
 
@@ -408,10 +462,6 @@ $temp_user_id = 2;
 
 
 </script>
-
-<div id="carte" style="height: 800px;width:800px"></div>
-<div id="resultat" style="height: 500px;width:500px"></div>
-<!-- Todo : verifier la taille de la page. See issue #60  -->
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
 

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// TODO: Document this file
+// TODO: Document this file (cf. #66)
 
 class Geomarcheur extends CI_Controller
 {
@@ -105,7 +105,7 @@ class Geomarcheur extends CI_Controller
         if ($place_id != null) {
             $result = $this->geomarcheur_db->sellPlace($place_id);
 
-            // TODO: echo an actual output that can serve for DEBUG mode
+            // TODO: echo an actual output that can serve for DEBUG mode (cf. #67)
             $this->logger(LogType::DEBUG, __FUNCTION__ . ": Place " . $place_id . " was sold.");
             http_response_code(200);
             echo "PLace sold.";
@@ -134,7 +134,7 @@ class Geomarcheur extends CI_Controller
         // (i.e., the form has not been filled out yet, or not correctly)
         if ($this->form_validation->run() == FALSE) {
             if (isset($_SESSION['logged_in'])) {
-                // TODO: This part of the logic doesn't make sense
+                // TODO: This part of the logic doesn't make sense (cf. #68)
                 echo validation_errors();
             } else {
                 $this->load->view('login_view');
