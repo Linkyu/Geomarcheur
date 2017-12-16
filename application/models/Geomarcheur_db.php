@@ -3,13 +3,13 @@ class Geomarcheur_db extends CI_Model {
 
     public function listAllUsers() {
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM user');
+        $query = $this->db->query('SELECT id, pseudo, credits, inscription_date, bio, quote, is_banned, is_admin FROM user');
         return $query->result_array();
     }
 
     public function listUser($id) {
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM user WHERE id='.$id);
+        $query = $this->db->query('SELECT id, pseudo, credits, inscription_date, bio, quote, is_banned, is_admin FROM user WHERE id='.$id);
         return $query->result_array();
     }
 
