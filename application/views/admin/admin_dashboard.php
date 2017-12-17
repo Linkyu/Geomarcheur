@@ -79,6 +79,7 @@
             font-size: 18px;
         }
 
+
     </style>
 </head>
 <body>
@@ -207,8 +208,18 @@
 
                 <!-- Place delete button + stats preview -->
                 <div class="col s3">
+
+
+
+                    <!-- si le status du lieu === 1 (lieu actif) -->
                     <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"
-                       onclick="deletePlace();"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+                       onclick="managePlace();"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+
+
+
+
+
+
 
                     <!-- Stats preview -->
                     <div class="card small modal_place_stats_block">
@@ -464,6 +475,20 @@
                         $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
                     } else {
                         $.each(places, function (j, place) {
+                            if (place.status == 0) {
+
+                                place_list.append(`
+                             <span>blabliblu c'est DELETED</span>
+                            <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
+                            <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
+                            <span class="place_id">` + place["id"] + `</span>
+                            <p class="place_name title">` + place["name"] + `</p>
+                            <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
+                            <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
+                            </a>`);
+
+                            } else {
+
                             place_list.append(`
                             <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
                             <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
@@ -472,10 +497,15 @@
                             <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
                             <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
                             </a>`);
+                            }
                         });
                     }
                 });
             });
+
+            //TODO : améliorer la gestion de l'affichage des lieux supprimés
+            // TODO : ajouter l'attribut hidden sur le bouton de suppression selon si le lieu est supprimé ou non
+
 
             // Search function
             $("#place_input_search").keyup(function () {
@@ -564,24 +594,25 @@
             });
         }
 
-        function deletePlace() {
+        function managePlace() {
+            const place_modal = $("#place_modal");
+
             let id = document.getElementById('idPlace').value;
-
-            console.log("sdfsdf" +id);
             if (confirm("Vous désirez vraiment supprimer?")) {
-
                 $.ajax({
-                    url: "<?php echo base_url(); ?>delete_place",
+                    url: "<?php echo base_url(); ?>manage_place",
                     type: "GET",
                     data: {
                         id: id
                     }
                 }).done(function () {
-                    //location.reload();
+                    place_modal.modal('close');
                 });
             }}
     //TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
         // TODO : supprimer le moche "input text hidden"
+        // si le lieu est supprimé => class deleted
+
 
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
