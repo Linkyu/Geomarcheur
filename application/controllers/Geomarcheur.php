@@ -140,6 +140,11 @@ class Geomarcheur extends CI_Controller
         }
     }
 
+    public function disablePlace() {
+
+        $place_id = $this->input->get('id');
+        $this->geomarcheur_db->disable_place($place_id);
+    }
 
     public function login()
     {

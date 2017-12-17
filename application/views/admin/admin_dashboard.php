@@ -71,6 +71,10 @@
             margin-top: 50px;
         }
 
+        #modal_place_manage_button {
+            white-space: nowrap;
+        }
+
         #card_user_pic {
             height: 150px;
         }
@@ -177,19 +181,9 @@
                         <input id="modal_place_address_input" name="modal_place_address_input" type="text">
                         <label for="modal_place_address_input">Adresse</label>
                     </div>
-                    <!--    No need to show these
-                    <div class="row">
-                        <div class="input-field col s6">
-                            <i class="material-icons prefix">gps_fixed</i>
-                            <input id="modal_place_latitude_input" name="modal_place_latitude_input" type="text">
-                            <label for="modal_place_latitude_input">Latitude</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="modal_place_longitude_input" name="modal_place_longitude_input" type="text">
-                            <label for="modal_place_longitude_input">Longitude</label>
-                        </div>
-                    </div>
-                -->
+
+                    <input type="hidden" id="idPlace" value="">
+
                     <div class="input-field">
                         <i class="material-icons prefix">account_circle</i>
                         <input disabled id="modal_place_owner_input" name="modal_place_owner_input" type="text">
@@ -204,8 +198,9 @@
 
                 <!-- Place delete button + stats preview -->
                 <div class="col s3">
-                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"
-                       onclick="deletePlace();"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
+                    <!-- si le status du lieu === 1 (lieu actif) -->
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth" id="modal_place_manage_button"
+                       onclick="managePlace();"></a>
 
                     <!-- Stats preview -->
                     <div class="card small modal_place_stats_block">
@@ -224,6 +219,7 @@
                 </div>
             </div>
         </div>
+
         <div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
@@ -290,7 +286,8 @@
                         <div class="col s2">
                             <span class="bold">Crédits</span>
                             <br>
-                            <span id="player_credits"></span> <span id="little_credit_symbol" class="credit_symbol prefix">¢</span>
+                            <span id="player_credits"></span> <span id="little_credit_symbol"
+                                                                    class="credit_symbol prefix">¢</span>
 
                         </div>
 
@@ -421,7 +418,6 @@
         $(document).ready(function () {
             const userListDatatable = $("#datatable_leaderboard");
             const user_list = $("#user_list");
-            var idPlace;
 
             $.getJSON("getUser", "", function (result) {
                 console.log(result);
@@ -430,13 +426,9 @@
                     if (users.length === 0) {
 
                         $("#user_list_message").html("<p>Il n'existe aucun utilisateur actuellement!</p>")
-
                     } else {
-
                         //userListDatatable.html("");
-
                         $.each(users, function (j, user) {
-
                                 const user_data = `
                            <tr>
                            <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
@@ -445,17 +437,13 @@
                            <td class="leaderboard_is_admin">` + user["is_admin"] + `</td>
                            </tr>
                            `;
-
                                 user_list.append(user_data);
-
                                 //userListDatatable.append(user_data);
                             }
                         )
                     }
-
                 })
             });
-
 
             const place_list = $("#place_list");
 
@@ -467,7 +455,20 @@
                         $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
                     } else {
                         $.each(places, function (j, place) {
-                            place_list.append(`
+                            if (place.status === '0') {
+
+                                place_list.append(`
+                            <a class="collection-item avatar grey-text place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
+                            <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
+                            <span class="place_id">` + place["id"] + `</span>
+                            <p class="place_name title">` + place["name"] + `</p>
+                            <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
+                            <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
+                            </a>`);
+
+                            } else {
+
+                                place_list.append(`
                             <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
                             <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
                             <span class="place_id">` + place["id"] + `</span>
@@ -475,10 +476,15 @@
                             <p class="place_location">` + ((place["address"] === null) ? place["lat"] + ', ' + place["lng"] : place["address"]) + `</p>
                             <p class="place_value secondary-content pink-text text-darken-3"><span class="credit_symbol">¢</span>` + place["value"] + `</p>
                             </a>`);
+                            }
                         });
                     }
                 });
             });
+
+            //TODO : améliorer la gestion de l'affichage des lieux supprimés
+            // TODO : ajouter l'attribut hidden sur le bouton de suppression selon si le lieu est supprimé ou non
+
 
             // Search function
             $("#place_input_search").keyup(function () {
@@ -521,8 +527,9 @@
         function display_place(id) {
             // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
             const place_modal = $("#place_modal");
+
             idPlace = id;
-            console.log("id de la place :  " + idPlace)
+            document.getElementById('idPlace').value = id;
             get_place(id, function (result) {
                 const place = result;
                 if (place === 1) {
@@ -549,6 +556,17 @@
                                 }
                                 $("#modal_place_value_input").val(place["value"]);
 
+                                let manage_button = $("#modal_place_manage_button");
+                                if (place["status"] === '0') {
+                                    manage_button.removeClass("red");
+                                    manage_button.addClass("green");
+                                    manage_button.html('<i class="material-icons grey-text text-lighten-5 left">place</i>Activer');
+                                } else {
+                                    manage_button.removeClass("green");
+                                    manage_button.addClass("red");
+                                    manage_button.html('<i class="material-icons grey-text text-lighten-5 left">delete</i>Désactiver');
+                                }
+
                                 Materialize.updateTextFields();
                             },
                             complete: function (modal, trigger) {
@@ -560,39 +578,43 @@
                                 Materialize.updateTextFields();
                             }
                         });
-
                         place_modal.modal('open');
                     });
                 }
-
             });
         }
 
-        function deletePlace(idPlace) {
+        // TODO: Handle the reactivation
+        function managePlace() {
+            const place_modal = $("#place_modal");
 
+            let id = document.getElementById('idPlace').value;
             if (confirm("Vous désirez vraiment supprimer?")) {
-                document.location.href = "delete/" + idPlace;
-
-                /* $.ajax({
-                    dataType: 'json',
-                    type:'delete',
-                    url: url + '/' + id
-
-                   /* type: "GET",
-                    url: "../../controllers/Geomarcheur.php",
-                    data: 'id='+ idPlace*/
+                $.ajax({
+                    url: "<?php echo base_url(); ?>disablePlace",
+                    type: "GET",
+                    data: {
+                        id: id
+                    }
+                }).done(function () {
+                    place_modal.modal('close');
+                });
             }
-        } //reload la page);
+        }
+
+        //TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+        // TODO : supprimer le moche "input text hidden"
+        // si le lieu est supprimé => class deleted
 
 
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
         let alpha_order = false;
-        var idUser;
-        var carte;
-        var marqueur = [];
-        var latlng = new google.maps.LatLng(43.600000, 1.433333);
-        var options = {
+        let idUser;
+        let carte;
+        let marqueur = [];
+        let latlng = new google.maps.LatLng(43.600000, 1.433333);
+        let options = {
             center: latlng,
             zoom: 13,
             mapTypeId: google.maps.MapTypeId.roadmap
@@ -611,11 +633,11 @@
                             marqueur[j].setMap(carte);
                             console.log(marqueur[j]);
                             // Closure => création de la function au moment de la création du marqueur
-                            var macallback = function callbackSpecificiqueMarqueur(ev) {
+                            let macallback = function callbackSpecificiqueMarqueur(ev) {
                                 //console.log("Callback appelée", ev, marqueur[j]);
                                 //console.log("la position est : " +marqueur[j].getPosition());
 
-                                var contentString =
+                                let contentString =
                                     '<div id="content">' +
                                     '<p> Nom du lieu : ' + place.name + '</p>' +
                                     '<p> Valeur : ' + place.value + '</p>' +
@@ -674,7 +696,7 @@
             idUser = row[0].childNodes[0].textContent;
             console.log(idUser);
 
-            var user_data;
+            let user_data;
 
             $.getJSON("getUser/" + idUser, "", function (result) {
                 $.each(result, function (i, users) {
@@ -686,7 +708,7 @@
                         $("#player_credits").html(user.credits)
                         $("#player_quote").html(user.quote);
                         $("#player_bio").html(user.bio);
-    // TODO : recupérer la photo des joueurs
+                        // TODO : recupérer la photo des joueurs
 
 
                         //users_detail_modal.append(`
@@ -700,10 +722,10 @@
                             texte = "<ul>";
                             $.each(result, function (i, places) {
                                 $.each(places, function (j, place) {
-                                   console.log("infos tableau" + places.length);
+                                    console.log("infos tableau" + places.length);
 
-                                        texte += "<li>" + place.name + "</li>";
-                                    });
+                                    texte += "<li>" + place.name + "</li>";
+                                });
                                 if (places.length !== 0) {
                                     return;
                                 }
@@ -714,10 +736,7 @@
                             $("#player_places").html(texte);
                             $("#player_number_place").html(places.length);
 
-
                         });
-
-
                         users_detail_modal.modal('open');
 
                     })
