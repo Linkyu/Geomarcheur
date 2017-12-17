@@ -42,6 +42,34 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             position: absolute;
             bottom: 0;
             width: 100%;
+            white-space: nowrap;
+        }
+
+        .bigg {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .gold {
+            text-shadow:
+                    -1px -1px 0 #ff6d00,
+                    1px -1px 0 #ff6d00,
+                    -1px 1px 0 #ff6d00,
+                    1px 1px 0 #ff6d00;
+        }
+
+        .modal-header {
+            width: 100%;
+            background-color: #00acc1;
+        }
+
+        #profile_modal_quote {
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        #profile_modal_bio {
+            color: #777;
         }
     </style>
 </head>
@@ -56,12 +84,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </header>
 
 <main class="center-align">
-
-    <div id="map">
-
-    </div>
-
-
+    <div id="map"></div>
 </main>
 
 <!-- Footer navbar -->
@@ -69,17 +92,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="container">
         <div class="row">
             <div class="col s3 center-align">
-                <span class="credit_symbol prefix">#</span>
-                <span id="player_rank_footer"></span>
-            </div>
-            <div class="col s4 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal" id="place_list_button">
-                    <i class="material-icons">place</i> 3
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#ranking_modal" id="ranking_button">
+                    <sup class="bigg">#</sup>
+                    <span id="player_rank_footer"></span>
                 </a>
             </div>
-            <div class="col s4 center-align">
-                <span class="credit_symbol prefix">¢</span>
-                <span id="player_credits_footer"></span>
+            <div class="col s3 center-align">
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal" id="place_list_button">
+                    <sup><i class="material-icons">place</i></sup>3
+                </a>
+            </div>
+            <div class="col s5 center-align">
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#profile_modal" id="credits_button">
+                    <sup class="bigg">¢</sup>
+                    <span id="player_credits_footer"></span>
+                </a>
             </div>
             <div class="col s1 right-align">
                 <a href="#" class="waves-effect waves-light circle white-text">
@@ -90,7 +117,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div>
 </footer>
 
-<!-- Modals -->
+<!-- ### Modals ### -->
+<!-- Places -->
 <div id="place_list_modal" class="modal modal-fixed-footer">
     <div class="modal-header">
         <!-- Standard header -->
@@ -149,6 +177,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div>
     <div class="modal-content">
         <div class="col s12 m7" id="place_list_table"></div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect btn-flat">Fermer</a>
+    </div>
+</div>
+
+<!-- Profile -->
+<div id="profile_modal" class="modal modal-fixed-footer">
+    <div class="modal-header center-align valign-wrapper">
+        <i class="modal-header material-icons">account_circle</i>
+    </div>
+    <div class="modal-content">
+        <h4 id="profile_modal_pseudo">Animal</h4>
+        <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places">3</span></p>
+        <h5 id="profile_modal_quote">"yEEEAAHHHHHH"</h5>
+        <p id="profile_modal_bio">Lorizzle ipsum bling bling sit amizzle, consectetuer adipiscing elit. Nizzle sapien velizzle, bling bling volutpat, suscipit , gravida vel, arcu. Check it out hizzle that's the shizzle. We gonna chung erizzle. Fo izzle dolor fo turpis tempizzle tempor. Gangsta boom shackalack mofo et turpizzle. Sizzle izzle tortor. Pellentesque uhuh ... yih!</p>
     </div>
     <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect btn-flat">Fermer</a>
