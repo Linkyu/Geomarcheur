@@ -71,6 +71,10 @@
             margin-top: 50px;
         }
 
+        #modal_place_manage_button {
+            white-space: nowrap;
+        }
+
         #card_user_pic {
             height: 150px;
         }
@@ -181,19 +185,6 @@
 
                     <input type="hidden" id="idPlace" value="">
 
-                    <!--    No need to show these
-                    <div class="row">
-                        <div class="input-field col s6">
-                            <i class="material-icons prefix">gps_fixed</i>
-                            <input id="modal_place_latitude_input" name="modal_place_latitude_input" type="text">
-                            <label for="modal_place_latitude_input">Latitude</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="modal_place_longitude_input" name="modal_place_longitude_input" type="text">
-                            <label for="modal_place_longitude_input">Longitude</label>
-                        </div>
-                    </div>
-                -->
                     <div class="input-field">
                         <i class="material-icons prefix">account_circle</i>
                         <input disabled id="modal_place_owner_input" name="modal_place_owner_input" type="text">
@@ -210,15 +201,9 @@
                 <div class="col s3">
 
 
-
                     <!-- si le status du lieu === 1 (lieu actif) -->
-                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"
-                       onclick="managePlace();"><i class="material-icons grey-text text-lighten-5 left">delete</i>Supprimer</a>
-
-
-
-
-
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth" id="modal_place_manage_button"
+                       onclick="managePlace();"></a>
 
 
                     <!-- Stats preview -->
@@ -238,7 +223,6 @@
                 </div>
             </div>
         </div>
-
 
 
         <div class="modal-footer">
@@ -307,7 +291,8 @@
                         <div class="col s2">
                             <span class="bold">Crédits</span>
                             <br>
-                            <span id="player_credits"></span> <span id="little_credit_symbol" class="credit_symbol prefix">¢</span>
+                            <span id="player_credits"></span> <span id="little_credit_symbol"
+                                                                    class="credit_symbol prefix">¢</span>
 
                         </div>
 
@@ -346,32 +331,32 @@
 
 
     </div>
-<footer class="page-footer pink darken-3">
-    <div class="container">
-        <div class="row">
-            <div class="col l6 s12">
-                <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
-                    content.</p>
-            </div>
-            <div class="col l4 offset-l2 s12">
-                <h5 class="grey-text text-lighten-5">Links</h5>
-                <ul>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="footer-copyright">
+    <footer class="page-footer pink darken-3">
         <div class="container">
-            © 2017 Kiantic
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="grey-text text-lighten-5">Footer Content</h5>
+                    <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
+                        content.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="grey-text text-lighten-5">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
-</footer>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2017 Kiantic
+                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            </div>
+        </div>
+    </footer>
 
     <!--Import jQuery before materialize.js-->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -449,7 +434,7 @@
                     } else {
                         //userListDatatable.html("");
                         $.each(users, function (j, user) {
-                            const user_data = `
+                                const user_data = `
                            <tr>
                            <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
                            <td class="leaderboard_pseudo">` + user["pseudo"] + `</td>
@@ -463,7 +448,7 @@
                         )
                     }
                 })
-            })
+            });
 
             const place_list = $("#place_list");
 
@@ -475,11 +460,10 @@
                         $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
                     } else {
                         $.each(places, function (j, place) {
-                            if (place.status == 0) {
+                            if (place.status === '0') {
 
                                 place_list.append(`
-                             <span>blabliblu c'est DELETED</span>
-                            <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
+                            <a class="collection-item avatar grey-text place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
                             <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
                             <span class="place_id">` + place["id"] + `</span>
                             <p class="place_name title">` + place["name"] + `</p>
@@ -489,7 +473,7 @@
 
                             } else {
 
-                            place_list.append(`
+                                place_list.append(`
                             <a class="collection-item avatar grey-text text-darken-4 place_item modal-trigger" href="#" onclick="display_place(` + place["id"] + `)">
                             <img class="place_picture circle" src="` + ((place["picture"] === null) ? 'https://maps.googleapis.com/maps/api/streetview?size=250x250&fov=70&location=' + place["lat"] + ',' + place["lng"] + '&key=<?php echo GOOGLE_API_KEY ?>' : place["picture"]) + `" alt="">
                             <span class="place_id">` + place["id"] + `</span>
@@ -577,6 +561,17 @@
                                 }
                                 $("#modal_place_value_input").val(place["value"]);
 
+                                let manage_button = $("#modal_place_manage_button");
+                                if (place["status"] === '0') {
+                                    manage_button.removeClass("red");
+                                    manage_button.addClass("green");
+                                    manage_button.html('<i class="material-icons grey-text text-lighten-5 left">place</i>Activer');
+                                } else {
+                                    manage_button.removeClass("green");
+                                    manage_button.addClass("red");
+                                    manage_button.html('<i class="material-icons grey-text text-lighten-5 left">delete</i>Désactiver');
+                                }
+
                                 Materialize.updateTextFields();
                             },
                             complete: function (modal, trigger) {
@@ -594,13 +589,14 @@
             });
         }
 
+        // TODO: Handle the reactivation
         function managePlace() {
             const place_modal = $("#place_modal");
 
             let id = document.getElementById('idPlace').value;
             if (confirm("Vous désirez vraiment supprimer?")) {
                 $.ajax({
-                    url: "<?php echo base_url(); ?>manage_place",
+                    url: "<?php echo base_url(); ?>disablePlace",
                     type: "GET",
                     data: {
                         id: id
@@ -608,8 +604,10 @@
                 }).done(function () {
                     place_modal.modal('close');
                 });
-            }}
-    //TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+            }
+        }
+
+        //TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
         // TODO : supprimer le moche "input text hidden"
         // si le lieu est supprimé => class deleted
 
@@ -617,11 +615,11 @@
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
         let alpha_order = false;
-        var idUser;
-        var carte;
-        var marqueur = [];
-        var latlng = new google.maps.LatLng(43.600000, 1.433333);
-        var options = {
+        let idUser;
+        let carte;
+        let marqueur = [];
+        let latlng = new google.maps.LatLng(43.600000, 1.433333);
+        let options = {
             center: latlng,
             zoom: 13,
             mapTypeId: google.maps.MapTypeId.roadmap
@@ -640,11 +638,11 @@
                             marqueur[j].setMap(carte);
                             console.log(marqueur[j]);
                             // Closure => création de la function au moment de la création du marqueur
-                            var macallback = function callbackSpecificiqueMarqueur(ev) {
+                            let macallback = function callbackSpecificiqueMarqueur(ev) {
                                 //console.log("Callback appelée", ev, marqueur[j]);
                                 //console.log("la position est : " +marqueur[j].getPosition());
 
-                                var contentString =
+                                let contentString =
                                     '<div id="content">' +
                                     '<p> Nom du lieu : ' + place.name + '</p>' +
                                     '<p> Valeur : ' + place.value + '</p>' +
@@ -703,7 +701,7 @@
             idUser = row[0].childNodes[0].textContent;
             console.log(idUser);
 
-            var user_data;
+            let user_data;
 
             $.getJSON("getUser/" + idUser, "", function (result) {
                 $.each(result, function (i, users) {
@@ -715,7 +713,7 @@
                         $("#player_credits").html(user.credits)
                         $("#player_quote").html(user.quote);
                         $("#player_bio").html(user.bio);
-    // TODO : recupérer la photo des joueurs
+                        // TODO : recupérer la photo des joueurs
 
 
                         //users_detail_modal.append(`
@@ -729,10 +727,10 @@
                             texte = "<ul>";
                             $.each(result, function (i, places) {
                                 $.each(places, function (j, place) {
-                                   console.log("infos tableau" + places.length);
+                                    console.log("infos tableau" + places.length);
 
-                                        texte += "<li>" + place.name + "</li>";
-                                    });
+                                    texte += "<li>" + place.name + "</li>";
+                                });
                                 if (places.length !== 0) {
                                     return;
                                 }

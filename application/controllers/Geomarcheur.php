@@ -198,11 +198,10 @@ class Geomarcheur extends CI_Controller
         $this->load->view('vuelistertous', $data);
     }
 
-    public function delete_place() {
+    public function disablePlace() {
 
         $place_id = $this->input->get('id');
-        var_dump($place_id);
-        $this->geomarcheur_db->delete_place($place_id);
+        $this->geomarcheur_db->disable_place($place_id);
 
     }
 

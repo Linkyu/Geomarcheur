@@ -79,7 +79,7 @@ class Geomarcheur_db extends CI_Model {
     }
 
 
-    public function delete_place($id_place) {
+    public function disable_place($id_place) {
 
            $this->load->database();
 
@@ -100,18 +100,24 @@ class Geomarcheur_db extends CI_Model {
         // si il y a un proprio, rajouter la valeur à son compte
             if (!empty($place_owner)) {
 
-                $credits = $this->db->query("SELECT credits FROM user WHERE id='" . $place_owner . "' ")->result_array();
-                $user_credits = $credits[0]['credits'];
+                $owner = $this->db->query("SELECT credits, is_banned FROM user WHERE id='" . $place_owner . "' ")->result_array();
+                if (!$owner[0]['is_banned']) {
+                    $user_credits = $owner[0]['credits'];
 
-                $new_value = $user_credits + $place_value;
-                $refund_query = $this->db->query('UPDATE user SET credits = "'.$new_value.'"  WHERE id = '.$place_owner);
-            }
-            if ($place_status === 0) {
-                $reactivate_place = $this->db->query('UPDATE place SET status = 1  WHERE id = '.$id_place.' ');
+                    $new_value = $user_credits + $place_value;
+                    $refund_query = $this->db->query('UPDATE user SET credits = ' . $new_value . '  WHERE id = '.$place_owner);
+                }
+                $revoke_ownership_query = $this->db->query('UPDATE place SET id_User = NULL WHERE id = '. $place_datas[0]['id']);
             }
 
-            if ($place_status === 1) {
-                $desactivate_place = $this->db->query('UPDATE place SET status = 0  WHERE id = '.$id_place.' ');
+            // This should be in a different function
+            // TODO: Create a reactivate function
+            /*if ($place_status === '0') {
+                $reactivate_place = $this->db->query('UPDATE place SET status = 1  WHERE id = '.$id_place);
+            }*/
+
+            if ($place_status === '1') {
+                $desactivate_place = $this->db->query('UPDATE place SET status = 0  WHERE id = '.$id_place);
             }
 
     }
