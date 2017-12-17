@@ -105,7 +105,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </a>
             </div>
             <div class="col s5 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#profile_modal" id="credits_button">
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#!" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
                     <sup class="bigg">¢</sup>
                     <span id="player_credits_footer"></span>
                 </a>
@@ -189,12 +189,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div id="profile_modal" class="modal modal-fixed-footer">
     <div class="profile_modal-header center-align valign-wrapper">
         <i class="material-icons white-text" style="width: 100%;">account_circle</i>
+        <h5 class="right white-text nowrap"><sup class="bigg">#</sup><span id="profile_modal_rank"></span></h5>
     </div>
     <div class="modal-content">
-        <h4 id="profile_modal_pseudo">Animal</h4>
-        <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places">3</span></p>
-        <h5 id="profile_modal_quote">"yEEEAAHHHHHH"</h5>
-        <p id="profile_modal_bio">Lorizzle ipsum bling bling sit amizzle, consectetuer adipiscing elit. Nizzle sapien velizzle, bling bling volutpat, suscipit , gravida vel, arcu. Check it out hizzle that's the shizzle. We gonna chung erizzle. Fo izzle dolor fo turpis tempizzle tempor. Gangsta boom shackalack mofo et turpizzle. Sizzle izzle tortor. Pellentesque uhuh ... yih!</p>
+        <h4 id="profile_modal_pseudo"></h4>
+        <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places"></span></p>
+        <h5 id="profile_modal_quote"></h5>
+        <p id="profile_modal_bio"></p>
     </div>
     <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect btn-flat">Fermer</a>
@@ -275,7 +276,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                             '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
                                             '</div>' +
                                             '<div class="row">' +
-                                            (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;">' + owner.pseudo + '</span></div>') +
+                                            (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
                                             '</div>' +
                                             '<div class="row"> ' +
                                             '<div class="col s6">' +
@@ -305,6 +306,44 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 })
             }
         )
+    }
+
+    function display_profile(user_id) {
+        get_user(user_id, function (user) {
+            let player = user;
+            $.getJSON( "getUserRank/" + user_id, "", function( result ) {
+                player['rank'] = result['rank'];
+                get_user_places(user_id, function (places) {
+                    player['places'] = places;
+
+                    let profile_modal = $('#profile_modal');
+                    profile_modal.modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%', // Ending top style attribute
+                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#profile_modal_pseudo").html(player['pseudo']);
+                            $("#profile_modal_places").html(player['places'].length);
+                            $("#profile_modal_quote").html('"' + player['quote'] + '"');
+                            $("#profile_modal_bio").html(player['bio']);
+                            $("#profile_modal_rank").html(player['rank']);
+                        },
+                        complete: function (modal, trigger) {
+                            $("#profile_modal_pseudo").html("");
+                            $("#profile_modal_places").html("");
+                            $("#profile_modal_quote").html("");
+                            $("#profile_modal_bio").html("");
+                            $("#profile_modal_rank").html("");
+                        }
+                    });
+
+                    profile_modal.modal('open');
+                })
+            });
+        });
     }
 
     function refreshCredits() {
@@ -394,7 +433,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
         refreshCredits();
 
-        $(".modal").modal({
+        $("#place_list_modal").modal({
             dismissible: true, // Modal can be dismissed by clicking outside of the modal
             opacity: .5, // Opacity of modal background
             inDuration: 300, // Transition in duration

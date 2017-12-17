@@ -25,3 +25,11 @@ function get_place(id, callback) {
         });
     });
 }
+
+function get_user_places(id, callback) {
+    $.getJSON( "getUserPlaces/" + id, "", function( result ) {
+        $.each(result, function(i, places) {
+            callback(places);
+        });
+    });
+}

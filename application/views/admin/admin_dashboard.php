@@ -329,6 +329,7 @@
 
 
     </div>
+</div>
 <footer class="page-footer pink darken-3">
     <div class="container">
         <div class="row">
@@ -453,7 +454,7 @@
                     }
 
                 })
-            })
+            });
 
 
             const place_list = $("#place_list");
