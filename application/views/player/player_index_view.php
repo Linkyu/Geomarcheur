@@ -58,9 +58,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     1px 1px 0 #ff6d00;
         }
 
-        .modal-header {
+        .profile_modal-header {
+            padding: 4px 6px;
+            height: 64px;
             width: 100%;
-            background-color: #00acc1;
+            background-color: #ad1457;
         }
 
         #profile_modal_quote {
@@ -185,8 +187,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <!-- Profile -->
 <div id="profile_modal" class="modal modal-fixed-footer">
-    <div class="modal-header center-align valign-wrapper">
-        <i class="modal-header material-icons">account_circle</i>
+    <div class="profile_modal-header center-align valign-wrapper">
+        <i class="material-icons white-text" style="width: 100%;">account_circle</i>
     </div>
     <div class="modal-content">
         <h4 id="profile_modal_pseudo">Animal</h4>
