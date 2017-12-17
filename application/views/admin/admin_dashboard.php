@@ -580,7 +580,8 @@
                     //location.reload();
                 });
             }}
-
+    //TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+        // TODO : supprimer le moche "input text hidden"
 
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
