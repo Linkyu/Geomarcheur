@@ -98,6 +98,29 @@ class Geomarcheur extends CI_Controller
         echo json_encode($data);
     }
 
+    public function getUserRank()
+    {
+        $user_id = $this->uri->segment(3);
+
+        $data['resultat'] = $this->geomarcheur_db->listAllUsers();
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from User table.");
+
+        // TODO: process the -1 error code case
+        $rank = array('rank' => $this->getUserPosition($user_id, $data['resultat']));
+
+        header("Content-Type: application/json");
+        echo json_encode($rank);
+    }
+    private function getUserPosition($user_id, $list) {
+        foreach ($list as $position => $user) {
+            // TODO: Handle ties
+            if ($user['id'] === $user_id) {
+                return $position + 1;
+            }
+        }
+        return -1;
+    }
+
     public function sellPlace()
     {
         $place_id = $this->uri->segment(3);
@@ -108,7 +131,7 @@ class Geomarcheur extends CI_Controller
             // TODO: echo an actual output that can serve for DEBUG mode (cf. #67)
             $this->logger(LogType::DEBUG, __FUNCTION__ . ": Place " . $place_id . " was sold.");
             http_response_code(200);
-            echo "PLace sold.";
+            echo "Place sold.";
         } else {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no parameter.");
             http_response_code(400);

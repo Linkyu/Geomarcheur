@@ -1,7 +1,7 @@
 function get_user(id, callback) {
     $.getJSON( "getUser/" + id, "", function( result ) {
         $.each(result, function(i, users) {
-            // If somehow the place doesn't exist
+            // If somehow the user doesn't exist
             if (users.length === 0) {
                 console.error('The user at id:' + id + ' does not exist.');
                 callback(null);   // TODO: Create dedicated exceptions

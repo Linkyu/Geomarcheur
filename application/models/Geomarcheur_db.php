@@ -3,7 +3,7 @@ class Geomarcheur_db extends CI_Model {
 
     public function listAllUsers() {
         $this->load->database();
-        $query = $this->db->query('SELECT id, pseudo, credits, inscription_date, bio, quote, is_banned, is_admin FROM user');
+        $query = $this->db->query('SELECT id, pseudo, credits, inscription_date, bio, quote, is_banned, is_admin FROM user ORDER BY credits DESC');
         return $query->result_array();
     }
 

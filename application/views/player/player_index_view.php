@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$temp_user_id = 2;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,7 +69,8 @@ $temp_user_id = 2;
     <div class="container">
         <div class="row">
             <div class="col s3 center-align">
-                Classement
+                <span class="credit_symbol prefix">#</span>
+                <span id="player_rank_footer"></span>
             </div>
             <div class="col s4 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal" id="place_list_button">
@@ -78,7 +78,8 @@ $temp_user_id = 2;
                 </a>
             </div>
             <div class="col s4 center-align">
-                Crédits
+                <span class="credit_symbol prefix">¢</span>
+                <span id="player_credits_footer"></span>
             </div>
             <div class="col s1 right-align">
                 <a href="#" class="waves-effect waves-light circle white-text">
@@ -165,6 +166,11 @@ $temp_user_id = 2;
 <!-- Custom local scripts -->
 <script type="text/javascript">
 
+    const PlayerId = "<?php echo $_SESSION['user_id'] ?>"; // TODO: refactor this
+    let PlayerData = {
+        id: "<?php echo $_SESSION['user_id'] ?>"
+    };
+
 
     function sellPlace(id) {
         if (confirm("Êtes-vous sûr?")) {
@@ -178,18 +184,110 @@ $temp_user_id = 2;
             });
         }
     }
+
+    function refreshMarkers(map) {
+        let markers = [];
+        let infowindow = new google.maps.InfoWindow();
+
+        $.getJSON( "getPlace", "", function( result ) {
+                $.each(result, function(i, places) {
+                    $.each(places, function(j, place) {
+
+                            markers[j] = new google.maps.Marker (
+                                {
+                                    position: new google.maps.LatLng(place.lat, place.lng),
+                                    title:'Nom du lieu : ' + place.name
+                                }
+                            );
+                            markers[j].setMap(map);
+
+
+                            // Closure => création de la function au moment de la création du marqueur
+                            let macallback = function callbackSpecificiqueMarqueur(ev) {
+                                let action = "";
+                                get_user(place.id_User, function (owner) {
+                                    get_user(PlayerId, function (player) {
+                                        /*console.log("ownerId : " + ownerId);
+                                        console.log("place.id_User : " + place.id_User);
+                                        console.log("owner['credits'] : " + owner["credits"]);
+                                        console.log("place.value : " + place.value);
+                                        console.log("");
+                                        console.log("place.id_User === null : " + place.id_User === null);
+                                        console.log("owner['credits'] >= place.value : " + owner['credits'] >= place.value);
+                                        console.log("ownerId === place.id_User : " + ownerId === place.id_User);
+                                        console.log("###");*/
+                                        if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                            action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                        } else if (PlayerId === place.id_User) {
+                                            action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                        }
+
+                                        const contentString =
+                                            '<div id="content">' +
+                                            '<div class="row">' +
+                                            '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
+                                            '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
+                                            '</div>' +
+                                            '<div class="row">' +
+                                            (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;">' + owner.pseudo + '</span></div>') +
+                                            '</div>' +
+                                            '<div class="row"> ' +
+                                            '<div class="col s6">' +
+                                            '<p style="font-weight: bold"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
+                                            '<p>' + action + '</p>' +
+                                            '</div>' +
+                                            '<div class="col s6">' +
+                                            '<img class="infowindow_place_picture" src="http://i.imgur.com/kzmgUyK.jpg" style="width: 100px;">' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '</div>';
+
+                                        infowindow.setContent(contentString);
+                                        infowindow.open(map, markers[j]);
+                                    });
+                                });
+                            };
+
+                            // creation de listener qui apelle la function ...
+                            //console.log("Creation du listener", carte);
+                            google.maps.event.addListener(
+                                markers[j], "click", macallback
+                            );
+
+                        }
+                    )
+                })
+            }
+        )
+    }
+
+    function refreshCredits() {
+        get_user(PlayerData['id'], function (player) {
+            PlayerData['credits'] = player['credits'];
+            $('#player_credits_footer').text(player['credits']);
+        });
+    }
+
+    function refreshRanking() {
+        $.getJSON( "getUserRank/" + PlayerData['id'], "", function( result ) {
+            PlayerData['rank'] = result['rank'];
+            $('#player_rank_footer').text(result['rank']);
+        });
+    }
+
     $(document).ready(function() {
+        get_user(PlayerData['id'], function (player) {
+            PlayerData['pseudo'] = player['pseudo'];
+            PlayerData['credits'] = player['credits'];
+        });
+
         const place_list_table = $("#place_list_table");
         const divs = place_list_table.find("div.card");
         let alpha_order = false;
 
-        const playerId = "<?php echo $_SESSION['user_id'] ?>";
-
-        let map;
-        let marqueur = [];
-        const latlng = new google.maps.LatLng(43.600000, 1.433333);
+        const starting_position = new google.maps.LatLng(43.6000, 1.44333);  // Set to Toulouse for development
         const options = {
-            center: latlng,
+            center: starting_position,
             zoom: 14,
             mapTypeId: google.maps.MapTypeId.roadmap,
             backgroundColor: "#AD1457",
@@ -212,10 +310,9 @@ $temp_user_id = 2;
                     "featureType": "landscape.man_made",
                     "elementType": "geometry",
                     "stylers": [
-                        //{ "color": "#aaAD1457" },
                         { "visibility": "on" },
                         { "hue": "#AD1457" },
-                        { "saturation": "90" },
+                        { "saturation": "50" },
                         { "lightness": "-60" },
                         { "weight": "3" }
                     ]
@@ -243,87 +340,13 @@ $temp_user_id = 2;
                 }
             ]
         };
-        map = new google.maps.Map(document.getElementById("map"), options);
+        let map = new google.maps.Map(document.getElementById("map"), options);
 
-        let infowindow = new google.maps.InfoWindow();
+        refreshMarkers(map);
 
+        refreshRanking();
 
-        function actualisePoint() {
-
-            $.getJSON( "getPlace", "", function( result ) {
-                    $.each(result, function(i, places) {
-                        $.each(places, function(j, place) {
-
-                                marqueur[j] = new google.maps.Marker (
-                                    {
-                                        position: new google.maps.LatLng(place.lat, place.lng),
-                                        title:'Nom du lieu : ' + place.name
-                                    }
-                                );
-                                marqueur[j].setMap(map);
-
-
-                                // Closure => création de la function au moment de la création du marqueur
-                                let macallback = function callbackSpecificiqueMarqueur(ev) {
-                                    let action = "";
-                                    get_user(place.id_User, function (owner) {
-                                        get_user(playerId, function (player) {
-                                            /*console.log("ownerId : " + ownerId);
-                                            console.log("place.id_User : " + place.id_User);
-                                            console.log("owner['credits'] : " + owner["credits"]);
-                                            console.log("place.value : " + place.value);
-                                            console.log("");
-                                            console.log("place.id_User === null : " + place.id_User === null);
-                                            console.log("owner['credits'] >= place.value : " + owner['credits'] >= place.value);
-                                            console.log("ownerId === place.id_User : " + ownerId === place.id_User);
-                                            console.log("###");*/
-                                            if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
-                                            } else if (playerId === place.id_User) {
-                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
-                                            }
-
-                                            const contentString =
-                                                '<div id="content">' +
-                                                    '<div class="row">' +
-                                                        '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
-                                                        '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
-                                                    '</div>' +
-                                                    '<div class="row">' +
-                                                        (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;">' + owner.pseudo + '</span></div>') +
-                                                    '</div>' +
-                                                    '<div class="row"> ' +
-                                                        '<div class="col s6">' +
-                                                            '<p style="font-weight: bold"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
-                                                            '<p>' + action + '</p>' +
-                                                        '</div>' +
-                                                        '<div class="col s6">' +
-                                                            '<img class="infowindow_place_picture" src="http://i.imgur.com/kzmgUyK.jpg" style="width: 100px;">' +
-                                                        '</div>' +
-                                                    '</div>' +
-                                                '</div>';
-
-                                            infowindow.setContent(contentString);
-                                            infowindow.open(map, marqueur[j]);
-                                        });
-                                    });
-                                };
-
-                                // creation de listener qui apelle la function ...
-                                //console.log("Creation du listener", carte);
-                                google.maps.event.addListener(
-                                    marqueur[j], "click", macallback
-                                );
-
-                            }
-                        )
-                    })
-                }
-            )
-        }
-
-        actualisePoint();
-
+        refreshCredits();
 
         $(".modal").modal({
             dismissible: true, // Modal can be dismissed by clicking outside of the modal
