@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+// TODO: Document this file (cf. #66)
+
 class Geomarcheur extends CI_Controller
 {
 
@@ -55,6 +57,7 @@ class Geomarcheur extends CI_Controller
         } else {
             $data['resultat'] = $this->geomarcheur_db->listAllUsers();
         }
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from User table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -71,6 +74,7 @@ class Geomarcheur extends CI_Controller
         } else {
             $data['resultat'] = $this->geomarcheur_db->listAllPlaces();
         }
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from Place table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
@@ -83,11 +87,38 @@ class Geomarcheur extends CI_Controller
         if ($place_id != null) {
             $data['resultat'] = $this->geomarcheur_db->listUserPlaces($place_id);
         } else {
-            // TODO: figure out how to send an error back
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no parameter.");
+            http_response_code(400);
+            echo "Missing parameter: place_id";
+            exit();
         }
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from PLace table.");
 
         header("Content-Type: application/json");
         echo json_encode($data);
+    }
+
+    public function getUserRank()
+    {
+        $user_id = $this->uri->segment(3);
+
+        $data['resultat'] = $this->geomarcheur_db->listAllUsers();
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from User table.");
+
+        // TODO: process the -1 error code case
+        $rank = array('rank' => $this->getUserPosition($user_id, $data['resultat']));
+
+        header("Content-Type: application/json");
+        echo json_encode($rank);
+    }
+    private function getUserPosition($user_id, $list) {
+        foreach ($list as $position => $user) {
+            // TODO: Handle ties
+            if ($user['id'] === $user_id) {
+                return $position + 1;
+            }
+        }
+        return -1;
     }
 
     public function sellPlace()
@@ -97,17 +128,23 @@ class Geomarcheur extends CI_Controller
         if ($place_id != null) {
             $result = $this->geomarcheur_db->sellPlace($place_id);
 
-            // TODO: echo an actual output that can serve for DEBUG mode
-            /*foreach ($result as $item) {
-                foreach ($item as $row) {
-                    echo $row;
-                }
-            }*/
+            // TODO: echo an actual output that can serve for DEBUG mode (cf. #67)
+            $this->logger(LogType::DEBUG, __FUNCTION__ . ": Place " . $place_id . " was sold.");
+            http_response_code(200);
+            echo "Place sold.";
         } else {
-            echo "ERROR - Was expecting place, received nothing instead.";
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no parameter.");
+            http_response_code(400);
+            echo "Missing parameter: place_id.";
+            exit();
         }
     }
 
+    public function disablePlace() {
+
+        $place_id = $this->input->get('id');
+        $this->geomarcheur_db->disable_place($place_id);
+    }
 
     public function login()
     {
@@ -125,7 +162,7 @@ class Geomarcheur extends CI_Controller
         // (i.e., the form has not been filled out yet, or not correctly)
         if ($this->form_validation->run() == FALSE) {
             if (isset($_SESSION['logged_in'])) {
-                // TODO: This part of the logic doesn't make sense
+                // TODO: This part of the logic doesn't make sense (cf. #68)
                 echo validation_errors();
             } else {
                 $this->load->view('login_view');
@@ -149,9 +186,10 @@ class Geomarcheur extends CI_Controller
                 $this->session->set_userdata('user_id', $is_login_valid[0]->id);
                 $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
 
+                $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $data['username'] . " logged in successfully.");
                 $this->redirect_after_login($_SESSION['is_admin']);
             } else {
-                // TODO: Display error message
+                $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
                 http_response_code(401);
                 echo "Bad login";
             }
@@ -167,54 +205,94 @@ class Geomarcheur extends CI_Controller
     }
 
     public function logout () {
+        $username = $_SESSION['user'];
         // Removing session data
         session_destroy();
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $username . " logged out successfully.");
+
         $data['message_display'] = 'Bye bye';
-        $this->load->view('login_view', $data);
+        $this->load->view('login_view', $data);   // TODO: Process the exit message
     }
 
-    // references
-    public function create()
-    {
-        if ($this->input->server('REQUEST_METHOD') == 'GET') {
-            $this->load->view('create_view');
-        } else if ($this->input->server('REQUEST_METHOD') == 'POST') {
+    /**
+     * Simple logging method
+     *
+     * This method will log messages in a readable format in the logs folder. The possible types are DEBUG, WARNING and ERROR.<br />
+     * DEBUG messages should be used whenever an action is taken by the server with no error.<br />
+     * WARNING messages are when there is a non-blocking error.<br />
+     * ERROR messages are ONLY for blocking errors that prevent the server from performing its given task.
+     *
+     * @param $type: The log type determined in @class LogType
+     * @param $message: The message to write in the log
+     */
+    private function logger($type, $message){
+        $log_dir = "./application/logs/" . date("Y-m-d") . "/";
+        $handler = null;
 
-            $data['title'] = $this->input->post('news_title');
-            $data['image'] = $this->input->post('news_image');
-            $data['text'] = $this->input->post('news_text');
-            $id = $this->actualite_db->create($data);
-            $data2['resultat'] = $this->actualite_db->display($id);
-            $this->load->view('index_view', $data2);
+        // Create the logs subdirectory if it doesn't exist yet
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir);
+        }
+
+        // Handle (very slightly) differently depending on the type of the message
+        // TODO: DRY this
+        if ($type === LogType::DEBUG) {
+            $filename = $log_dir . date("Y-m-d") . "_DEBUG.log";
+            if (!file_exists($filename)) {
+                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+            }
+            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $data = $this->log_format($type, $message);
+            fwrite($handler, $data);
+        } elseif ($type === LogType::WARNING) {
+            $filename = $log_dir . date("Y-m-d") . "_WARNING.log";
+            if (!file_exists($filename)) {
+                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+            }
+            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $data = $this->log_format($type, $message);
+            fwrite($handler, $data);
+        } elseif ($type === LogType::ERROR) {
+            $filename = $log_dir . date("Y-m-d") . "_ERROR.log";
+            if (!file_exists($filename)) {
+                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+            }
+            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $data = $this->log_format($type, $message);
+            fwrite($handler, $data);
+        } else {
+            // This should not happen
+            $sub_message = "A log was sent with the wrong parameters. Original message: " . $message;
+            $this->logger(LogType::WARNING, $sub_message);
+        }
+
+        if ($handler != null) {
+            fclose($handler);
         }
     }
 
-    public function display()
-    {
-        $this->load->model('produitbdd');
-
-        $data['resultat'] = $this->produitbdd->listerTous();
-
-        $this->load->view('vuelistertous', $data);
+    private function log_format($type, $message) {
+        if ($type === LogType::DEBUG) {
+            return date("[h:i:s] ") . "[DEBUG] " . $message . "\r\n";
+        } elseif ($type === LogType::WARNING) {
+            return date("[h:i:s] ") . "[WARNING] " . $message . "\r\n";
+        } elseif ($type === LogType::ERROR) {
+            return date("[h:i:s] ") . "[ERROR] " . $message . "\r\n";
+        }
+        return date("[h:i:s] ") . "[???] " . $message . "\r\n";
     }
 
-    public function disablePlace() {
+    // Debugging function
+    /*public function log_tester() {
+        $this->logger(LogType::WARNING, "ATTENCIONE");
+    }*/
 
-        $place_id = $this->input->get('id');
-        $this->geomarcheur_db->disable_place($place_id);
+}
 
-    }
-
-
-
-    /*
-    public function operation()
-     {
-        // 1- récupérer les parametres / données de la requete HTTP, et faire les vérifications nécessaires (session etc.)
-        // 2- faire éventuellement appel à la couche Base de données (requetes SQL)
-        // 3- transmettre les données à la vue pour génération de la réponse HTTP
-     }
-     */
+abstract class LogType {
+    const DEBUG = 0;
+    const WARNING = 1;
+    const ERROR = 2;
 }
 
 

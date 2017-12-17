@@ -83,7 +83,6 @@
             font-size: 18px;
         }
 
-
     </style>
 </head>
 <body>
@@ -199,12 +198,9 @@
 
                 <!-- Place delete button + stats preview -->
                 <div class="col s3">
-
-
                     <!-- si le status du lieu === 1 (lieu actif) -->
                     <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth" id="modal_place_manage_button"
                        onclick="managePlace();"></a>
-
 
                     <!-- Stats preview -->
                     <div class="card small modal_place_stats_block">
@@ -223,7 +219,6 @@
                 </div>
             </div>
         </div>
-
 
         <div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
@@ -331,32 +326,33 @@
 
 
     </div>
-    <footer class="page-footer pink darken-3">
+</div>
+<footer class="page-footer pink darken-3">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="grey-text text-lighten-5">Footer Content</h5>
+                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
+                    content.</p>
+            </div>
+            <div class="col l4 offset-l2 s12">
+                <h5 class="grey-text text-lighten-5">Links</h5>
+                <ul>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
         <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                    <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
-                        content.</p>
-                </div>
-                <div class="col l4 offset-l2 s12">
-                    <h5 class="grey-text text-lighten-5">Links</h5>
-                    <ul>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
-                    </ul>
-                </div>
-            </div>
+            © 2017 Kiantic
+            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
         </div>
-        <div class="footer-copyright">
-            <div class="container">
-                © 2017 Kiantic
-                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
-            </div>
-        </div>
-    </footer>
+    </div>
+</footer>
 
     <!--Import jQuery before materialize.js-->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -420,7 +416,6 @@
     <!-- Custom local scripts -->
     <script>
         $(document).ready(function () {
-
             const userListDatatable = $("#datatable_leaderboard");
             const user_list = $("#user_list");
 
