@@ -177,6 +177,9 @@
                         <input id="modal_place_address_input" name="modal_place_address_input" type="text">
                         <label for="modal_place_address_input">Adresse</label>
                     </div>
+
+                    <input type="hidden" id="idPlace" value="">
+
                     <!--    No need to show these
                     <div class="row">
                         <div class="input-field col s6">
@@ -224,6 +227,9 @@
                 </div>
             </div>
         </div>
+
+
+
         <div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
@@ -418,9 +424,9 @@
     <!-- Custom local scripts -->
     <script>
         $(document).ready(function () {
+
             const userListDatatable = $("#datatable_leaderboard");
             const user_list = $("#user_list");
-            var idPlace;
 
             $.getJSON("getUser", "", function (result) {
                 console.log(result);
@@ -429,14 +435,10 @@
                     if (users.length === 0) {
 
                         $("#user_list_message").html("<p>Il n'existe aucun utilisateur actuellement!</p>")
-
                     } else {
-
                         //userListDatatable.html("");
-
                         $.each(users, function (j, user) {
-
-                                const user_data = `
+                            const user_data = `
                            <tr>
                            <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
                            <td class="leaderboard_pseudo">` + user["pseudo"] + `</td>
@@ -444,17 +446,13 @@
                            <td class="leaderboard_is_admin">` + user["is_admin"] + `</td>
                            </tr>
                            `;
-
                                 user_list.append(user_data);
-
                                 //userListDatatable.append(user_data);
                             }
                         )
                     }
-
                 })
             })
-
 
             const place_list = $("#place_list");
 
@@ -520,8 +518,9 @@
         function display_place(id) {
             // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
             const place_modal = $("#place_modal");
+
             idPlace = id;
-            console.log("id de la place :  " + idPlace)
+            document.getElementById('idPlace').value = id;
             get_place(id, function (result) {
                 const place = result;
                 if (place === 1) {
@@ -559,29 +558,28 @@
                                 Materialize.updateTextFields();
                             }
                         });
-
                         place_modal.modal('open');
                     });
                 }
-
             });
         }
 
-        function deletePlace(idPlace) {
+        function deletePlace() {
+            let id = document.getElementById('idPlace').value;
 
+            console.log("sdfsdf" +id);
             if (confirm("Vous désirez vraiment supprimer?")) {
-                document.location.href = "delete/" + idPlace;
 
-                /* $.ajax({
-                    dataType: 'json',
-                    type:'delete',
-                    url: url + '/' + id
-
-                   /* type: "GET",
-                    url: "../../controllers/Geomarcheur.php",
-                    data: 'id='+ idPlace*/
-            }
-        } //reload la page);
+                $.ajax({
+                    url: "<?php echo base_url(); ?>delete_place",
+                    type: "GET",
+                    data: {
+                        id: id
+                    }
+                }).done(function () {
+                    //location.reload();
+                });
+            }}
 
 
         const place_list_table = $("#place_list_table");
@@ -713,10 +711,7 @@
                             $("#player_places").html(texte);
                             $("#player_number_place").html(places.length);
 
-
                         });
-
-
                         users_detail_modal.modal('open');
 
                     })

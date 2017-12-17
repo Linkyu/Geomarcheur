@@ -189,10 +189,6 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-
-
-
-
     public function display()
     {
         $this->load->model('produitbdd');
@@ -201,6 +197,15 @@ class Geomarcheur extends CI_Controller
 
         $this->load->view('vuelistertous', $data);
     }
+
+    public function delete_place() {
+
+        $place_id = $this->input->get('id');
+        var_dump($place_id);
+        $this->geomarcheur_db->delete_place($place_id);
+
+    }
+
 
 
     /*

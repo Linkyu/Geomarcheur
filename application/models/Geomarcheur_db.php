@@ -77,4 +77,44 @@ class Geomarcheur_db extends CI_Model {
             return false;
         }
     }
+
+
+    public function delete_place($id_place) {
+
+           $this->load->database();
+
+           // recupere l'ID du proprietaire du lieu + la valeur du lieu
+            $place_datas = $this->db->query("SELECT id_User, value, status FROM place WHERE id='".$id_place."' ");
+
+            $value = 0;
+            $id_user = 0;
+            $status = 5;
+
+        foreach ($place_datas->result_array() as $row) {
+
+                $id_user = $row['id_User'];
+                $value = $row['value'];
+                $status = $row['status'];
+
+           }
+            // si il y a un proprio, rajouter la valeur à son compte
+            if ($id_user === 0) {
+                $credits = $this->db->query("SELECT credits FROM user WHERE id='".$id_user."' ");
+                $user_credits = $credits->row();
+                $new_value = $value + $user_credits;
+                $refund_query = $this->db->query('UPDATE user SET credits = id="'.$new_value.'"  WHERE id = '.$id_user);
+            }
+            if ($status === 0) {
+                $desactivate_place = $this->db->query('UPDATE place SET status = 1  WHERE id = '.$id_place);
+            }
+
+            if ($status === 1) {
+                $desactivate_place = $this->db->query('UPDATE place SET status = 0  WHERE id = '.$id_place);
+            }
+            var_dump($id_user);
+            var_dump($value);
+            var_dump($status);
+
+
+    }
 }
