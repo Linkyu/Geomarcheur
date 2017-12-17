@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// TODO: Document this file
+// TODO: Document this file (cf. #66)
 
 class Geomarcheur extends CI_Controller
 {
@@ -98,6 +98,29 @@ class Geomarcheur extends CI_Controller
         echo json_encode($data);
     }
 
+    public function getUserRank()
+    {
+        $user_id = $this->uri->segment(3);
+
+        $data['resultat'] = $this->geomarcheur_db->listAllUsers();
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Retrieved " . sizeof($data['resultat']) . " line" . (sizeof($data['resultat']) > 1 ? "s" : "") . " from User table.");
+
+        // TODO: process the -1 error code case
+        $rank = array('rank' => $this->getUserPosition($user_id, $data['resultat']));
+
+        header("Content-Type: application/json");
+        echo json_encode($rank);
+    }
+    private function getUserPosition($user_id, $list) {
+        foreach ($list as $position => $user) {
+            // TODO: Handle ties
+            if ($user['id'] === $user_id) {
+                return $position + 1;
+            }
+        }
+        return -1;
+    }
+
     public function sellPlace()
     {
         $place_id = $this->uri->segment(3);
@@ -105,10 +128,10 @@ class Geomarcheur extends CI_Controller
         if ($place_id != null) {
             $result = $this->geomarcheur_db->sellPlace($place_id);
 
-            // TODO: echo an actual output that can serve for DEBUG mode
+            // TODO: echo an actual output that can serve for DEBUG mode (cf. #67)
             $this->logger(LogType::DEBUG, __FUNCTION__ . ": Place " . $place_id . " was sold.");
             http_response_code(200);
-            echo "PLace sold.";
+            echo "Place sold.";
         } else {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no parameter.");
             http_response_code(400);
@@ -134,7 +157,7 @@ class Geomarcheur extends CI_Controller
         // (i.e., the form has not been filled out yet, or not correctly)
         if ($this->form_validation->run() == FALSE) {
             if (isset($_SESSION['logged_in'])) {
-                // TODO: This part of the logic doesn't make sense
+                // TODO: This part of the logic doesn't make sense (cf. #68)
                 echo validation_errors();
             } else {
                 $this->load->view('login_view');
