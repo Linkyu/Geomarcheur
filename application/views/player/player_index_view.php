@@ -11,6 +11,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"  media="screen,projection"/>
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"  media="screen,projection"/>
@@ -20,6 +21,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+
+
+
+
 
 
 
@@ -94,7 +100,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="container">
         <div class="row">
             <div class="col s3 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#ranking_modal" id="ranking_button">
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text" id="ranking_button">
                     <sup class="bigg">#</sup>
                     <span id="player_rank_footer"></span>
                 </a>
@@ -120,6 +126,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </footer>
 
 <!-- ### Modals ### -->
+<div id="profile_modal"></div>
+
+<div id="ranking_modal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <table id="ranking_datatable"></table>
+    </div>
+</div>
+
 <!-- Places -->
 <div id="place_list_modal" class="modal modal-fixed-footer">
     <div class="modal-header">
@@ -202,12 +216,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div>
 </div>
 
-<!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<!-- Compiled and minified Materialize JavaScript -->
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
-
-<!-- Custom tools -->
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
 <!-- Custom local scripts -->
@@ -359,6 +370,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             $('#player_rank_footer').text(result['rank']);
         });
     }
+
+
+    //listAllUsers => fonction qui retourne les joueurs triés avec le classement....
+    // envoyer ces données dans le datatable
 
     $(document).ready(function() {
         get_user(PlayerData['id'], function (player) {
@@ -566,10 +581,116 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             });
             $("#container").html(numericallyOrderedDivs);
         });
+
+    $('#ranking_button').on('click', function () {
+   console.log("clik");
+
+
+    // déclaration de la modale
+    const ranking_modal = $("#ranking_modal");
+    ranking_modal.modal({
+        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+        opacity: .5, // Opacity of modal background
+        inDuration: 300, // Transition in duration
+        outDuration: 200, // Transition out duration
+        startingTop: '4%', // Starting top style attribute
+        endingTop: '10%'
+    });
+
+        $('#ranking_datatable').DataTable()({
+        "language": {
+            url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
+        },
+        ajax: {
+            url: 'getUser',
+            dataSrc: "resultat"
+        },
+        columns: [
+            {data: "id"},
+            {data: "pseudo"},
+            {data: "credits"},
+            {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
+        ]
+
+    });
+
+    });
+
     });
 
 
+
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
 
