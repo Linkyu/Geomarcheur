@@ -152,11 +152,123 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <th>Crédits</th>
                         <th>Lieux possédés</th>
                     </tr>
-
                 </table>
             </div>
+        </div>
     </div>
-</div>
+
+
+    <!-- la modale des détails d'un utilisateur -->
+    <div id="modal_detail_user" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col s3">
+                    <div id="card_user_pic" class="card small modal_place_stats_block">
+                        <div class="card-content">
+                            <p class="bold">Photo de l'utilisateur</p>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <span id="player_quote"></span>
+                    </div>
+                </div>
+
+                <div class="col s9">
+                    <div class="row">
+                        <div class="col s6">
+                            <span class="bold">Nom</span>
+                            <br>
+                            <span id="player_name"></span>
+                        </div>
+                        <div class="col s2">
+                            <span class="bold">#</span>
+                            <br>
+                            <span id="player_position"></span>
+                        </div>
+                        <div class="col s2">
+                            <span class="bold">Crédits</span>
+                            <br>
+                            <span id="player_credits"></span> <span id="little_credit_symbol" class="credit_symbol prefix">¢</span>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="row"></div>
+
+                        <div class="col s8">
+                            <span class="bold">Bio</span>
+                            <br>
+                            <span id="player_bio"></span>
+                        </div>
+
+                        <div class="col s4">
+                            <span class="bold">Lieu(x) possédé(s)</span>
+                            <br>
+                            <span id="player_places"></span>
+                            <!-- liste sur les lieux possédés -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal-footer">
+            <a class="waves-effect waves-light btn-large #f44336 red">BANNIR</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
+               onclick="idPlace = '';">Retour</a>
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- Places -->
 <div id="place_list_modal" class="modal modal-fixed-footer">
@@ -609,8 +721,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 //@TODO : afficher la ligne du joueur connecté d'une autre couleur
-  const ranking_modal = $("#ranking_modal");
-    ranking_modal.modal({
+    const users_detail_modal = $("#ranking_modal");
+    users_detail_modal.modal({
         dismissible: true, // Modal can be dismissed by clicking outside of the modal
         opacity: .5, // Opacity of modal background
         inDuration: 300, // Transition in duration
@@ -619,10 +731,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         endingTop: '10%'
     });
 
-    let container_ranking = $('#ranking_datatable');
-    container_ranking.DataTable({
-        "order": [[ 3, "desc" ]],
-            "language": {
+    // Datatable setup
+    let container = $('#ranking_datatable');
+    container.DataTable({
+        "language": {
             url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
         },
         ajax: {
@@ -634,9 +746,86 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             {data: "pseudo"},
             {data: "credits"},
             {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
-        ]
+        ],
+        "order": [[ 2, "desc" ]]
 
     });
+
+    let rows = $('#datatable_leaderboard');
+
+    rows.on('click', 'tr', function () {
+
+        let row = $(this);
+        idUser = row[0].childNodes[0].textContent;
+        console.log(idUser);
+
+        let user_data;
+
+        $.getJSON("getUser/" + idUser, "", function (result) {
+            $.each(result, function (i, users) {
+                $.each(users, function (j, user) {
+                    //users_detail_modal.html("");
+                    let player_name = $("#player_name").html(user.pseudo);
+                    //TODO : creer la fonction + requete de qui va positionner le joueur
+                    $("#player_position").html(user.credits);
+                    $("#player_credits").html(user.credits)
+                    $("#player_quote").html(user.quote);
+                    $("#player_bio").html(user.bio);
+                    // TODO : recupérer la photo des joueurs
+
+                    //users_detail_modal.append(`
+                    //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
+                    //<p>Nom de l'utilisateur : ` + user.credits + ` </p>
+                    //`);
+                    // recuperer les lieux de l'utilisateur where ID => machin
+                    $.getJSON("getUserPlaces/" + idUser, "", function (result) {
+                        let texte;
+
+                        texte = "<ul>";
+                        $.each(result, function (i, places) {
+                            $.each(places, function (j, place) {
+                                console.log("infos tableau" + places.length);
+
+                                texte += "<li>" + place.name + "</li>";
+                            });
+                            if (places.length !== 0) {
+                                return;
+                            }
+                            texte = "Aucun lieu."
+                        });
+
+                        texte += "</ul>";
+                        $("#player_places").html(texte);
+                        $("#player_number_place").html(result.length);
+
+                    });
+                    users_detail_modal.modal('open');
+
+                })
+            })
+        });
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
