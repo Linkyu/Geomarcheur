@@ -685,6 +685,7 @@
                 {data: "credits"},
                 {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
             ],
+            "order": [[ 2, "desc" ]]
 
         });
 

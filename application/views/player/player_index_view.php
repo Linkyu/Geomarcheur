@@ -99,12 +99,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <footer id="player_page_footer" class="page-footer pink darken-3">
     <div class="container">
         <div class="row">
+
             <div class="col s3 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text" id="ranking_button">
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#ranking_modal" id="ranking_button">
                     <sup class="bigg">#</sup>
                     <span id="player_rank_footer"></span>
                 </a>
             </div>
+
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal" id="place_list_button">
                     <sup><i class="material-icons">place</i></sup>3
@@ -130,7 +132,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <div id="ranking_modal" class="modal modal-fixed-footer">
     <div class="modal-content">
-        <table id="ranking_datatable"></table>
+        <div class="card-panel hoverable">
+            <div class="row">
+                <table id="ranking_datatable" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Crédits</th>
+                        <th>Lieux possédés</th>
+                    </tr>
+                    </thead>
+                    <tbody id="datatable_leaderboard">
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Crédits</th>
+                        <th>Lieux possédés</th>
+                    </tr>
+
+                </table>
+            </div>
     </div>
 </div>
 
@@ -581,13 +605,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             });
             $("#container").html(numericallyOrderedDivs);
         });
-
-    $('#ranking_button').on('click', function () {
-   console.log("clik");
+    });
 
 
-    // déclaration de la modale
-    const ranking_modal = $("#ranking_modal");
+//@TODO : afficher la ligne du joueur connecté d'une autre couleur
+  const ranking_modal = $("#ranking_modal");
     ranking_modal.modal({
         dismissible: true, // Modal can be dismissed by clicking outside of the modal
         opacity: .5, // Opacity of modal background
@@ -597,8 +619,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         endingTop: '10%'
     });
 
-        $('#ranking_datatable').DataTable()({
-        "language": {
+    let container_ranking = $('#ranking_datatable');
+    container_ranking.DataTable({
+        "order": [[ 3, "desc" ]],
+            "language": {
             url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
         },
         ajax: {
@@ -614,9 +638,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     });
 
-    });
 
-    });
+
+
 
 
 
