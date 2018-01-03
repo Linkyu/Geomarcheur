@@ -69,14 +69,13 @@ $temp_user_id = 2;
                 <div class="row">
                     <div class="input-field col s12  white-text">
                         <i class="material-icons prefix">lock</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Password</label>
+                        <input id="geo_password" type="password" class="validate">
+                        <label for="geo_password">Password</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="switch col s12 white-text">
-                        <!-- TODO: Make this functional. See issue #56 -->
-                        <input type="checkbox" id="showPassword" class="white-text" />
+                        <input type="checkbox" id="showPassword" class="white-text" onclick="displayPassword()"/>
                         <label for="showPassword">Afficher le mot de passe</label>
                     </div>
                 </div>
@@ -101,6 +100,10 @@ $temp_user_id = 2;
 <script src="<?php echo base_url(); ?>static/js/capslock_detector.js"></script>
 
 <script type="text/javascript">
+    function displayPassword() {
+        let pass_input = $("#geo_password");
+        pass_input.attr('type', (pass_input.attr('type') === "password" ? "text" : "password"));
+    }
     function login() {
         $.ajax({
             type: "POST",
