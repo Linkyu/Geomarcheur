@@ -59,6 +59,10 @@ $temp_user_id = 2;
         </div>
         <div class="row aanimated fadeInUp">
             <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="<?php echo base_url(); ?>/login/">
+                <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="error_bar">
+                    <i class="material-icons">warning</i>
+                    <div class="text"></div>
+                </div>
                 <div class="row">
                     <div class="input-field col s12 white-text">
                         <i class="material-icons prefix">account_circle</i>
@@ -75,8 +79,7 @@ $temp_user_id = 2;
                 </div>
                 <div class="row">
                     <div class="switch col s12 white-text">
-                        <!-- TODO: Make this functional. See issue #56 -->
-                        <input type="checkbox" id="showPassword" class="white-text" />
+                        <input type="checkbox" id="showPassword" class="white-text" onclick="displayPassword()"/>
                         <label for="showPassword">Afficher le mot de passe</label>
                     </div>
                 </div>
@@ -89,7 +92,6 @@ $temp_user_id = 2;
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="white-text underline">S'inscrire</a></p>
         </div>
     </div>
-
 </main>
 
 <!--Import jQuery before materialize.js-->
@@ -101,7 +103,15 @@ $temp_user_id = 2;
 <script src="<?php echo base_url(); ?>static/js/capslock_detector.js"></script>
 
 <script type="text/javascript">
+    function displayPassword() {
+        let pass_input = $("#password");
+        pass_input.attr('type', (pass_input.attr('type') === "password" ? "text" : "password"));
+    }
     function login() {
+        let error_bar = $("#error_bar");
+        error_bar.find(".text").html("");
+        error_bar.addClass("hide");
+
         $.ajax({
             type: "POST",
             url: "<?php echo base_url(); ?>login/",
@@ -113,19 +123,27 @@ $temp_user_id = 2;
                 200: function (data) {
                     // TODO: Find a cleaner way?
                     location.reload();
-                    // $("html").html(data); // much quicker but breaks the next page
+                    // $("html").html(data); // much quicker but breaks the next page because document.ready is not called
+                    // document.write(data) // breaks it less but still not quite functional
                 },
                 400: function (data) {
-                    // TODO: Display this as an error bar in the form
-                    alert(data.responseText);
+                    error_bar.find(".text").html(data.responseText);
+                    error_bar.removeClass("hide");
                 },
                 401: function (data) {
-                    // TODO: Display this as an error bar in the form
-                    alert(data.responseText);
+                    error_bar.find(".text").html(data.responseText);
+                    error_bar.removeClass("hide");
                 }
             }
         });
     }
+
+    $("form").on('keypress', 'input', function(event) {
+        if (event.which === 13) {
+            event.preventDefault();
+            login();
+        }
+    });
 </script>
 </body>
 </html>
