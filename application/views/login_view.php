@@ -69,8 +69,8 @@ $temp_user_id = 2;
                 <div class="row">
                     <div class="input-field col s12  white-text">
                         <i class="material-icons prefix">lock</i>
-                        <input id="geo_password" type="password" class="validate">
-                        <label for="geo_password">Password</label>
+                        <input id="password" type="password" class="validate">
+                        <label for="password">Password</label>
                     </div>
                 </div>
                 <div class="row">
@@ -101,7 +101,7 @@ $temp_user_id = 2;
 
 <script type="text/javascript">
     function displayPassword() {
-        let pass_input = $("#geo_password");
+        let pass_input = $("#password");
         pass_input.attr('type', (pass_input.attr('type') === "password" ? "text" : "password"));
     }
     function login() {
