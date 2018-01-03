@@ -126,6 +126,13 @@ $temp_user_id = 2;
             }
         });
     }
+
+    $("form").on('keypress', 'input', function(event) {
+        if (event.which === 13) {
+            event.preventDefault();
+            login();
+        }
+    });
 </script>
 </body>
 </html>
