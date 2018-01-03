@@ -123,7 +123,8 @@ $temp_user_id = 2;
                 200: function (data) {
                     // TODO: Find a cleaner way?
                     location.reload();
-                    // $("html").html(data); // much quicker but breaks the next page
+                    // $("html").html(data); // much quicker but breaks the next page because document.ready is not called
+                    // document.write(data) // breaks it less but still not quite functional
                 },
                 400: function (data) {
                     error_bar.find(".text").html(data.responseText);
