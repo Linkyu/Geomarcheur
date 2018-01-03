@@ -99,7 +99,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <footer id="player_page_footer" class="page-footer pink darken-3">
     <div class="container">
         <div class="row">
-
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#ranking_modal" id="ranking_button">
                     <sup class="bigg">#</sup>
@@ -113,7 +112,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </a>
             </div>
             <div class="col s5 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#!" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#modal_detail_user" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
                     <sup class="bigg">¢</sup>
                     <span id="player_credits_footer"></span>
                 </a>
@@ -128,8 +127,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </footer>
 
 <!-- ### Modals ### -->
-<div id="profile_modal"></div>
-
 <div id="ranking_modal" class="modal modal-fixed-footer">
     <div class="modal-content">
         <div class="card-panel hoverable">
@@ -156,7 +153,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
         </div>
     </div>
-
+</div>
 
     <!-- la modale des détails d'un utilisateur -->
     <div id="modal_detail_user" class="modal modal-fixed-footer">
@@ -208,11 +205,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <!-- liste sur les lieux possédés -->
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-
 
         <div class="modal-footer">
             <a class="waves-effect waves-light btn-large #f44336 red">BANNIR</a>
@@ -223,52 +218,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- Places -->
 <div id="place_list_modal" class="modal modal-fixed-footer">
@@ -339,15 +288,33 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div id="profile_modal" class="modal modal-fixed-footer">
     <div class="profile_modal-header center-align valign-wrapper">
         <i class="material-icons white-text" style="width: 100%;">account_circle</i>
+
         <h5 class="right white-text nowrap"><sup class="bigg">#</sup><span id="profile_modal_rank"></span></h5>
     </div>
     <div class="modal-content">
-        <h4 id="profile_modal_pseudo"></h4>
-        <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places"></span></p>
-        <h5 id="profile_modal_quote"></h5>
-        <p id="profile_modal_bio"></p>
+
+
+        <div class="col s10 m10">
+            <label for="input_profile_modal_pseudo">Pseudo</label>
+            <input id="input_profile_modal_pseudo" name="input_profile_modal_pseudo" type="text" function="check_form(this.value)">
+        </div>
+
+        <div class="col s2 m2">
+            <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places"></span></p>
+        </div>
+
+        <label for="input_profile_modal_quote">Quote</label>
+        <input id="input_profile_modal_quote" name="input_profile_modal_quote" type="text">
+
+        <label for="input_profile_modal_bio">Bio</label>
+        <input id="input_profile_modal_bio" name="input_profile_modal_bio" type="text">
+
+
     </div>
     <div class="modal-footer">
+
+        <a href="#!" onclick='update_profile(<?php echo $_SESSION['user_id'] ?>)' class="waves-effect btn-flat">Sauvegarder</a>
+
         <a href="#!" class="modal-action modal-close waves-effect btn-flat">Fermer</a>
     </div>
 </div>
@@ -472,6 +439,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         startingTop: '4%', // Starting top style attribute
                         endingTop: '10%', // Ending top style attribute
                         ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#input_profile_modal_pseudo").val(player["pseudo"]);
+                            $("#input_profile_modal_quote").val(player["quote"]);
+                            $("#input_profile_modal_bio").val(player['bio']);
+
                             $("#profile_modal_pseudo").html(player['pseudo']);
                             $("#profile_modal_places").html(player['places'].length);
                             $("#profile_modal_quote").html('"' + player['quote'] + '"');
@@ -806,21 +777,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         });
     })
 
+function update_profile(id) {
+    let pseudo =  $("#input_profile_modal_pseudo").val();
+    let quote =  $("#input_profile_modal_quote").val();
+    let bio =  $("#input_profile_modal_bio").val();
 
+    console.log(pseudo);
+    console.log(quote);
+    console.log(bio);
 
+    $.ajax({
+        url: "<?php echo base_url(); ?>modify_profile",
+        type: "POST",
+        data: {
+            id: id, pseudo : pseudo, quote: quote, bio: bio
+        },
+        success: function(){
+            alert("Profil modifié !");
+        },
+        error : function() {
+            alert("Enregistrement échoué !");
+        }
+        }).done(function () {
 
+        let profile_modal = $('#profile_modal');
 
+        profile_modal.modal('close');
+    });
+}
 
-
-
-
-
-
-
-
-
-
-
+function check_form(value) {
+        console.log(value);
+}
 
 
 
@@ -834,51 +822,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
