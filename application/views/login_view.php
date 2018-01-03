@@ -59,6 +59,10 @@ $temp_user_id = 2;
         </div>
         <div class="row aanimated fadeInUp">
             <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="<?php echo base_url(); ?>/login/">
+                <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="error_bar">
+                    <i class="material-icons">warning</i>
+                    <div class="text"></div>
+                </div>
                 <div class="row">
                     <div class="input-field col s12 white-text">
                         <i class="material-icons prefix">account_circle</i>
@@ -88,7 +92,6 @@ $temp_user_id = 2;
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="white-text underline">S'inscrire</a></p>
         </div>
     </div>
-
 </main>
 
 <!--Import jQuery before materialize.js-->
@@ -105,6 +108,10 @@ $temp_user_id = 2;
         pass_input.attr('type', (pass_input.attr('type') === "password" ? "text" : "password"));
     }
     function login() {
+        let error_bar = $("#error_bar");
+        error_bar.find(".text").html("");
+        error_bar.addClass("hide");
+
         $.ajax({
             type: "POST",
             url: "<?php echo base_url(); ?>login/",
@@ -119,12 +126,12 @@ $temp_user_id = 2;
                     // $("html").html(data); // much quicker but breaks the next page
                 },
                 400: function (data) {
-                    // TODO: Display this as an error bar in the form
-                    alert(data.responseText);
+                    error_bar.find(".text").html(data.responseText);
+                    error_bar.removeClass("hide");
                 },
                 401: function (data) {
-                    // TODO: Display this as an error bar in the form
-                    alert(data.responseText);
+                    error_bar.find(".text").html(data.responseText);
+                    error_bar.removeClass("hide");
                 }
             }
         });
