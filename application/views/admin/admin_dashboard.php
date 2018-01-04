@@ -83,6 +83,9 @@
             font-size: 18px;
         }
 
+        #player_bio {
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -282,39 +285,35 @@
                 <div class="col s9">
                     <div class="row">
                         <div class="col s6">
-                            <span class="bold">Nom</span>
-                            <br>
-                            <span id="player_name"></span>
+                            <p class="bold">Nom</p>
+                            <p id="player_name"></p>
                         </div>
                         <div class="col s2">
-                            <span class="bold">#</span>
-                            <br>
-                            <span id="player_position"></span>
+                            <p class="bold">#</p>
+                            <p id="player_position"></p>
                         </div>
                         <div class="col s2">
                             <span class="bold">Crédits</span>
-                            <br>
-                            <span id="player_credits" contenteditable="true"></span>&nbsp;<span id="little_credit_symbol"
-                                                                         class="credit_symbol prefix">¢</span>
+                            <p><span id="player_credits"></span>&nbsp;<span id="little_credit_symbol"
+                                                                         class="credit_symbol prefix">¢</span></p>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="row"></div>
                         <div class="col s8">
-                            <span class="bold">Bio</span>
-                            <br>
-                            <span id="player_bio" contenteditable="true"></span>
+                            <p class="bold">Bio</p>
+                            <p id="player_bio" contenteditable="true"></p>
                         </div>
                         <div class="col s4">
-                            <span class="bold">Lieu(x) possédé(s)</span>
-                            <br>
-                            <span id="player_places"></span>
+                            <p class="bold">Lieu(x) possédé(s)</p>
+                            <p id="player_places"></p>
                             <!-- liste des lieux possédés -->
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="hide" id="player_id"></div>
         </div>
 
         <div class="modal-footer">
@@ -415,8 +414,6 @@
 
 <!-- Custom local scripts -->
 <script>
-    let currentUser = '';
-
     $(document).ready(function () {
 
         // Leaderboards
@@ -741,13 +738,13 @@
 
     });
 
-    // Display and fill out place detail modal
+    // Display and fill out user detail modal
     let rows = $('#datatable_leaderboard');
     rows.on('click', 'tr', function () {
 
         let row = $(this);
         idUser = row[0].childNodes[0].textContent;
-        console.log(idUser);
+        //console.log(idUser);
 
         let user_data;
 
@@ -762,6 +759,7 @@
                     $("#player_credits").html(user.credits);
                     $("#player_quote").html(user.quote);
                     $("#player_bio").html(user.bio);
+                    $("#player_id").html(user.id);
                     // TODO : recupérer la photo des joueurs
 
 
@@ -776,7 +774,7 @@
                         texte = "<ul>";
                         $.each(result, function (i, places) {
                             $.each(places, function (j, place) {
-                                console.log("infos tableau" + places.length);
+                                //console.log("infos tableau" + places.length);
 
                                 texte += "<li>" + place.name + "</li>";
                             });
@@ -798,9 +796,35 @@
         });
     });
 
-    // Switch the modal to edit mode
+    // Save the modifications
     function edit_profile() {
+        const player_id = $("#player_id").text();
+        const player_quote = $("#player_quote").text();
+        const player_bio = $("#player_bio").html();
+        console.log(player_id);
+        console.log(player_quote);
+        console.log(player_bio);
 
+        $.ajax({
+            type: "POST",
+            url: "editProfile/",
+            data: {
+                id: player_id,
+                quote: player_quote,
+                bio: player_bio
+            },
+            statusCode: {
+                200: function (data) {
+                    Materialize.toast(data.responseText, 3000, 'green rounded');
+                },
+                400: function (data) {
+                    Materialize.toast("An error was encountered. Error code: 400", 3000, 'red rounded');
+                },
+                401: function (data) {
+                    Materialize.toast("An error was encountered. Error code: 401", 3000, 'red rounded');
+                }
+            }
+        });
     }
 
 </script>
