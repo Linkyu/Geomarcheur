@@ -58,7 +58,7 @@ $temp_user_id = 2;
             <h2 class="col s12 white-text center-align full hide-on-med-and-up">Géomarcheur</h2>    <!-- Mobile -->
         </div>
         <div class="row aanimated fadeInUp">
-            <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="<?php echo base_url(); ?>/login/">
+            <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="login/">
                 <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="error_bar">
                     <i class="material-icons">warning</i>
                     <div class="text"></div>
@@ -114,7 +114,7 @@ $temp_user_id = 2;
 
         $.ajax({
             type: "POST",
-            url: "<?php echo base_url(); ?>login/",
+            url: "login/",
             data: {
                 username: $("#username").val(),
                 password: $("#password").val()

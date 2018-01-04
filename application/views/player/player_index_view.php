@@ -45,7 +45,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             white-space: nowrap;
         }
 
-        .bigg {
+        .big_symbol {
             font-size: 1.3em;
             font-weight: bold;
         }
@@ -95,7 +95,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="row">
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#ranking_modal" id="ranking_button">
-                    <sup class="bigg">#</sup>
+                    <sup class="big_symbol">#</sup>
                     <span id="player_rank_footer"></span>
                 </a>
             </div>
@@ -106,7 +106,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <div class="col s5 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#!" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
-                    <sup class="bigg">¢</sup>
+                    <sup class="big_symbol">¢</sup>
                     <span id="player_credits_footer"></span>
                 </a>
             </div>
@@ -189,7 +189,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div id="profile_modal" class="modal modal-fixed-footer">
     <div class="profile_modal-header center-align valign-wrapper">
         <i class="material-icons white-text" style="width: 100%;">account_circle</i>
-        <h5 class="right white-text nowrap"><sup class="bigg">#</sup><span id="profile_modal_rank"></span></h5>
+        <h5 class="right white-text nowrap"><sup class="big_symbol">#</sup><span id="profile_modal_rank"></span></h5>
     </div>
     <div class="modal-content">
         <h4 id="profile_modal_pseudo"></h4>

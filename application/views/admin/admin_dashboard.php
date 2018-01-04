@@ -468,11 +468,11 @@
     }
 </script>
 
-<!-- Charts API + placeholder data -->
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+    <!-- DataTables API -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
 
-<!-- Custom tools -->
-<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+    <!-- Custom tools -->
+    <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
 <!-- Custom local scripts -->
 <script>
@@ -514,7 +514,7 @@
         // Places list
         $.getJSON("getPlace/asc", "", function (result) {
             $.each(result, function (i, places) {
-                // TODO: Make a better overfllow rule
+                // TODO: Make a better overflow rule
                 if (places.length === 0) {
                     $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
                 } else {
