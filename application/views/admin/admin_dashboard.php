@@ -13,6 +13,9 @@
           media="screen,projection"/>
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"
           media="screen,projection"/>
+    <!-- Import Snazzy CSS -->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>static/css/snazzy-info-window/snazzy-info-window.min.css">
+
     <!--Import custom css files-->
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"
           media="screen,projection"/>
@@ -34,7 +37,7 @@
         }
 
         .map_block, .place_list_block {
-            height: 400px !important;
+            height: 600px !important;
         }
 
         .place_list_block {
@@ -105,6 +108,45 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        .pac-card {
+            margin: 10px 10px 0 0;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background-color: #fff;
+            font-family: Roboto;
+        }
+
+        #pac-container {
+            padding-bottom: 12px;
+            margin-right: 12px;
+        }
+
+        .pac-controls {
+            display: inline-block;
+            padding: 5px 11px;
+        }
+
+        .pac-controls label {
+            font-family: Roboto, serif;
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+        #pac-input {
+            background-color: rgba(0, 0, 0, .7);
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 100%;
+            color: white
+        }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +179,7 @@
         <!-- MAP -->
         <div class="col s6">
             <div class="card-panel hoverable map_block">
+                <input id="pac-input" class="controls" type="text" placeholder="Chercher un lieu">
                 <div class="valign-wrapper center-align map" id="map"><h1>MAP</h1></div>
             </div>
         </div>
@@ -202,6 +245,11 @@
                         <input id="modal_place_name_input" name="modal_place_name_input" type="text">
                         <label for="modal_place_name_input">Nom</label>
                     </div>
+
+                    <input id="modal_place_lat_input" name="modal_place_lat_input" type="hidden">
+                    <input id="modal_place_lng_input" name="modal_place_lng_input" type="hidden">
+                    <input id="modal_place_create_input" name="modal_place_create_input" type="hidden">
+
                     <div class="input-field">
                         <i class="material-icons prefix">place</i>
                         <input id="modal_place_address_input" name="modal_place_address_input" type="text">
@@ -250,7 +298,7 @@
 
         <div class="modal-footer">
             <a href="#!" class="waves-effect btn-flat indigo-text text-darken-4"
-               onclick="editPlace()">Sauvegarder les modifications</a>
+               onclick="savePlace()">Sauvegarder les modifications</a>
             <a href="#!" class="modal-action modal-close waves-effect btn-flat red-text"
                onclick="idPlace = '';">Retour</a>
         </div>
@@ -377,10 +425,12 @@
 
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>"
-        type="text/javascript"></script>
-<!-- Charts API + placeholder data -->
+<script src="https://maps.googleapis.com/maps/api/js?language=fr-FR&key=<?php echo GOOGLE_API_KEY ?>&libraries=places" type="text/javascript"></script>
 
+<!-- Snazzy plugin -->
+<script src="<?php echo base_url(); ?>static/js/snazzy-info-window/snazzy-info-window.min.js"></script>
+
+<!-- Charts API + placeholder data -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 
@@ -427,14 +477,15 @@
     }
 </script>
 
-<!-- Charts API + placeholder data -->
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+    <!-- DataTables API -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
 
-<!-- Custom tools -->
-<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+    <!-- Custom tools -->
+    <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
 <!-- Custom local scripts -->
 <script>
+    // TODO: Clean this up
     $(document).ready(function () {
 
         // Leaderboards
@@ -442,7 +493,7 @@
         const user_list = $("#user_list");
 
         $.getJSON("getUser", "", function (result) {
-            console.log(result);
+            //console.log(result);
             $.each(result, function (i, users) {
 
                 if (users.length === 0) {
@@ -472,7 +523,7 @@
         // Places list
         $.getJSON("getPlace/asc", "", function (result) {
             $.each(result, function (i, places) {
-                // TODO: Make a better overfllow rule
+                // TODO: Make a better overflow rule
                 if (places.length === 0) {
                     $("#place_list_message").html("<p>Il n'existe aucun lieu actuellement! Pour créer un lieu, cliquez la où vous souhaitez créer un lieu sur la carte, ou entrez l'adresse directement dans le champ de recherche ci-dessus puis suivez les instructions.</p>")
                 } else {
@@ -538,139 +589,20 @@
         });
     });
 
-    function logout() {
-        $.ajax({url: "<?php echo base_url(); ?>logout/"}
-        ).done(function () {
-            location.reload();
-        });
-    }
-
-    // Place details display
-    function display_place(id) {
-        // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
-        const place_modal = $("#place_modal");
-
-        // TODO: Use the same method as the User modal; don't use inputs, use editable divs. It's 2018 ffs
-        idPlace = id;
-        $("#idPlace").val(id);
-        get_place(id, function (result) {
-            const place = result;
-            if (place === 1) {
-                alert("Ce lieu n'existe pas!");
-            } else {
-
-                get_user(place["id_User"], function (result) {
-                    const owner = result;
-
-                    place_modal.modal({
-                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
-                        opacity: .5, // Opacity of modal background
-                        inDuration: 300, // Transition in duration
-                        outDuration: 200, // Transition out duration
-                        startingTop: '4%', // Starting top style attribute
-                        endingTop: '10%', // Ending top style attribute
-                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                            $("#modal_place_name_input").val(place["name"]);
-                            if (place["address"] !== null) {
-                                $("#modal_place_address_input").val(place["address"]);
-                            }
-                            if (place["id_User"] !== null) {
-                                $("#modal_place_owner_input").val(owner["pseudo"]);
-                            }
-                            $("#modal_place_value_input").val(place["value"]);
-
-                            let manage_button = $("#modal_place_manage_button");
-                            if (place["status"] === '0') {
-                                manage_button.removeClass("red");
-                                manage_button.addClass("green");
-                                manage_button.html('<i class="material-icons grey-text text-lighten-5 left">place</i>Activer');
-                            } else {
-                                manage_button.removeClass("green");
-                                manage_button.addClass("red");
-                                manage_button.html('<i class="material-icons grey-text text-lighten-5 left">delete</i>Désactiver');
-                            }
-
-                            Materialize.updateTextFields();
-                        },
-                        complete: function (modal, trigger) {
-                            $("#modal_place_name_input").val("");
-                            $("#modal_place_address_input").val("");
-                            $("#modal_place_owner_input").val("");
-                            $("#modal_place_value_input").val("");
-
-                            Materialize.updateTextFields();
-                        }
-                    });
-                    place_modal.modal('open');
-                });
-            }
-        });
-    }
-
-    // TODO: Handle the reactivation
-    function managePlace() {
-        const place_modal = $("#place_modal");
-
-        let id = document.getElementById('idPlace').value;
-        if (confirm("Vous désirez vraiment supprimer?")) {
-            $.ajax({
-                url: "<?php echo base_url(); ?>disablePlace",
-                type: "GET",
-                data: {
-                    id: id
-                }
-            }).done(function () {
-                place_modal.modal('close');
-            });
-        }
-    }
-
-    // TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
-    // TODO : supprimer le moche "input text hidden"
-    // si le lieu est supprimé => class deleted
-
-    function editPlace() {
-        const place_id = $("#idPlace").val();
-        const place_name = $("#modal_place_name_input").val();
-        const place_address = $("#modal_place_address_input").val();
-        const place_value = $("#modal_place_value_input").val();
-
-        $.ajax({
-            type: "POST",
-            url: "editPlace/",
-            data: {
-                id: place_id,
-                name: place_name,
-                address: place_address,
-                value: place_value
-            },
-            statusCode: {
-                200: function (data) {
-                    Materialize.toast(data, 3000, 'green rounded');
-                },
-                400: function (data) {
-                    Materialize.toast("An error was encountered. Error code: 400", 3000, 'red rounded');
-                },
-                401: function (data) {
-                    Materialize.toast("An error was encountered. Error code: 401", 3000, 'red rounded');
-                }
-            }
-        });
-    }
-
+    // Map setup
     const place_list_table = $("#place_list_table");
     const divs = place_list_table.find("div.card");
     let alpha_order = false;
     let idUser;
-    let carte;
-    let marqueur = [];
-    let latlng = new google.maps.LatLng(43.600000, 1.433333);
+    let markers = [];
+    let initial_latlng = new google.maps.LatLng(43.600000, 1.433333);   // Toulouse
     let options = {
-        center: latlng,
+        center: initial_latlng,
         zoom: 14,
-        mapTypeId: google.maps.MapTypeId.roadmap,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
         backgroundColor: "#AD1457",
         disableDefaultUI: true,
+        fullscreenControl: false,
         clickableIcons: false,
         styles: [
             {
@@ -719,45 +651,327 @@
             }
         ]
     };
-    carte = new google.maps.Map(document.getElementById("map"), options);
+    let dashboard_map = new google.maps.Map(document.getElementById("map"), options);
     let infowindow = new google.maps.InfoWindow();
+    // TODO: Find a way to customize the infowindows with Snazzy
+    //let infowindow = new SnazzyInfoWindow();
+    const marker_icon = {
+        url: "<?php echo base_url(); ?>static/img/pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
+
+    // Set the place markers on the map
     $.getJSON("getPlace", "", function (result) {
-            $.each(result, function (i, places) {
-                $.each(places, function (j, place) {
-                        marqueur[j] = new google.maps.Marker(
-                            {
-                                position: new google.maps.LatLng(place.lat, place.lng),
-                                title: 'Nom du lieu : ' + place.name
-                            }
-                        );
-                        marqueur[j].setMap(carte);
-                        //console.log(marqueur[j]);
-                        // Closure => création de la function au moment de la création du marqueur
-                        let macallback = function callbackSpecificiqueMarqueur(ev) {
-                            //console.log("Callback appelée", ev, marqueur[j]);
-                            //console.log("la position est : " +marqueur[j].getPosition());
+        $.each(result, function (i, places) {
+            $.each(places, function (j, place) {
+                markers[j] = new google.maps.Marker({
+                    position: new google.maps.LatLng(place.lat, place.lng),
+                    title: place.name,
+                    icon: marker_icon
+                });
+                markers[j].setMap(dashboard_map);
 
-                            let contentString =
-                                '<div id="content">' +
-                                '<p> Nom du lieu : ' + place.name + '</p>' +
-                                '<p> Valeur : ' + place.value + '</p>' +
-                                '<a href="#">Plus de détails</a><br><br>' +
-                                '<a href="#">Vendre le lieu</a>' +
-                                '</div>';
+                // Closure => création de la function au moment de la création du marqueur
+                let openMarkerInfowindow = function (ev) {
+                    let contentString =
+                        '<div class="marker_infowindow">' +
+                        '<p><b>' + place.name + '</b></p>' +
+                        '<p>' + place.value + '<span class="credit_symbol">¢</span></p>' +
+                        '<p><a class="waves-effect waves-light btn pink darken-3" onclick="display_place(\'' + place.id + '\', false)">Plus de détails</a></p>' +
+                        '</div>';
 
-                            infowindow.setContent(contentString);
-                            infowindow.open(map, marqueur[j]);
-                        };
-                        // creation de listener qui apelle la function ...
-                        //console.log("Creation du listener", carte);
-                        google.maps.event.addListener(
-                            marqueur[j], "click", macallback
-                        );
-                    }
-                )
+                    infowindow.setContent(contentString);
+                    infowindow.open(dashboard_map, markers[j]);
+                };
+
+                // Linking the infoview to a click event
+                google.maps.event.addListener(
+                    markers[j], "click", openMarkerInfowindow
+                );
             })
+        })
+    });
+
+    // Create the search box and link it to the UI element.
+    let input = document.getElementById('pac-input');
+    let searchBox = new google.maps.places.SearchBox(input);
+    dashboard_map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    // Bias the SearchBox results towards current map's viewport.
+    dashboard_map.addListener('bounds_changed', function() {
+        searchBox.setBounds(dashboard_map.getBounds());
+    });
+
+    let search_markers = [];
+    const search_marker_icon = {
+        url: "<?php echo base_url(); ?>static/img/search_pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place.
+    searchBox.addListener('places_changed', function() {
+        let places = searchBox.getPlaces();
+
+        if (places.length === 0) {
+            return;
         }
-    );
+
+        // Clear out the old markers.
+        search_markers.forEach(function(marker) {
+            marker.setMap(null);
+        });
+        search_markers = [];
+
+        // For each place, get the icon, name and location.
+        let bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place, i) {
+            if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+
+            // Create a marker for each place.
+            search_markers[i] = new google.maps.Marker({
+                icon: search_marker_icon,
+                title: place.name,
+                position: place.geometry.location
+            });
+            search_markers[i].setMap(dashboard_map);
+
+            // Create an infowindow for each marker
+            let openMarkerInfowindow = function (ev) {
+                let typeChips = "";
+                place.types.forEach(function (type) {
+                    typeChips += "<div class='chip'>" + type + "</div>";
+                });
+                let contentString =
+                    '<div class="marker_infowindow">' +
+                    '<img src="' + place.icon + '" />' +
+                    '<p><b>' + place.name + '</b><br>' +
+                    place.formatted_address + '<br>' +
+                    place.geometry.location + '</p>' +
+                    typeChips + '<br>' +
+                    '<p><a class="waves-effect waves-light btn pink darken-3" onclick="createPlace(\'' + place.place_id + '\')">Créer ce lieu</a></p>' +
+                    '</div>';
+
+                infowindow.setContent(contentString);
+                infowindow.open(dashboard_map, search_markers[i]);
+            };
+
+            // Linking the infoview to a click event
+            google.maps.event.addListener(
+                search_markers[i], "click", openMarkerInfowindow
+            );
+
+            if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+        });
+        dashboard_map.fitBounds(bounds);
+    });
+
+
+
+
+    function createPlace(place_id) {
+        // Build the request for the place resolution
+        let request = {
+            placeId: place_id
+        };
+
+        // Send the request
+        let service = new google.maps.places.PlacesService(dashboard_map);
+        service.getDetails(request, displayCreatePlaceModal);
+    }
+
+    function displayCreatePlaceModal(place, status) {
+        // TODO: Handle other error codes (see https://developers.google.com/maps/documentation/javascript/places#place_details_responses )
+        // TODO: DRY this up with displayPlace()
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            const place_modal = $("#place_modal");
+            place_modal.modal({
+                dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                opacity: .5, // Opacity of modal background
+                inDuration: 300, // Transition in duration
+                outDuration: 200, // Transition out duration
+                startingTop: '4%', // Starting top style attribute
+                endingTop: '10%', // Ending top style attribute
+                ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                    $("#idPlace").val('');
+                    $("#modal_place_name_input").val(place.name);
+                    $("#modal_place_address_input").val(place.formatted_address);
+                    $("#modal_place_owner_input").val();
+                    $("#modal_place_value_input").val();
+                    $("#modal_place_lat_input").val(place.geometry.location.lat());
+                    $("#modal_place_lng_input").val(place.geometry.location.lng());
+                    $("#modal_place_create_input").val(true);
+
+                    let manage_button = $("#modal_place_manage_button");
+                    manage_button.addClass("hide");
+
+                    Materialize.updateTextFields();
+                },
+                complete: function (modal, trigger) {
+                    $("#modal_place_name_input").val("");
+                    $("#modal_place_address_input").val("");
+                    $("#modal_place_owner_input").val("");
+                    $("#modal_place_value_input").val("");
+                    $("#modal_place_manage_button").removeClass("hide");
+
+                    Materialize.updateTextFields();
+                }
+            });
+            place_modal.modal('open');
+        }
+    }
+
+    function logout() {
+        $.ajax({url: "<?php echo base_url(); ?>logout/"}
+        ).done(function () {
+            location.reload();
+        });
+    }
+
+    // Place details display
+    function display_place(id, create=false) {
+        // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
+        const place_modal = $("#place_modal");
+
+        // TODO: Use the same method as the User modal; don't use inputs, use editable divs. It's 2018 ffs
+        idPlace = id;
+        $("#idPlace").val(id);
+        get_place(id, function (result) {
+            const place = result;
+            if (place === 1) {
+                alert("Ce lieu n'existe pas!");
+            } else {
+
+                get_user(place["id_User"], function (result) {
+                    const owner = result;
+
+                    place_modal.modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%', // Ending top style attribute
+                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#modal_place_name_input").val(place["name"]);
+                            if (place["address"] !== null) {
+                                $("#modal_place_address_input").val(place["address"]);
+                            }
+                            if (place["id_User"] !== null) {
+                                $("#modal_place_owner_input").val(owner["pseudo"]);
+                            }
+                            $("#modal_place_value_input").val(place["value"]);
+
+                            let manage_button = $("#modal_place_manage_button");
+                            if (place["status"] === '0') {
+                                manage_button.removeClass("red");
+                                manage_button.addClass("green");
+                                manage_button.html('<i class="material-icons grey-text text-lighten-5 left">place</i>Activer');
+                            } else {
+                                manage_button.removeClass("green");
+                                manage_button.addClass("red");
+                                manage_button.html('<i class="material-icons grey-text text-lighten-5 left">delete</i>Désactiver');
+                            }
+                            $("#modal_place_create_input").val(create);
+
+                            Materialize.updateTextFields();
+                        },
+                        complete: function (modal, trigger) {
+                            $("#modal_place_name_input").val("");
+                            $("#modal_place_address_input").val("");
+                            $("#modal_place_owner_input").val("");
+                            $("#modal_place_value_input").val("");
+
+                            Materialize.updateTextFields();
+                        }
+                    });
+                    place_modal.modal('open');
+                });
+            }
+        });
+    }
+
+    // TODO: Handle the reactivation
+    function managePlace() {
+        const place_modal = $("#place_modal");
+
+        let id = document.getElementById('idPlace').value;
+        if (confirm("Vous désirez vraiment supprimer?")) {
+            $.ajax({
+                url: "<?php echo base_url(); ?>disablePlace",
+                type: "GET",
+                data: {
+                    id: id
+                }
+            }).done(function () {
+                place_modal.modal('close');
+            });
+        }
+    }
+
+    // TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+    // TODO : supprimer le moche "input text hidden"
+    // si le lieu est supprimé => class deleted
+
+    function savePlace() {
+        const place_create = $("#modal_place_create_input").val();
+        const place_id = $("#idPlace").val();
+        const place_name = $("#modal_place_name_input").val();
+        const place_address = $("#modal_place_address_input").val();
+        const place_value = $("#modal_place_value_input").val();
+
+        let place_url = "";
+        let place_data = {};
+
+        if (place_create === 'true') {
+            const place_lng = $("#modal_place_lng_input").val();
+            const place_lat = $("#modal_place_lat_input").val();
+
+            place_url = "createPlace/";
+            place_data = {
+                name: place_name,
+                address: place_address,
+                value: place_value,
+                lat: place_lat,
+                lng: place_lng
+            }
+        } else {
+            place_url = "editPlace/";
+            place_data = {
+                id: place_id,
+                name: place_name,
+                address: place_address,
+                value: place_value
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            url: place_url,
+            data: place_data,
+            statusCode: {
+                200: function (data) {
+                    Materialize.toast(data, 3000, 'green rounded');
+                    // TODO: Update the map and list
+                },
+                400: function (data) {
+                    Materialize.toast("An error was encountered. Error code: 400", 3000, 'red rounded');
+                },
+                401: function (data) {
+                    Materialize.toast("An error was encountered. Error code: 401", 3000, 'red rounded');
+                }
+            }
+        });
+    }
 
     const users_detail_modal = $("#modal_detail_user");
     users_detail_modal.modal({

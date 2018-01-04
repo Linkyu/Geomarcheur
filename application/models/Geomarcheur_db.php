@@ -152,4 +152,17 @@ class Geomarcheur_db extends CI_Model
 
         $query = $this->db->query("UPDATE place SET name=" . $name . ", address=" . $address . ", value=" . $value . " WHERE id=" . $place['id']);
     }
+
+    public function create_place($place)
+    {
+        $this->load->database();
+
+        $name = $this->db->escape($place['name']);
+        $address = $this->db->escape($place['address']);
+        $value = $this->db->escape($place['value']);
+        $lat = $this->db->escape($place['lat']);
+        $lng = $this->db->escape($place['lng']);
+
+        $query = $this->db->query("INSERT INTO place (address, name, value, lat, lng) VALUES (" . $address . ", " . $name . ", " . $value . ", " . $lat . ", " . $lng . ")");
+    }
 }
