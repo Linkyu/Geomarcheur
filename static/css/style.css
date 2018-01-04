@@ -20,6 +20,10 @@
     height: 64px;
 }
 
+.modal .modal-footer {
+    height: auto;
+}
+
 .card-content .place_location {
     font-weight: bold;
 }

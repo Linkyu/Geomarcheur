@@ -203,7 +203,8 @@
                 <!-- Place delete button + stats preview -->
                 <div class="col s3">
                     <!-- si le status du lieu === 1 (lieu actif) -->
-                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth" id="modal_place_manage_button"
+                    <a href="#!" class="btn waves-effect waves-light red darken-4 grey-text text-lighten-5 fullwidth"
+                       id="modal_place_manage_button"
                        onclick="managePlace();"></a>
 
                     <!-- Stats preview -->
@@ -274,7 +275,7 @@
                         </div>
                     </div>
                     <div class="center">
-                        <span id="player_quote"></span>
+                        <p id="player_quote" contenteditable="true"></p>
                     </div>
                 </div>
 
@@ -293,45 +294,35 @@
                         <div class="col s2">
                             <span class="bold">Crédits</span>
                             <br>
-                            <span id="player_credits"></span> <span id="little_credit_symbol"
-                                                                    class="credit_symbol prefix">¢</span>
-
+                            <span id="player_credits" contenteditable="true"></span>&nbsp;<span id="little_credit_symbol"
+                                                                         class="credit_symbol prefix">¢</span>
                         </div>
-
                     </div>
 
                     <div class="row">
-
-
                         <div class="row"></div>
-
                         <div class="col s8">
                             <span class="bold">Bio</span>
                             <br>
-                            <span id="player_bio"></span>
+                            <span id="player_bio" contenteditable="true"></span>
                         </div>
-
                         <div class="col s4">
                             <span class="bold">Lieu(x) possédé(s)</span>
                             <br>
                             <span id="player_places"></span>
-                            <!-- liste sur les lieux possédés -->
+                            <!-- liste des lieux possédés -->
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
-
         <div class="modal-footer">
-            <a class="waves-effect waves-light btn-large #f44336 red">BANNIR</a>
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
+            <a class="waves-effect waves-light btn-large btn-flat indigo-text text-darken-4" onclick="edit_profile()"><i class="material-icons">edit</i> Sauvegarder les changements</a>
+            <a class="waves-effect waves-light btn-large red">Bannir</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-large btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
-
         </div>
-
-
     </div>
 </div>
 <footer class="page-footer pink darken-3">
@@ -424,7 +415,11 @@
 
 <!-- Custom local scripts -->
 <script>
+    let currentUser = '';
+
     $(document).ready(function () {
+
+        // Leaderboards
         const userListDatatable = $("#datatable_leaderboard");
         const user_list = $("#user_list");
 
@@ -456,7 +451,7 @@
 
         const place_list = $("#place_list");
 
-        // Place data retrieval
+        // Places list
         $.getJSON("getPlace/asc", "", function (result) {
             $.each(result, function (i, places) {
                 // TODO: Make a better overfllow rule
@@ -491,11 +486,11 @@
             });
         });
 
-        //TODO : améliorer la gestion de l'affichage des lieux supprimés
-        // TODO : ajouter l'attribut hidden sur le bouton de suppression selon si le lieu est supprimé ou non
+        // TODO: améliorer la gestion de l'affichage des lieux supprimés
+        // TODO: ajouter l'attribut hidden sur le bouton de suppression selon si le lieu est supprimé ou non
 
 
-        // Search function
+        // Place search function
         $("#place_input_search").keyup(function () {
 
             // Retrieve the input field text and reset the count to zero
@@ -611,7 +606,7 @@
         }
     }
 
-    //TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+    // TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
     // TODO : supprimer le moche "input text hidden"
     // si le lieu est supprimé => class deleted
 
@@ -625,8 +620,57 @@
     let latlng = new google.maps.LatLng(43.600000, 1.433333);
     let options = {
         center: latlng,
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.roadmap
+        zoom: 14,
+        mapTypeId: google.maps.MapTypeId.roadmap,
+        backgroundColor: "#AD1457",
+        disableDefaultUI: true,
+        clickableIcons: false,
+        styles: [
+            {
+                "featureType": "all",
+                "stylers": [
+                    { "visibility": "off" }
+                ]
+            },{
+                "featureType": "road",
+                "elementType": "geometry",
+                "stylers": [
+                    { "color": "#A18A95" },
+                    { "visibility": "on" }
+                ]
+            },{
+                "featureType": "landscape.man_made",
+                "elementType": "geometry",
+                "stylers": [
+                    { "visibility": "on" },
+                    { "hue": "#AD1457" },
+                    { "saturation": "50" },
+                    { "lightness": "-60" },
+                    { "weight": "3" }
+                ]
+            },{
+                "featureType": "landscape.natural",
+                "elementType": "geometry",
+                "stylers": [
+                    { "color": "#4E6D44" },
+                    { "visibility": "on" }
+                ]
+            },{
+                "featureType": "transit",
+                "elementType": "geometry",
+                "stylers": [
+                    { "color": "#FF7F00" },
+                    { "visibility": "on" }
+                ]
+            },{
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [
+                    { "color": "#384E79" },
+                    { "visibility": "on" }
+                ]
+            }
+        ]
     };
     carte = new google.maps.Map(document.getElementById("map"), options);
     let infowindow = new google.maps.InfoWindow();
@@ -697,8 +741,8 @@
 
     });
 
+    // Display and fill out place detail modal
     let rows = $('#datatable_leaderboard');
-
     rows.on('click', 'tr', function () {
 
         let row = $(this);
@@ -711,10 +755,11 @@
             $.each(result, function (i, users) {
                 $.each(users, function (j, user) {
                     //users_detail_modal.html("");
+                    currentUser = user;
                     let player_name = $("#player_name").html(user.pseudo);
                     //TODO : creer la fonction + requete de qui va positionner le joueur
                     $("#player_position").html(user.credits);
-                    $("#player_credits").html(user.credits)
+                    $("#player_credits").html(user.credits);
                     $("#player_quote").html(user.quote);
                     $("#player_bio").html(user.bio);
                     // TODO : recupérer la photo des joueurs
@@ -751,8 +796,12 @@
                 })
             })
         });
-    })
+    });
 
+    // Switch the modal to edit mode
+    function edit_profile() {
+
+    }
 
 </script>
 
