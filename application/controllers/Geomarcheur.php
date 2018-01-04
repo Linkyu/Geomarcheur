@@ -48,6 +48,7 @@ class Geomarcheur extends CI_Controller
         $this->load->view('admin/admin_dashboard');
     }
 
+    // Getter functions
     public function getUser()
     {
         $user_id = $this->uri->segment(3);
@@ -121,8 +122,10 @@ class Geomarcheur extends CI_Controller
         return -1;
     }
 
+    // Operational functions
     public function sellPlace()
     {
+        // TODO: Switch this to use POST instead
         $place_id = $this->uri->segment(3);
 
         if ($place_id != null) {
@@ -141,11 +144,38 @@ class Geomarcheur extends CI_Controller
     }
 
     public function disablePlace() {
-
+        // TODO: Switch this to use POST instead
+        // TODO: Log this
         $place_id = $this->input->get('id');
         $this->geomarcheur_db->disable_place($place_id);
     }
 
+    public function editProfile() {
+        if ($this->input->server('REQUEST_METHOD') != 'POST') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
+            http_response_code(400);
+            echo "Wrong method. Please use POST.";
+            exit();
+        }
+
+        $user['id'] = $this->input->post('id');
+        $user['bio'] = $this->input->post('bio');
+        $user['quote'] = $this->input->post('quote');
+
+        if ($user['id'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no id parameter.");
+            http_response_code(401);
+            echo "Missing parameter: id.";
+            exit();
+        }
+
+        $result = $this->geomarcheur_db->edit_profile($user);
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": User " . $user['id'] . " was modified.");
+        http_response_code(200);
+        echo "Profile modified.";
+    }
+
+    // Identification functions
     public function login()
     {
         // Set up the data to be validated
@@ -191,7 +221,7 @@ class Geomarcheur extends CI_Controller
             } else {
                 $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
                 http_response_code(401);
-                echo "Bad login";
+                echo "L'identifiant ou mot de passe est erroné.";
             }
         }
     }
