@@ -214,6 +214,27 @@ class Geomarcheur extends CI_Controller
         $this->load->view('login_view', $data);   // TODO: Process the exit message
     }
 
+
+/*
+    public function disablePlace() {
+
+        $place_id = $this->input->get('id');
+        $this->geomarcheur_db->disable_place($place_id);
+    }
+    */
+
+
+    public function modify_profile() {
+
+        $aDatas['id'] = $this->input->post('id');
+        $aDatas['pseudo'] = $this->input->post('pseudo');
+        $aDatas['bio'] = $this->input->post('bio');
+        $aDatas['quote'] = $this->input->post('quote');
+
+        $this->geomarcheur_db->modify_profile($aDatas);
+
+    }
+
     /**
      * Simple logging method
      *
@@ -286,8 +307,9 @@ class Geomarcheur extends CI_Controller
     /*public function log_tester() {
         $this->logger(LogType::WARNING, "ATTENCIONE");
     }*/
-
 }
+
+
 
 abstract class LogType {
     const DEBUG = 0;

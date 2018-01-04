@@ -296,7 +296,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
         <div class="col s10 m10">
             <label for="input_profile_modal_pseudo">Pseudo</label>
-            <input id="input_profile_modal_pseudo" name="input_profile_modal_pseudo" type="text" function="check_form(this.value)">
+            <input required="required" readonly id="input_profile_modal_pseudo" name="input_profile_modal_pseudo" type="text" function="check_form(this.value)">
         </div>
 
         <div class="col s2 m2">
@@ -790,7 +790,7 @@ function update_profile(id) {
         url: "<?php echo base_url(); ?>modify_profile",
         type: "POST",
         data: {
-            id: id, pseudo : pseudo, quote: quote, bio: bio
+            id: id, quote: quote, bio: bio
         },
         success: function(){
             alert("Profil modifié !");
