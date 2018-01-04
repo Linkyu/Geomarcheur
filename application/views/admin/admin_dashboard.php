@@ -208,6 +208,7 @@
                         <label for="modal_place_address_input">Adresse</label>
                     </div>
 
+                    <!-- TODO: Refactor this so that it actually looks like it belongs in there -->
                     <input type="hidden" id="idPlace" value="">
 
                     <div class="input-field">
@@ -248,10 +249,10 @@
         </div>
 
         <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
+            <a href="#!" class="waves-effect btn-flat indigo-text text-darken-4"
+               onclick="editPlace()">Sauvegarder les modifications</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat red-text"
                onclick="idPlace = '';">Retour</a>
-            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3">Sauvegarder les
-                modifications</a>
         </div>
     </div>
 </div>
@@ -314,7 +315,7 @@
                         <div class="col s2">
                             <span class="bold">Crédits</span>
                             <p><span id="player_credits"></span>&nbsp;<span id="little_credit_symbol"
-                                                                         class="credit_symbol prefix">¢</span></p>
+                                                                            class="credit_symbol prefix">¢</span></p>
                         </div>
                     </div>
 
@@ -336,7 +337,8 @@
         </div>
 
         <div class="modal-footer">
-            <a class="waves-effect waves-light btn-large btn-flat indigo-text text-darken-4" onclick="edit_profile()"><i class="material-icons">edit</i> Sauvegarder les changements</a>
+            <a class="waves-effect waves-light btn-large btn-flat indigo-text text-darken-4" onclick="editProfile()"><i
+                        class="material-icons">edit</i> Sauvegarder les changements</a>
             <a class="waves-effect waves-light btn-large red">Bannir</a>
             <a href="#!" class="modal-action modal-close waves-effect btn-large btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
@@ -548,8 +550,9 @@
         // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
         const place_modal = $("#place_modal");
 
+        // TODO: Use the same method as the User modal; don't use inputs, use editable divs. It's 2018 ffs
         idPlace = id;
-        document.getElementById('idPlace').value = id;
+        $("#idPlace").val(id);
         get_place(id, function (result) {
             const place = result;
             if (place === 1) {
@@ -626,6 +629,34 @@
     // TODO : supprimer le moche "input text hidden"
     // si le lieu est supprimé => class deleted
 
+    function editPlace() {
+        const place_id = $("#idPlace").val();
+        const place_name = $("#modal_place_name_input").val();
+        const place_address = $("#modal_place_address_input").val();
+        const place_value = $("#modal_place_value_input").val();
+
+        $.ajax({
+            type: "POST",
+            url: "editPlace/",
+            data: {
+                id: place_id,
+                name: place_name,
+                address: place_address,
+                value: place_value
+            },
+            statusCode: {
+                200: function (data) {
+                    Materialize.toast(data, 3000, 'green rounded');
+                },
+                400: function (data) {
+                    Materialize.toast("An error was encountered. Error code: 400", 3000, 'red rounded');
+                },
+                401: function (data) {
+                    Materialize.toast("An error was encountered. Error code: 401", 3000, 'red rounded');
+                }
+            }
+        });
+    }
 
     const place_list_table = $("#place_list_table");
     const divs = place_list_table.find("div.card");
@@ -645,45 +676,45 @@
             {
                 "featureType": "all",
                 "stylers": [
-                    { "visibility": "off" }
+                    {"visibility": "off"}
                 ]
-            },{
+            }, {
                 "featureType": "road",
                 "elementType": "geometry",
                 "stylers": [
-                    { "color": "#A18A95" },
-                    { "visibility": "on" }
+                    {"color": "#A18A95"},
+                    {"visibility": "on"}
                 ]
-            },{
+            }, {
                 "featureType": "landscape.man_made",
                 "elementType": "geometry",
                 "stylers": [
-                    { "visibility": "on" },
-                    { "hue": "#AD1457" },
-                    { "saturation": "50" },
-                    { "lightness": "-60" },
-                    { "weight": "3" }
+                    {"visibility": "on"},
+                    {"hue": "#AD1457"},
+                    {"saturation": "50"},
+                    {"lightness": "-60"},
+                    {"weight": "3"}
                 ]
-            },{
+            }, {
                 "featureType": "landscape.natural",
                 "elementType": "geometry",
                 "stylers": [
-                    { "color": "#4E6D44" },
-                    { "visibility": "on" }
+                    {"color": "#4E6D44"},
+                    {"visibility": "on"}
                 ]
-            },{
+            }, {
                 "featureType": "transit",
                 "elementType": "geometry",
                 "stylers": [
-                    { "color": "#FF7F00" },
-                    { "visibility": "on" }
+                    {"color": "#FF7F00"},
+                    {"visibility": "on"}
                 ]
-            },{
+            }, {
                 "featureType": "water",
                 "elementType": "geometry",
                 "stylers": [
-                    { "color": "#384E79" },
-                    { "visibility": "on" }
+                    {"color": "#384E79"},
+                    {"visibility": "on"}
                 ]
             }
         ]
@@ -700,7 +731,7 @@
                             }
                         );
                         marqueur[j].setMap(carte);
-                        console.log(marqueur[j]);
+                        //console.log(marqueur[j]);
                         // Closure => création de la function au moment de la création du marqueur
                         let macallback = function callbackSpecificiqueMarqueur(ev) {
                             //console.log("Callback appelée", ev, marqueur[j]);
@@ -816,13 +847,10 @@
     });
 
     // Save the modifications
-    function edit_profile() {
+    function editProfile() {
         const player_id = $("#player_id").text();
         const player_quote = $("#player_quote").text();
         const player_bio = $("#player_bio").html();
-        console.log(player_id);
-        console.log(player_quote);
-        console.log(player_bio);
 
         $.ajax({
             type: "POST",
@@ -834,7 +862,7 @@
             },
             statusCode: {
                 200: function (data) {
-                    Materialize.toast(data.responseText, 3000, 'green rounded');
+                    Materialize.toast(data, 3000, 'green rounded');
                 },
                 400: function (data) {
                     Materialize.toast("An error was encountered. Error code: 400", 3000, 'red rounded');

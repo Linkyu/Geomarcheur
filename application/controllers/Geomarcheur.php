@@ -150,6 +150,44 @@ class Geomarcheur extends CI_Controller
         $this->geomarcheur_db->disable_place($place_id);
     }
 
+    public function editPlace() {
+        if ($this->input->server('REQUEST_METHOD') != 'POST') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
+            http_response_code(400);
+            echo "Wrong method. Please use POST.";
+            exit();
+        }
+
+        $place['id'] = $this->input->post('id');
+        $place['name'] = $this->input->post('name');
+        $place['address'] = $this->input->post('address');
+        $place['value'] = $this->input->post('value');
+
+        if ($place['id'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no id parameter.");
+            http_response_code(401);
+            echo "Missing parameter: id.";
+            exit();
+        }
+        if ($place['value'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with an empty value.");
+            http_response_code(401);
+            echo "Parameter error: value can't be null.";
+            exit();
+        }
+        if ($place['name'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no name.");
+            http_response_code(401);
+            echo "Parameter error: name can't be null.";
+            exit();
+        }
+
+        $result = $this->geomarcheur_db->edit_place($place);
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": Place " . $place['id'] . " was modified.");
+        http_response_code(200);
+        echo "Place modified.";
+    }
+
     public function editProfile() {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");

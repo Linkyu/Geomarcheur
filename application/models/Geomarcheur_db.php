@@ -139,6 +139,17 @@ class Geomarcheur_db extends CI_Model
         $bio = $this->db->escape($profile['bio']);
         $quote = $this->db->escape($profile['quote']);
 
-        $refund_query = $this->db->query("UPDATE user SET quote=" . $quote . ", bio=" . $bio . " WHERE id=" . $profile['id']);
+        $query = $this->db->query("UPDATE user SET quote=" . $quote . ", bio=" . $bio . " WHERE id=" . $profile['id']);
+    }
+
+    public function edit_place($place)
+    {
+        $this->load->database();
+
+        $name = $this->db->escape($place['name']);
+        $address = $this->db->escape($place['address']);
+        $value = $this->db->escape($place['value']);
+
+        $query = $this->db->query("UPDATE place SET name=" . $name . ", address=" . $address . ", value=" . $value . " WHERE id=" . $place['id']);
     }
 }
