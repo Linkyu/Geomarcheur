@@ -1049,9 +1049,9 @@
                             texte = "Aucun lieu."
                         });
 
-                        texte += "</ul>";
-                        $("#player_places").html(texte);
-                        $("#player_number_place").html(places.length);
+                            texte += "</ul>";
+                            $("#player_places").html(texte);
+                            $("#player_number_place").html(result.length);
 
                     });
                     users_detail_modal.modal('open');
