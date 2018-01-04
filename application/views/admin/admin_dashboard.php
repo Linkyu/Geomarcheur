@@ -34,7 +34,7 @@
         }
 
         .map_block, .place_list_block {
-            height: 400px !important;
+            height: 600px !important;
         }
 
         .place_list_block {
@@ -105,6 +105,46 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        .pac-card {
+            margin: 10px 10px 0 0;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background-color: #fff;
+            font-family: Roboto;
+        }
+
+        #pac-container {
+            padding-bottom: 12px;
+            margin-right: 12px;
+        }
+
+        .pac-controls {
+            display: inline-block;
+            padding: 5px 11px;
+        }
+
+        .pac-controls label {
+            font-family: Roboto, serif;
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+        #pac-input {
+            background-color: rgba(0, 0, 0, .7);
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 100%;
+            color: white
+        }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+
     </style>
 </head>
 <body>
@@ -137,6 +177,7 @@
         <!-- MAP -->
         <div class="col s6">
             <div class="card-panel hoverable map_block">
+                <input id="pac-input" class="controls" type="text" placeholder="Chercher un lieu">
                 <div class="valign-wrapper center-align map" id="map"><h1>MAP</h1></div>
             </div>
         </div>
@@ -377,8 +418,8 @@
 
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>"
-        type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>&libraries=places" type="text/javascript"></script>
+
 <!-- Charts API + placeholder data -->
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -435,6 +476,7 @@
 
 <!-- Custom local scripts -->
 <script>
+    // TODO: Clean this up
     $(document).ready(function () {
 
         // Leaderboards
@@ -442,7 +484,7 @@
         const user_list = $("#user_list");
 
         $.getJSON("getUser", "", function (result) {
-            console.log(result);
+            //console.log(result);
             $.each(result, function (i, users) {
 
                 if (users.length === 0) {
@@ -537,6 +579,185 @@
             }
         });
     });
+
+    // Map setup
+    const place_list_table = $("#place_list_table");
+    const divs = place_list_table.find("div.card");
+    let alpha_order = false;
+    let idUser;
+    let markers = [];
+    let initial_latlng = new google.maps.LatLng(43.600000, 1.433333);   // Toulouse
+    let options = {
+        center: initial_latlng,
+        zoom: 14,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        backgroundColor: "#AD1457",
+        disableDefaultUI: true,
+        fullscreenControl: false,
+        clickableIcons: false,
+        styles: [
+            {
+                "featureType": "all",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "road",
+                "elementType": "geometry",
+                "stylers": [
+                    {"color": "#A18A95"},
+                    {"visibility": "on"}
+                ]
+            }, {
+                "featureType": "landscape.man_made",
+                "elementType": "geometry",
+                "stylers": [
+                    {"visibility": "on"},
+                    {"hue": "#AD1457"},
+                    {"saturation": "50"},
+                    {"lightness": "-60"},
+                    {"weight": "3"}
+                ]
+            }, {
+                "featureType": "landscape.natural",
+                "elementType": "geometry",
+                "stylers": [
+                    {"color": "#4E6D44"},
+                    {"visibility": "on"}
+                ]
+            }, {
+                "featureType": "transit",
+                "elementType": "geometry",
+                "stylers": [
+                    {"color": "#FF7F00"},
+                    {"visibility": "on"}
+                ]
+            }, {
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [
+                    {"color": "#384E79"},
+                    {"visibility": "on"}
+                ]
+            }
+        ]
+    };
+    let dashboard_map = new google.maps.Map(document.getElementById("map"), options);
+    let infowindow = new google.maps.InfoWindow();
+    const marker_icon = {
+        url: "<?php echo base_url(); ?>static/img/pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
+
+    // Set the place markers on the map
+    $.getJSON("getPlace", "", function (result) {
+        $.each(result, function (i, places) {
+            $.each(places, function (j, place) {
+                markers[j] = new google.maps.Marker({
+                    position: new google.maps.LatLng(place.lat, place.lng),
+                    title: 'Nom du lieu : ' + place.name,
+                    icon: marker_icon
+                });
+                markers[j].setMap(dashboard_map);
+
+                // Closure => création de la function au moment de la création du marqueur
+                let openMarkerInfowindow = function (ev) {
+                    let contentString =
+                        '<div id="content">' +
+                        '<p> Nom du lieu : ' + place.name + '</p>' +
+                        '<p> Valeur : ' + place.value + '</p>' +
+                        '<a href="#">Plus de détails</a><br><br>' +
+                        '</div>';
+
+                    infowindow.setContent(contentString);
+                    infowindow.open(dashboard_map, markers[j]);
+                };
+                // creation de listener qui apelle la function ...
+                //console.log("Creation du listener", dashboard_map);
+                google.maps.event.addListener(
+                    markers[j], "click", openMarkerInfowindow
+                );
+            })
+        })
+    });
+
+    // Create the search box and link it to the UI element.
+    let input = document.getElementById('pac-input');
+    let searchBox = new google.maps.places.SearchBox(input);
+    dashboard_map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    // Bias the SearchBox results towards current map's viewport.
+    dashboard_map.addListener('bounds_changed', function() {
+        searchBox.setBounds(dashboard_map.getBounds());
+    });
+
+    let search_markers = [];
+    const search_marker_icon = {
+        url: "<?php echo base_url(); ?>static/img/search_pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place.
+    searchBox.addListener('places_changed', function() {
+        let places = searchBox.getPlaces();
+
+        if (places.length === 0) {
+            return;
+        }
+
+        // Clear out the old markers.
+        search_markers.forEach(function(marker) {
+            marker.setMap(null);
+        });
+        search_markers = [];
+
+        // For each place, get the icon, name and location.
+        let bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place, i) {
+            if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+
+            // Create a marker for each place.
+            search_markers.push(new google.maps.Marker({
+                map: dashboard_map,
+                icon: search_marker_icon,
+                title: place.name,
+                position: place.geometry.location
+            }));
+
+            // Create an infowindow for each marker
+            let openMarkerInfowindow = function (ev) {
+                let contentString =
+                    '<div id="content">' +
+                    '<p>' + place.name + '<br>' +
+                    '<a href="#">Créer ce lieu</a></p>' +
+                    '</div>';
+
+                infowindow.setContent(contentString);
+                infowindow.open(dashboard_map, search_markers[i]);
+            };
+
+            // Linking the infoview to a click event
+            google.maps.event.addListener(
+                search_markers[i], "click", openMarkerInfowindow
+            );
+
+            if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+        });
+        dashboard_map.fitBounds(bounds);
+    });
+
+
+
 
     function logout() {
         $.ajax({url: "<?php echo base_url(); ?>logout/"}
@@ -657,107 +878,6 @@
             }
         });
     }
-
-    const place_list_table = $("#place_list_table");
-    const divs = place_list_table.find("div.card");
-    let alpha_order = false;
-    let idUser;
-    let carte;
-    let marqueur = [];
-    let latlng = new google.maps.LatLng(43.600000, 1.433333);
-    let options = {
-        center: latlng,
-        zoom: 14,
-        mapTypeId: google.maps.MapTypeId.roadmap,
-        backgroundColor: "#AD1457",
-        disableDefaultUI: true,
-        clickableIcons: false,
-        styles: [
-            {
-                "featureType": "all",
-                "stylers": [
-                    {"visibility": "off"}
-                ]
-            }, {
-                "featureType": "road",
-                "elementType": "geometry",
-                "stylers": [
-                    {"color": "#A18A95"},
-                    {"visibility": "on"}
-                ]
-            }, {
-                "featureType": "landscape.man_made",
-                "elementType": "geometry",
-                "stylers": [
-                    {"visibility": "on"},
-                    {"hue": "#AD1457"},
-                    {"saturation": "50"},
-                    {"lightness": "-60"},
-                    {"weight": "3"}
-                ]
-            }, {
-                "featureType": "landscape.natural",
-                "elementType": "geometry",
-                "stylers": [
-                    {"color": "#4E6D44"},
-                    {"visibility": "on"}
-                ]
-            }, {
-                "featureType": "transit",
-                "elementType": "geometry",
-                "stylers": [
-                    {"color": "#FF7F00"},
-                    {"visibility": "on"}
-                ]
-            }, {
-                "featureType": "water",
-                "elementType": "geometry",
-                "stylers": [
-                    {"color": "#384E79"},
-                    {"visibility": "on"}
-                ]
-            }
-        ]
-    };
-    carte = new google.maps.Map(document.getElementById("map"), options);
-    let infowindow = new google.maps.InfoWindow();
-    $.getJSON("getPlace", "", function (result) {
-            $.each(result, function (i, places) {
-                $.each(places, function (j, place) {
-                        marqueur[j] = new google.maps.Marker(
-                            {
-                                position: new google.maps.LatLng(place.lat, place.lng),
-                                title: 'Nom du lieu : ' + place.name
-                            }
-                        );
-                        marqueur[j].setMap(carte);
-                        //console.log(marqueur[j]);
-                        // Closure => création de la function au moment de la création du marqueur
-                        let macallback = function callbackSpecificiqueMarqueur(ev) {
-                            //console.log("Callback appelée", ev, marqueur[j]);
-                            //console.log("la position est : " +marqueur[j].getPosition());
-
-                            let contentString =
-                                '<div id="content">' +
-                                '<p> Nom du lieu : ' + place.name + '</p>' +
-                                '<p> Valeur : ' + place.value + '</p>' +
-                                '<a href="#">Plus de détails</a><br><br>' +
-                                '<a href="#">Vendre le lieu</a>' +
-                                '</div>';
-
-                            infowindow.setContent(contentString);
-                            infowindow.open(map, marqueur[j]);
-                        };
-                        // creation de listener qui apelle la function ...
-                        //console.log("Creation du listener", carte);
-                        google.maps.event.addListener(
-                            marqueur[j], "click", macallback
-                        );
-                    }
-                )
-            })
-        }
-    );
 
     const users_detail_modal = $("#modal_detail_user");
     users_detail_modal.modal({
