@@ -3,8 +3,15 @@ class Geomarcheur_db extends CI_Model {
 
     public function listAllUsers() {
         $this->load->database();
-        $query = $this->db->query('SELECT id, pseudo, credits, inscription_date, bio, quote, is_banned, is_admin FROM user ORDER BY credits DESC');
-        return $query->result_array();
+        //$query = $this->db->query('SELECT id, pseudo, credits, inscription_date, bio, quote, is_banned, is_admin FROM user ORDER BY credits DESC');
+        $query = $this->db->query('select inscription_date, bio, quote, is_banned, is_admin,
+                                  u.pseudo, u.id, u.credits, count(p.id) as nbOfPlace
+                                  from user u
+                                  left join place p on p.id_User = u.id
+                                  group by u.pseudo, u.id, u.credits
+                                  order by u.credits desc, count(p.id) desc');
+
+                                return $query->result_array();
     }
 
     public function listUser($id) {
@@ -80,45 +87,62 @@ class Geomarcheur_db extends CI_Model {
 
 
     public function disable_place($id_place) {
-
            $this->load->database();
-
            // recupere l'ID du proprietaire du lieu + la valeur du lieu
             $place_datas = $this->db->query("SELECT id_User, value, status FROM place WHERE id='".$id_place."' ");
-
             $value = 0;
             $id_user = 0;
-
            // recupération de l'état actif/desactif pour changer le status
         $place_datas = $this->db->query("SELECT * FROM place WHERE id='" . $id_place . "' ")->result_array();
         $place_status = $place_datas[0]['status'];
         $place_value = $place_datas[0]['value'];
         $place_owner = $place_datas[0]['id_User'];
-
-        var_dump($place_status);
-
         // si il y a un proprio, rajouter la valeur à son compte
             if (!empty($place_owner)) {
-
                 $owner = $this->db->query("SELECT credits, is_banned FROM user WHERE id='" . $place_owner . "' ")->result_array();
                 if (!$owner[0]['is_banned']) {
                     $user_credits = $owner[0]['credits'];
-
                     $new_value = $user_credits + $place_value;
                     $refund_query = $this->db->query('UPDATE user SET credits = ' . $new_value . '  WHERE id = '.$place_owner);
                 }
                 $revoke_ownership_query = $this->db->query('UPDATE place SET id_User = NULL WHERE id = '. $place_datas[0]['id']);
             }
-
             // This should be in a different function
             // TODO: Create a reactivate function
             /*if ($place_status === '0') {
                 $reactivate_place = $this->db->query('UPDATE place SET status = 1  WHERE id = '.$id_place);
             }*/
-
             if ($place_status === '1') {
                 $desactivate_place = $this->db->query('UPDATE place SET status = 0  WHERE id = '.$id_place);
             }
-
     }
+
+    public function modify_profile($aDatas) {
+        $this->load->database();
+
+            // si le pseudo n'est pas vide...
+        if (!empty($aDatas['pseudo'])) {
+            //je le compare avec ceux de la BDD
+            $check_pseudo = $this->db->query("SELECT pseudo FROM user WHERE pseudo='".$aDatas['pseudo']."'");
+            $row = $check_pseudo->row();
+            //var_dump($row);
+            // si la ligne est remplie ça veux dire qu'il y a déjà le pseudo dans la BDD
+            if (!empty($row))  {
+                $pseudo_db = $row->pseudo;
+                if ($pseudo_db == $aDatas['pseudo']) {
+                    echo "C'est la mer noire ! Y'a déjà le pseudo !";
+                }
+                // si c'est pas la cas je modifie le pseudo
+                } else {
+                    $modify_profile = $this->db->query("UPDATE user SET  bio = '".$aDatas['bio']."', quote = '".$aDatas['quote']."' WHERE id = '".$aDatas['id']."' ");
+                }
+            } else {
+            echo "C'est la mer noire ! y'a pas de pseudo !";
+        }
+        // dans tout les cas on insére quand meme le reste
+
+        $modify_profile = $this->db->query("UPDATE user SET bio = '".$aDatas['bio']."', quote = '".$aDatas['quote']."' WHERE id = '".$aDatas['id']."' ");
+
+        }
+
 }

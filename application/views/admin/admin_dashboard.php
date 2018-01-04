@@ -286,8 +286,7 @@
                         <div class="col s2">
                             <span class="bold">Crédits</span>
                             <br>
-                            <span id="player_credits"></span> <span id="little_credit_symbol"
-                                                                    class="credit_symbol prefix">¢</span>
+                            <span id="player_credits"></span> <span id="little_credit_symbol" class="credit_symbol prefix">¢</span>
 
                         </div>
 
@@ -735,7 +734,7 @@
 
                             texte += "</ul>";
                             $("#player_places").html(texte);
-                            $("#player_number_place").html(places.length);
+                            $("#player_number_place").html(result.length);
 
                         });
                         users_detail_modal.modal('open');
