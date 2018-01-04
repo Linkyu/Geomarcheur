@@ -86,6 +86,25 @@
         #player_bio {
             white-space: pre-wrap;
         }
+
+        .editable:hover {
+            cursor: pointer;
+        }
+
+        .editable:focus {
+            background-color: #fff;
+            box-shadow: 0 0 18px #B21745;
+            padding: 4px;
+        }
+
+        .editable:hover::after {
+            display: inline-block;
+            font-size: inherit;
+            text-rendering: auto;
+            content: "\270E";
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -278,7 +297,7 @@
                         </div>
                     </div>
                     <div class="center">
-                        <p id="player_quote" contenteditable="true"></p>
+                        <p id="player_quote" contenteditable="true" class="editable"></p>
                     </div>
                 </div>
 
@@ -303,7 +322,7 @@
                         <div class="row"></div>
                         <div class="col s8">
                             <p class="bold">Bio</p>
-                            <p id="player_bio" contenteditable="true"></p>
+                            <p id="player_bio" contenteditable="true" class="editable"></p>
                         </div>
                         <div class="col s4">
                             <p class="bold">Lieu(x) possédé(s)</p>
