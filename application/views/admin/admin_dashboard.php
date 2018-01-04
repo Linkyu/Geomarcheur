@@ -13,6 +13,9 @@
           media="screen,projection"/>
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"
           media="screen,projection"/>
+    <!-- Import Snazzy CSS -->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>static/css/snazzy-info-window/snazzy-info-window.min.css">
+
     <!--Import custom css files-->
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/input_color_override.css"
           media="screen,projection"/>
@@ -144,7 +147,6 @@
         #pac-input:focus {
             border-color: #4d90fe;
         }
-
     </style>
 </head>
 <body>
@@ -243,6 +245,11 @@
                         <input id="modal_place_name_input" name="modal_place_name_input" type="text">
                         <label for="modal_place_name_input">Nom</label>
                     </div>
+
+                    <input id="modal_place_lat_input" name="modal_place_lat_input" type="hidden">
+                    <input id="modal_place_lng_input" name="modal_place_lng_input" type="hidden">
+                    <input id="modal_place_create_input" name="modal_place_create_input" type="hidden">
+
                     <div class="input-field">
                         <i class="material-icons prefix">place</i>
                         <input id="modal_place_address_input" name="modal_place_address_input" type="text">
@@ -291,7 +298,7 @@
 
         <div class="modal-footer">
             <a href="#!" class="waves-effect btn-flat indigo-text text-darken-4"
-               onclick="editPlace()">Sauvegarder les modifications</a>
+               onclick="savePlace()">Sauvegarder les modifications</a>
             <a href="#!" class="modal-action modal-close waves-effect btn-flat red-text"
                onclick="idPlace = '';">Retour</a>
         </div>
@@ -418,10 +425,12 @@
 
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>&libraries=places" type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?language=fr-FR&key=<?php echo GOOGLE_API_KEY ?>&libraries=places" type="text/javascript"></script>
+
+<!-- Snazzy plugin -->
+<script src="<?php echo base_url(); ?>static/js/snazzy-info-window/snazzy-info-window.min.js"></script>
 
 <!-- Charts API + placeholder data -->
-
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 
@@ -644,6 +653,8 @@
     };
     let dashboard_map = new google.maps.Map(document.getElementById("map"), options);
     let infowindow = new google.maps.InfoWindow();
+    // TODO: Find a way to customize the infowindows with Snazzy
+    //let infowindow = new SnazzyInfoWindow();
     const marker_icon = {
         url: "<?php echo base_url(); ?>static/img/pin.svg",
         anchor: new google.maps.Point(25,50),
@@ -656,7 +667,7 @@
             $.each(places, function (j, place) {
                 markers[j] = new google.maps.Marker({
                     position: new google.maps.LatLng(place.lat, place.lng),
-                    title: 'Nom du lieu : ' + place.name,
+                    title: place.name,
                     icon: marker_icon
                 });
                 markers[j].setMap(dashboard_map);
@@ -664,17 +675,17 @@
                 // Closure => création de la function au moment de la création du marqueur
                 let openMarkerInfowindow = function (ev) {
                     let contentString =
-                        '<div id="content">' +
-                        '<p> Nom du lieu : ' + place.name + '</p>' +
-                        '<p> Valeur : ' + place.value + '</p>' +
-                        '<a href="#">Plus de détails</a><br><br>' +
+                        '<div class="marker_infowindow">' +
+                        '<p><b>' + place.name + '</b></p>' +
+                        '<p>' + place.value + '<span class="credit_symbol">¢</span></p>' +
+                        '<p><a class="waves-effect waves-light btn pink darken-3" onclick="display_place(\'' + place.id + '\', false)">Plus de détails</a></p>' +
                         '</div>';
 
                     infowindow.setContent(contentString);
                     infowindow.open(dashboard_map, markers[j]);
                 };
-                // creation de listener qui apelle la function ...
-                //console.log("Creation du listener", dashboard_map);
+
+                // Linking the infoview to a click event
                 google.maps.event.addListener(
                     markers[j], "click", openMarkerInfowindow
                 );
@@ -722,19 +733,27 @@
             }
 
             // Create a marker for each place.
-            search_markers.push(new google.maps.Marker({
-                map: dashboard_map,
+            search_markers[i] = new google.maps.Marker({
                 icon: search_marker_icon,
                 title: place.name,
                 position: place.geometry.location
-            }));
+            });
+            search_markers[i].setMap(dashboard_map);
 
             // Create an infowindow for each marker
             let openMarkerInfowindow = function (ev) {
+                let typeChips = "";
+                place.types.forEach(function (type) {
+                    typeChips += "<div class='chip'>" + type + "</div>";
+                });
                 let contentString =
-                    '<div id="content">' +
-                    '<p>' + place.name + '<br>' +
-                    '<a href="#">Créer ce lieu</a></p>' +
+                    '<div class="marker_infowindow">' +
+                    '<img src="' + place.icon + '" />' +
+                    '<p><b>' + place.name + '</b><br>' +
+                    place.formatted_address + '<br>' +
+                    place.geometry.location + '</p>' +
+                    typeChips + '<br>' +
+                    '<p><a class="waves-effect waves-light btn pink darken-3" onclick="createPlace(\'' + place.place_id + '\')">Créer ce lieu</a></p>' +
                     '</div>';
 
                 infowindow.setContent(contentString);
@@ -759,6 +778,58 @@
 
 
 
+    function createPlace(place_id) {
+        // Build the request for the place resolution
+        let request = {
+            placeId: place_id
+        };
+
+        // Send the request
+        let service = new google.maps.places.PlacesService(dashboard_map);
+        service.getDetails(request, displayCreatePlaceModal);
+    }
+
+    function displayCreatePlaceModal(place, status) {
+        // TODO: Handle other error codes (see https://developers.google.com/maps/documentation/javascript/places#place_details_responses )
+        // TODO: DRY this up with displayPlace()
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            const place_modal = $("#place_modal");
+            place_modal.modal({
+                dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                opacity: .5, // Opacity of modal background
+                inDuration: 300, // Transition in duration
+                outDuration: 200, // Transition out duration
+                startingTop: '4%', // Starting top style attribute
+                endingTop: '10%', // Ending top style attribute
+                ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                    $("#idPlace").val('');
+                    $("#modal_place_name_input").val(place.name);
+                    $("#modal_place_address_input").val(place.formatted_address);
+                    $("#modal_place_owner_input").val();
+                    $("#modal_place_value_input").val();
+                    $("#modal_place_lat_input").val(place.geometry.location.lat());
+                    $("#modal_place_lng_input").val(place.geometry.location.lng());
+                    $("#modal_place_create_input").val(true);
+
+                    let manage_button = $("#modal_place_manage_button");
+                    manage_button.addClass("hide");
+
+                    Materialize.updateTextFields();
+                },
+                complete: function (modal, trigger) {
+                    $("#modal_place_name_input").val("");
+                    $("#modal_place_address_input").val("");
+                    $("#modal_place_owner_input").val("");
+                    $("#modal_place_value_input").val("");
+                    $("#modal_place_manage_button").removeClass("hide");
+
+                    Materialize.updateTextFields();
+                }
+            });
+            place_modal.modal('open');
+        }
+    }
+
     function logout() {
         $.ajax({url: "<?php echo base_url(); ?>logout/"}
         ).done(function () {
@@ -767,7 +838,7 @@
     }
 
     // Place details display
-    function display_place(id) {
+    function display_place(id, create=false) {
         // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
         const place_modal = $("#place_modal");
 
@@ -810,6 +881,7 @@
                                 manage_button.addClass("red");
                                 manage_button.html('<i class="material-icons grey-text text-lighten-5 left">delete</i>Désactiver');
                             }
+                            $("#modal_place_create_input").val(create);
 
                             Materialize.updateTextFields();
                         },
@@ -850,24 +922,46 @@
     // TODO : supprimer le moche "input text hidden"
     // si le lieu est supprimé => class deleted
 
-    function editPlace() {
+    function savePlace() {
+        const place_create = $("#modal_place_create_input").val();
         const place_id = $("#idPlace").val();
         const place_name = $("#modal_place_name_input").val();
         const place_address = $("#modal_place_address_input").val();
         const place_value = $("#modal_place_value_input").val();
 
-        $.ajax({
-            type: "POST",
-            url: "editPlace/",
-            data: {
+        let place_url = "";
+        let place_data = {};
+
+        if (place_create === 'true') {
+            const place_lng = $("#modal_place_lng_input").val();
+            const place_lat = $("#modal_place_lat_input").val();
+
+            place_url = "createPlace/";
+            place_data = {
+                name: place_name,
+                address: place_address,
+                value: place_value,
+                lat: place_lat,
+                lng: place_lng
+            }
+        } else {
+            place_url = "editPlace/";
+            place_data = {
                 id: place_id,
                 name: place_name,
                 address: place_address,
                 value: place_value
-            },
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            url: place_url,
+            data: place_data,
             statusCode: {
                 200: function (data) {
                     Materialize.toast(data, 3000, 'green rounded');
+                    // TODO: Update the map and list
                 },
                 400: function (data) {
                     Materialize.toast("An error was encountered. Error code: 400", 3000, 'red rounded');
