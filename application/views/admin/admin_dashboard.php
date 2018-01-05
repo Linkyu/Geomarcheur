@@ -831,7 +831,7 @@
     }
 
     function logout() {
-        $.ajax({url: "<?php echo base_url(); ?>logout/"}
+        $.ajax({url: "logout/"}
         ).done(function () {
             location.reload();
         });

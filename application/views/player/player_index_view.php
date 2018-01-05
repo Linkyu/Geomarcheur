@@ -51,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             white-space: nowrap;
         }
 
-        .bigg {
+        .big_symbol {
             font-size: 1.3em;
             font-weight: bold;
         }
@@ -101,7 +101,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="row">
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#ranking_modal" id="ranking_button">
-                    <sup class="bigg">#</sup>
+                    <sup class="big_symbol">#</sup>
                     <span id="player_rank_footer"></span>
                 </a>
             </div>
@@ -113,7 +113,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <div class="col s5 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#modal_detail_user" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
-                    <sup class="bigg">¢</sup>
+                    <sup class="big_symbol">¢</sup>
                     <span id="player_credits_footer"></span>
                 </a>
             </div>
@@ -289,7 +289,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="profile_modal-header center-align valign-wrapper">
         <i class="material-icons white-text" style="width: 100%;">account_circle</i>
 
-        <h5 class="right white-text nowrap"><sup class="bigg">#</sup><span id="profile_modal_rank"></span></h5>
+        <h5 class="right white-text nowrap"><sup class="big_symbol">#</sup><span id="profile_modal_rank"></span></h5>
     </div>
     <div class="modal-content">
 
@@ -313,7 +313,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div>
     <div class="modal-footer">
 
-        <a href="#!" onclick='update_profile(<?php echo $_SESSION['user_id'] ?>)' class="waves-effect btn-flat">Sauvegarder</a>
+        <a href="#!" onclick='update_profile(<?php echo $_SESSION['user_id'] ?>)' class="waves-effect btn-flat" id="profile_modal_save_button">Sauvegarder</a>
 
         <a href="#!" class="modal-action modal-close waves-effect btn-flat">Fermer</a>
     </div>
@@ -448,6 +448,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             $("#profile_modal_quote").html('"' + player['quote'] + '"');
                             $("#profile_modal_bio").html(player['bio']);
                             $("#profile_modal_rank").html(player['rank']);
+
+                            if (player['id'] !== PlayerData['id']) {
+                                $("#profile_modal_save_button").addClass("hide");
+                            }
                         },
                         complete: function (modal, trigger) {
                             $("#profile_modal_pseudo").html("");
@@ -455,6 +459,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             $("#profile_modal_quote").html("");
                             $("#profile_modal_bio").html("");
                             $("#profile_modal_rank").html("");
+                            $("#profile_modal_save_button").removeClass("hide");
                         }
                     });
 
@@ -739,7 +744,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     let player_name = $("#player_name").html(user.pseudo);
                     //TODO : creer la fonction + requete de qui va positionner le joueur
                     $("#player_position").html(user.credits);
-                    $("#player_credits").html(user.credits)
+                    $("#player_credits").html(user.credits);
                     $("#player_quote").html(user.quote);
                     $("#player_bio").html(user.bio);
                     // TODO : recupérer la photo des joueurs
@@ -775,7 +780,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 })
             })
         });
-    })
+    });
 
 function update_profile(id) {
     let pseudo =  $("#input_profile_modal_pseudo").val();
@@ -787,7 +792,7 @@ function update_profile(id) {
     console.log(bio);
 
     $.ajax({
-        url: "<?php echo base_url(); ?>modify_profile",
+        url: "editProfile/",
         type: "POST",
         data: {
             id: id, quote: quote, bio: bio
@@ -823,34 +828,7 @@ function check_form(value) {
 
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
-
-
 
 </body>
 </html>
