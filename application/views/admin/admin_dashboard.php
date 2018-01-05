@@ -831,7 +831,7 @@
     }
 
     function logout() {
-        $.ajax({url: "<?php echo base_url(); ?>logout/"}
+        $.ajax({url: "logout/"}
         ).done(function () {
             location.reload();
         });
@@ -999,6 +999,7 @@
             {data: "credits"},
             {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
         ],
+            "order": [[ 2, "desc" ]]
 
     });
 
@@ -1048,9 +1049,9 @@
                             texte = "Aucun lieu."
                         });
 
-                        texte += "</ul>";
-                        $("#player_places").html(texte);
-                        $("#player_number_place").html(places.length);
+                            texte += "</ul>";
+                            $("#player_places").html(texte);
+                            $("#player_number_place").html(result.length);
 
                     });
                     users_detail_modal.modal('open');
