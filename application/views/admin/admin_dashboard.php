@@ -287,7 +287,7 @@
     <!-- la modale des détails d'un utilisateur -->
     <div id="modal_detail_user" class="modal modal-fixed-footer">
         <div class="modal-content">
-            <div class="row">
+            <div class="row">²
                 <div class="col s3">
                     <div id="card_user_pic" class="card small modal_place_stats_block">
                         <div class="card-content">
@@ -339,7 +339,7 @@
         <div class="modal-footer">
             <a class="waves-effect waves-light btn-large btn-flat indigo-text text-darken-4" onclick="editProfile()"><i
                         class="material-icons">edit</i> Sauvegarder les changements</a>
-            <a class="waves-effect waves-light btn-large red">Bannir</a>
+            <a class="waves-effect waves-light btn-large red" onclick="manage_ban()" ><span id="ban_button_message"></span></a>
             <a href="#!" class="modal-action modal-close waves-effect btn-large btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
         </div>
@@ -661,7 +661,6 @@
     const place_list_table = $("#place_list_table");
     const divs = place_list_table.find("div.card");
     let alpha_order = false;
-    let idUser;
     let carte;
     let marqueur = [];
     let latlng = new google.maps.LatLng(43.600000, 1.433333);
@@ -760,6 +759,7 @@
     );
 
     const users_detail_modal = $("#modal_detail_user");
+    let idUser;
     users_detail_modal.modal({
         dismissible: true, // Modal can be dismissed by clicking outside of the modal
         opacity: .5, // Opacity of modal background
@@ -811,6 +811,17 @@
                     $("#player_bio").html(user.bio);
                     $("#player_id").html(user.id);
                     // TODO : recupérer la photo des joueurs
+
+    console.log("etat banni = "+ user.is_banned);
+                    //si ban = 0
+                    if (user.is_banned == 0) {
+                        $("#ban_button_message").html("Bannir");
+                    } else {
+                        $("#ban_button_message").html("Débannir");
+                    }
+
+
+
 
 
                     //users_detail_modal.append(`
@@ -872,7 +883,28 @@
                 }
             }
         });
-    }
+    };
+
+    function manage_ban() {
+        console.log(idUser);
+// @TODO :get user where ID pour recupérer son nom
+                let id = document.getElementById('idPlace').value;
+                if (confirm("Voulez vous bannir le joueur ?")) {
+                    $.ajax({
+                        url: "<?php echo base_url(); ?>manage_ban",
+                        type: "GET",
+                        data: {
+                            idUser: idUser
+                        }
+                    }).done(function () {
+                        users_detail_modal.modal('close');
+                    });
+                }
+            }
+
+
+
+
 
 </script>
 
