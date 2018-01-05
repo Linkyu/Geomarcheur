@@ -111,15 +111,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <sup><i class="material-icons">place</i></sup>3
                 </a>
             </div>
-            <div class="col s5 center-align">
+            <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#modal_detail_user" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
                     <sup class="big_symbol">¢</sup>
                     <span id="player_credits_footer"></span>
                 </a>
             </div>
-            <div class="col s1 right-align">
+            <div class="col s3 right-align">
                 <a href="#" class="waves-effect waves-light circle white-text">
-                    <i class="material-icons" style="font-size: large">more_vert</i>
+                    <a class="waves-effect waves-light btn-flat modal-trigger white-text" id="logout_button" onclick="logout();">
+                        <i class="material-icons" style="font-size: large">power_settings_new</i>
+                    </a>
                 </a>
             </div>
         </div>
@@ -327,7 +329,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <!-- Custom local scripts -->
 <script type="text/javascript">
 
-    const PlayerId = "<?php echo $_SESSION['user_id'] ?>"; // TODO: refactor this
     let PlayerData = {
         id: "<?php echo $_SESSION['user_id'] ?>"
     };
@@ -364,47 +365,40 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
                             // Closure => création de la function au moment de la création du marqueur
-                            let macallback = function callbackSpecificiqueMarqueur(ev) {
+                            let openMarkerInfowindow = function (ev) {
                                 let action = "";
                                 get_user(place.id_User, function (owner) {
-                                    get_user(PlayerId, function (player) {
-                                        /*console.log("ownerId : " + ownerId);
-                                        console.log("place.id_User : " + place.id_User);
-                                        console.log("owner['credits'] : " + owner["credits"]);
-                                        console.log("place.value : " + place.value);
-                                        console.log("");
-                                        console.log("place.id_User === null : " + place.id_User === null);
-                                        console.log("owner['credits'] >= place.value : " + owner['credits'] >= place.value);
-                                        console.log("ownerId === place.id_User : " + ownerId === place.id_User);
-                                        console.log("###");*/
-                                        if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                            action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
-                                        } else if (PlayerId === place.id_User) {
-                                            action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                    get_user(PlayerData['id'], function (player) {
+                                        if (true) {
+                                            if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                            } else if (PlayerData['id'] === place.id_User) {
+                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                            }
+
+                                            const contentString =
+                                                '<div id="content">' +
+                                                '<div class="row">' +
+                                                '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
+                                                '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
+                                                '</div>' +
+                                                '<div class="row">' +
+                                                (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
+                                                '</div>' +
+                                                '<div class="row"> ' +
+                                                '<div class="col s6">' +
+                                                '<p style="font-weight: bold" class="orange-text text-accent-4"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
+                                                '<p>' + action + '</p>' +
+                                                '</div>' +
+                                                '<div class="col s6">' +
+                                                '<img class="infowindow_place_picture" src="https://maps.googleapis.com/maps/api/streetview?size=100x150&fov=70&location=' + place.lat + ',' + place.lng + '&key=<?php echo GOOGLE_API_KEY ?>" style="width: 100px;">' +
+                                                '</div>' +
+                                                '</div>' +
+                                                '</div>';
+
+                                            infowindow.setContent(contentString);
+                                            infowindow.open(map, markers[j]);
                                         }
-
-                                        const contentString =
-                                            '<div id="content">' +
-                                            '<div class="row">' +
-                                            '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
-                                            '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
-                                            '</div>' +
-                                            '<div class="row">' +
-                                            (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
-                                            '</div>' +
-                                            '<div class="row"> ' +
-                                            '<div class="col s6">' +
-                                            '<p style="font-weight: bold"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
-                                            '<p>' + action + '</p>' +
-                                            '</div>' +
-                                            '<div class="col s6">' +
-                                            '<img class="infowindow_place_picture" src="http://i.imgur.com/kzmgUyK.jpg" style="width: 100px;">' +
-                                            '</div>' +
-                                            '</div>' +
-                                            '</div>';
-
-                                        infowindow.setContent(contentString);
-                                        infowindow.open(map, markers[j]);
                                     });
                                 });
                             };
@@ -412,7 +406,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             // creation de listener qui apelle la function ...
                             //console.log("Creation du listener", carte);
                             google.maps.event.addListener(
-                                markers[j], "click", macallback
+                                markers[j], "click", openMarkerInfowindow
                             );
 
                         }
@@ -480,6 +474,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         $.getJSON( "getUserRank/" + PlayerData['id'], "", function( result ) {
             PlayerData['rank'] = result['rank'];
             $('#player_rank_footer').text(result['rank']);
+        });
+    }
+
+    function logout() {
+        $.ajax({url: "logout/"}
+        ).done(function () {
+            location.reload();
         });
     }
 
