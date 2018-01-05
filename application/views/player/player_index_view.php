@@ -11,6 +11,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/materialize.min.css"  media="screen,projection"/>
     <link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>static/css/animate.css"  media="screen,projection"/>
@@ -20,6 +21,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+
+
+
+
 
 
 
@@ -45,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             white-space: nowrap;
         }
 
-        .bigg {
+        .big_symbol {
             font-size: 1.3em;
             font-weight: bold;
         }
@@ -94,19 +100,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="container">
         <div class="row">
             <div class="col s3 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#ranking_modal" id="ranking_button">
-                    <sup class="bigg">#</sup>
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#ranking_modal" id="ranking_button">
+                    <sup class="big_symbol">#</sup>
                     <span id="player_rank_footer"></span>
                 </a>
             </div>
+
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal" id="place_list_button">
                     <sup><i class="material-icons">place</i></sup>3
                 </a>
             </div>
             <div class="col s5 center-align">
-                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#!" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
-                    <sup class="bigg">¢</sup>
+                <a class="waves-effect waves-light btn-flat modal-trigger white-text gold" href="#modal_detail_user" id="credits_button" onclick="display_profile(<?php echo $_SESSION['user_id'] ?>)">
+                    <sup class="big_symbol">¢</sup>
                     <span id="player_credits_footer"></span>
                 </a>
             </div>
@@ -120,6 +127,98 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </footer>
 
 <!-- ### Modals ### -->
+<div id="ranking_modal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <div class="card-panel hoverable">
+            <div class="row">
+                <table id="ranking_datatable" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Crédits</th>
+                        <th>Lieux possédés</th>
+                    </tr>
+                    </thead>
+                    <tbody id="datatable_leaderboard">
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Crédits</th>
+                        <th>Lieux possédés</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- la modale des détails d'un utilisateur -->
+    <div id="modal_detail_user" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col s3">
+                    <div id="card_user_pic" class="card small modal_place_stats_block">
+                        <div class="card-content">
+                            <p class="bold">Photo de l'utilisateur</p>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <span id="player_quote"></span>
+                    </div>
+                </div>
+
+                <div class="col s9">
+                    <div class="row">
+                        <div class="col s6">
+                            <span class="bold">Nom</span>
+                            <br>
+                            <span id="player_name"></span>
+                        </div>
+                        <div class="col s2">
+                            <span class="bold">#</span>
+                            <br>
+                            <span id="player_position"></span>
+                        </div>
+                        <div class="col s2">
+                            <span class="bold">Crédits</span>
+                            <br>
+                            <span id="player_credits"></span> <span id="little_credit_symbol" class="credit_symbol prefix">¢</span>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="row"></div>
+
+                        <div class="col s8">
+                            <span class="bold">Bio</span>
+                            <br>
+                            <span id="player_bio"></span>
+                        </div>
+
+                        <div class="col s4">
+                            <span class="bold">Lieu(x) possédé(s)</span>
+                            <br>
+                            <span id="player_places"></span>
+                            <!-- liste sur les lieux possédés -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a class="waves-effect waves-light btn-large #f44336 red">BANNIR</a>
+            <a href="#!" class="modal-action modal-close waves-effect btn-flat pink-text text-darken-3"
+               onclick="idPlace = '';">Retour</a>
+
+        </div>
+
+
+    </div>
+
 <!-- Places -->
 <div id="place_list_modal" class="modal modal-fixed-footer">
     <div class="modal-header">
@@ -189,25 +288,40 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div id="profile_modal" class="modal modal-fixed-footer">
     <div class="profile_modal-header center-align valign-wrapper">
         <i class="material-icons white-text" style="width: 100%;">account_circle</i>
-        <h5 class="right white-text nowrap"><sup class="bigg">#</sup><span id="profile_modal_rank"></span></h5>
+
+        <h5 class="right white-text nowrap"><sup class="big_symbol">#</sup><span id="profile_modal_rank"></span></h5>
     </div>
     <div class="modal-content">
-        <h4 id="profile_modal_pseudo"></h4>
-        <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places"></span></p>
-        <h5 id="profile_modal_quote"></h5>
-        <p id="profile_modal_bio"></p>
+
+
+        <div class="col s10 m10">
+            <label for="input_profile_modal_pseudo">Pseudo</label>
+            <input required="required" readonly id="input_profile_modal_pseudo" name="input_profile_modal_pseudo" type="text" function="check_form(this.value)">
+        </div>
+
+        <div class="col s2 m2">
+            <p class="right"><span><i class="material-icons">place</i></span><span id="profile_modal_places"></span></p>
+        </div>
+
+        <label for="input_profile_modal_quote">Quote</label>
+        <input id="input_profile_modal_quote" name="input_profile_modal_quote" type="text">
+
+        <label for="input_profile_modal_bio">Bio</label>
+        <input id="input_profile_modal_bio" name="input_profile_modal_bio" type="text">
+
+
     </div>
     <div class="modal-footer">
+
+        <a href="#!" onclick='update_profile(<?php echo $_SESSION['user_id'] ?>)' class="waves-effect btn-flat" id="profile_modal_save_button">Sauvegarder</a>
+
         <a href="#!" class="modal-action modal-close waves-effect btn-flat">Fermer</a>
     </div>
 </div>
 
-<!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<!-- Compiled and minified Materialize JavaScript -->
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
-
-<!-- Custom tools -->
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
 <!-- Custom local scripts -->
@@ -325,11 +439,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         startingTop: '4%', // Starting top style attribute
                         endingTop: '10%', // Ending top style attribute
                         ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#input_profile_modal_pseudo").val(player["pseudo"]);
+                            $("#input_profile_modal_quote").val(player["quote"]);
+                            $("#input_profile_modal_bio").val(player['bio']);
+
                             $("#profile_modal_pseudo").html(player['pseudo']);
                             $("#profile_modal_places").html(player['places'].length);
                             $("#profile_modal_quote").html('"' + player['quote'] + '"');
                             $("#profile_modal_bio").html(player['bio']);
                             $("#profile_modal_rank").html(player['rank']);
+
+                            if (player['id'] !== PlayerData['id']) {
+                                $("#profile_modal_save_button").addClass("hide");
+                            }
                         },
                         complete: function (modal, trigger) {
                             $("#profile_modal_pseudo").html("");
@@ -337,6 +459,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             $("#profile_modal_quote").html("");
                             $("#profile_modal_bio").html("");
                             $("#profile_modal_rank").html("");
+                            $("#profile_modal_save_button").removeClass("hide");
                         }
                     });
 
@@ -359,6 +482,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             $('#player_rank_footer').text(result['rank']);
         });
     }
+
+
+    //listAllUsers => fonction qui retourne les joueurs triés avec le classement....
+    // envoyer ces données dans le datatable
 
     $(document).ready(function() {
         get_user(PlayerData['id'], function (player) {
@@ -569,11 +696,139 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     });
 
 
+//@TODO : afficher la ligne du joueur connecté d'une autre couleur
+    const users_detail_modal = $("#ranking_modal");
+    users_detail_modal.modal({
+        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+        opacity: .5, // Opacity of modal background
+        inDuration: 300, // Transition in duration
+        outDuration: 200, // Transition out duration
+        startingTop: '4%', // Starting top style attribute
+        endingTop: '10%'
+    });
+
+    // Datatable setup
+    let container = $('#ranking_datatable');
+    container.DataTable({
+        "language": {
+            url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/French.json"
+        },
+        ajax: {
+            url: 'getUser',
+            dataSrc: "resultat"
+        },
+        columns: [
+            {data: "id"},
+            {data: "pseudo"},
+            {data: "credits"},
+            {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
+        ],
+        "order": [[ 2, "desc" ]]
+
+    });
+
+    let rows = $('#datatable_leaderboard');
+
+    rows.on('click', 'tr', function () {
+
+        let row = $(this);
+        idUser = row[0].childNodes[0].textContent;
+        console.log(idUser);
+
+        let user_data;
+
+        $.getJSON("getUser/" + idUser, "", function (result) {
+            $.each(result, function (i, users) {
+                $.each(users, function (j, user) {
+                    //users_detail_modal.html("");
+                    let player_name = $("#player_name").html(user.pseudo);
+                    //TODO : creer la fonction + requete de qui va positionner le joueur
+                    $("#player_position").html(user.credits);
+                    $("#player_credits").html(user.credits);
+                    $("#player_quote").html(user.quote);
+                    $("#player_bio").html(user.bio);
+                    // TODO : recupérer la photo des joueurs
+
+                    //users_detail_modal.append(`
+                    //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
+                    //<p>Nom de l'utilisateur : ` + user.credits + ` </p>
+                    //`);
+                    // recuperer les lieux de l'utilisateur where ID => machin
+                    $.getJSON("getUserPlaces/" + idUser, "", function (result) {
+                        let texte;
+
+                        texte = "<ul>";
+                        $.each(result, function (i, places) {
+                            $.each(places, function (j, place) {
+                                console.log("infos tableau" + places.length);
+
+                                texte += "<li>" + place.name + "</li>";
+                            });
+                            if (places.length !== 0) {
+                                return;
+                            }
+                            texte = "Aucun lieu."
+                        });
+
+                        texte += "</ul>";
+                        $("#player_places").html(texte);
+                        $("#player_number_place").html(result.length);
+
+                    });
+                    users_detail_modal.modal('open');
+
+                })
+            })
+        });
+    });
+
+function update_profile(id) {
+    let pseudo =  $("#input_profile_modal_pseudo").val();
+    let quote =  $("#input_profile_modal_quote").val();
+    let bio =  $("#input_profile_modal_bio").val();
+
+    console.log(pseudo);
+    console.log(quote);
+    console.log(bio);
+
+    $.ajax({
+        url: "editProfile/",
+        type: "POST",
+        data: {
+            id: id, quote: quote, bio: bio
+        },
+        success: function(){
+            alert("Profil modifié !");
+        },
+        error : function() {
+            alert("Enregistrement échoué !");
+        }
+        }).done(function () {
+
+        let profile_modal = $('#profile_modal');
+
+        profile_modal.modal('close');
+    });
+}
+
+function check_form(value) {
+        console.log(value);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
-
-
 
 </body>
 </html>

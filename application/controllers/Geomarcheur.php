@@ -224,6 +224,40 @@ class Geomarcheur extends CI_Controller
         echo "Place modified.";
     }
 
+    // TODO: Polymorph this with editPlace, or at least DRY it up a little
+    public function createPlace() {
+        if ($this->input->server('REQUEST_METHOD') != 'POST') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
+            http_response_code(400);
+            echo "Wrong method. Please use POST.";
+            exit();
+        }
+
+        $place['name'] = $this->input->post('name');
+        $place['address'] = $this->input->post('address');
+        $place['value'] = $this->input->post('value');
+        $place['lat'] = $this->input->post('lat');
+        $place['lng'] = $this->input->post('lng');
+
+        if ($place['value'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with an empty value.");
+            http_response_code(401);
+            echo "Parameter error: value can't be null.";
+            exit();
+        }
+        if ($place['name'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no name.");
+            http_response_code(401);
+            echo "Parameter error: name can't be null.";
+            exit();
+        }
+
+        $result = $this->geomarcheur_db->create_place($place);
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": A new place was created: " . $place['name'] . "."); // TODO: Get better logs from write events
+        http_response_code(200);
+        echo "Place created.";
+    }
+
     public function editProfile() {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
@@ -318,6 +352,27 @@ class Geomarcheur extends CI_Controller
         $this->load->view('login_view', $data);   // TODO: Process the exit message
     }
 
+
+/*
+    public function disablePlace() {
+
+        $place_id = $this->input->get('id');
+        $this->geomarcheur_db->disable_place($place_id);
+    }
+    */
+
+
+    public function modify_profile() {
+
+        $aDatas['id'] = $this->input->post('id');
+        $aDatas['pseudo'] = $this->input->post('pseudo');
+        $aDatas['bio'] = $this->input->post('bio');
+        $aDatas['quote'] = $this->input->post('quote');
+
+        $this->geomarcheur_db->modify_profile($aDatas);
+
+    }
+
     /**
      * Simple logging method
      *
@@ -390,8 +445,9 @@ class Geomarcheur extends CI_Controller
     /*public function log_tester() {
         $this->logger(LogType::WARNING, "ATTENCIONE");
     }*/
-
 }
+
+
 
 abstract class LogType {
     const DEBUG = 0;
