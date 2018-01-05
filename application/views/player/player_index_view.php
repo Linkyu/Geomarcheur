@@ -326,167 +326,35 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
+
 <!-- Custom local scripts -->
 <script type="text/javascript">
 
+    // Global constants and variables
     let PlayerData = {
-        id: "<?php echo $_SESSION['user_id'] ?>"
+        id: "<?php echo $_SESSION['user_id'] ?>",
+        loc: {
+            lat: 43.6,
+            lng: 1.44   // Placeholder
+        }
     };
 
-
-    function sellPlace(id) {
-        if (confirm("Êtes-vous sûr?")) {
-            $.ajax({
-                url: "sellPlace/" + id,
-                success: function () {
-                    alert("Vendu!");
-                    // TODO: Display these with modals? See issue #57
-                    // TODO: Update infowindow bubble. See issue #58
-                }
-            });
-        }
-    }
-
-    function refreshMarkers(map) {
-        let markers = [];
-        let infowindow = new google.maps.InfoWindow();
-
-        $.getJSON( "getPlace", "", function( result ) {
-                $.each(result, function(i, places) {
-                    $.each(places, function(j, place) {
-
-                            markers[j] = new google.maps.Marker (
-                                {
-                                    position: new google.maps.LatLng(place.lat, place.lng),
-                                    title:'Nom du lieu : ' + place.name
-                                }
-                            );
-                            markers[j].setMap(map);
-
-
-                            // Closure => création de la function au moment de la création du marqueur
-                            let openMarkerInfowindow = function (ev) {
-                                let action = "";
-                                get_user(place.id_User, function (owner) {
-                                    get_user(PlayerData['id'], function (player) {
-                                        if (true) {
-                                            if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
-                                            } else if (PlayerData['id'] === place.id_User) {
-                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
-                                            }
-
-                                            const contentString =
-                                                '<div id="content">' +
-                                                '<div class="row">' +
-                                                '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
-                                                '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
-                                                '</div>' +
-                                                '<div class="row">' +
-                                                (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
-                                                '</div>' +
-                                                '<div class="row"> ' +
-                                                '<div class="col s6">' +
-                                                '<p style="font-weight: bold" class="orange-text text-accent-4"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
-                                                '<p>' + action + '</p>' +
-                                                '</div>' +
-                                                '<div class="col s6">' +
-                                                '<img class="infowindow_place_picture" src="https://maps.googleapis.com/maps/api/streetview?size=100x150&fov=70&location=' + place.lat + ',' + place.lng + '&key=<?php echo GOOGLE_API_KEY ?>" style="width: 100px;">' +
-                                                '</div>' +
-                                                '</div>' +
-                                                '</div>';
-
-                                            infowindow.setContent(contentString);
-                                            infowindow.open(map, markers[j]);
-                                        }
-                                    });
-                                });
-                            };
-
-                            // creation de listener qui apelle la function ...
-                            //console.log("Creation du listener", carte);
-                            google.maps.event.addListener(
-                                markers[j], "click", openMarkerInfowindow
-                            );
-
-                        }
-                    )
-                })
-            }
-        )
-    }
-
-    function display_profile(user_id) {
-        get_user(user_id, function (user) {
-            let player = user;
-            $.getJSON( "getUserRank/" + user_id, "", function( result ) {
-                player['rank'] = result['rank'];
-                get_user_places(user_id, function (places) {
-                    player['places'] = places;
-
-                    let profile_modal = $('#profile_modal');
-                    profile_modal.modal({
-                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
-                        opacity: .5, // Opacity of modal background
-                        inDuration: 300, // Transition in duration
-                        outDuration: 200, // Transition out duration
-                        startingTop: '4%', // Starting top style attribute
-                        endingTop: '10%', // Ending top style attribute
-                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                            $("#input_profile_modal_pseudo").val(player["pseudo"]);
-                            $("#input_profile_modal_quote").val(player["quote"]);
-                            $("#input_profile_modal_bio").val(player['bio']);
-
-                            $("#profile_modal_pseudo").html(player['pseudo']);
-                            $("#profile_modal_places").html(player['places'].length);
-                            $("#profile_modal_quote").html('"' + player['quote'] + '"');
-                            $("#profile_modal_bio").html(player['bio']);
-                            $("#profile_modal_rank").html(player['rank']);
-
-                            if (player['id'] !== PlayerData['id']) {
-                                $("#profile_modal_save_button").addClass("hide");
-                            }
-                        },
-                        complete: function (modal, trigger) {
-                            $("#profile_modal_pseudo").html("");
-                            $("#profile_modal_places").html("");
-                            $("#profile_modal_quote").html("");
-                            $("#profile_modal_bio").html("");
-                            $("#profile_modal_rank").html("");
-                            $("#profile_modal_save_button").removeClass("hide");
-                        }
-                    });
-
-                    profile_modal.modal('open');
-                })
-            });
-        });
-    }
-
-    function refreshCredits() {
-        get_user(PlayerData['id'], function (player) {
-            PlayerData['credits'] = player['credits'];
-            $('#player_credits_footer').text(player['credits']);
-        });
-    }
-
-    function refreshRanking() {
-        $.getJSON( "getUserRank/" + PlayerData['id'], "", function( result ) {
-            PlayerData['rank'] = result['rank'];
-            $('#player_rank_footer').text(result['rank']);
-        });
-    }
-
-    function logout() {
-        $.ajax({url: "logout/"}
-        ).done(function () {
-            location.reload();
-        });
-    }
-
-
-    //listAllUsers => fonction qui retourne les joueurs triés avec le classement....
-    // envoyer ces données dans le datatable
+    const PlayerMarkerIcon = {
+        url: "<?php echo base_url(); ?>static/img/pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
+    const OthersMarkerIcon = {
+        url: "<?php echo base_url(); ?>static/img/search_pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
+    const FreeMarkerIcon = {
+        url: "<?php echo base_url(); ?>static/img/free_pin.svg",
+        anchor: new google.maps.Point(25,50),
+        scaledSize: new google.maps.Size(50,50)
+    };
 
     $(document).ready(function() {
         get_user(PlayerData['id'], function (player) {
@@ -553,13 +421,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
             ]
         };
-        let map = new google.maps.Map(document.getElementById("map"), options);
+        let player_map = new google.maps.Map(document.getElementById("map"), options);
 
-        refreshMarkers(map);
+        // Initialise player marker
+        PlayerData["marker"] = new google.maps.Marker (
+            {
+                position: new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]),
+                map: player_map,
+                icon: {
+                    url: "<?php echo base_url(); ?>static/img/located.svg",
+                    anchor: new google.maps.Point(50,50),
+                    scaledSize: new google.maps.Size(50,50)
+                }
+            });
+
+        refreshMarkers(player_map);
 
         refreshRanking();
 
         refreshCredits();
+
+        refreshLocation();
 
         $("#place_list_modal").modal({
             dismissible: true, // Modal can be dismissed by clicking outside of the modal
@@ -697,6 +579,200 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     });
 
 
+    function sellPlace(id) {
+        if (confirm("Êtes-vous sûr?")) {
+            $.ajax({
+                url: "sellPlace/" + id,
+                success: function () {
+                    alert("Vendu!");
+                    // TODO: Display these with modals? See issue #57
+                    // TODO: Update infowindow bubble. See issue #58
+                }
+            });
+        }
+    }
+
+    function refreshMarkers(map) {
+        let markers = [];
+        let infowindow = new google.maps.InfoWindow();
+
+        $.getJSON( "getPlace", "", function( result ) {
+                $.each(result, function(i, places) {
+                    $.each(places, function(j, place) {
+                        // Apply the correct marker icon
+                        let marker_icon = "";
+                        if (place.id_User === null) {
+                            marker_icon = FreeMarkerIcon;
+                        } else if (place.id_User === PlayerData['id']) {
+                            marker_icon = PlayerMarkerIcon;
+                        } else {
+                            marker_icon = OthersMarkerIcon;
+                        }
+
+                        // Create the marker
+                        markers[j] = new google.maps.Marker (
+                            {
+                                position: new google.maps.LatLng(place.lat, place.lng),
+                                title:'Nom du lieu : ' + place.name,
+                                icon: marker_icon
+                            }
+                        );
+                        markers[j].setMap(map);
+
+
+                            // Closure => création de la function au moment de la création du marqueur
+                            let openMarkerInfowindow = function (ev) {
+                                let action = "";
+                                get_user(place.id_User, function (owner) {
+                                    get_user(PlayerData['id'], function (player) {
+                                        if (true) {
+
+                                            // Determine the action on this place
+                                            if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                            } else if (PlayerData['id'] === place.id_User) {
+                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                            }
+
+                                            const contentString =
+                                                '<div id="content">' +
+                                                '<div class="row">' +
+                                                '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
+                                                '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
+                                                '</div>' +
+                                                '<div class="row">' +
+                                                (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
+                                                '</div>' +
+                                                '<div class="row"> ' +
+                                                '<div class="col s6">' +
+                                                '<p style="font-weight: bold" class="orange-text text-accent-4"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
+                                                '<p>' + action + '</p>' +
+                                                '</div>' +
+                                                '<div class="col s6">' +
+                                                '<img class="infowindow_place_picture" src="https://maps.googleapis.com/maps/api/streetview?size=100x150&fov=70&location=' + place.lat + ',' + place.lng + '&key=<?php echo GOOGLE_API_KEY ?>" style="width: 100px;">' +
+                                                '</div>' +
+                                                '</div>' +
+                                                '</div>';
+
+                                            infowindow.setContent(contentString);
+                                            infowindow.open(map, markers[j]);
+                                        }
+                                    });
+                                });
+                            };
+
+                            // creation de listener qui apelle la function
+                            google.maps.event.addListener(
+                                markers[j], "click", openMarkerInfowindow
+                            );
+                        }
+                    )
+                })
+            }
+        )
+    }
+
+    function refreshLocation() {
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                PlayerData["loc"] = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                PlayerData["marker"].setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+
+                //setTimeout(refreshLocation, 1000);
+            }, function() {
+                handleLocationError(true);
+            });
+        } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false);
+        }
+    }
+
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
+        infoWindow.open(map);
+    }
+
+    function display_profile(user_id) {
+        get_user(user_id, function (user) {
+            let player = user;
+            $.getJSON( "getUserRank/" + user_id, "", function( result ) {
+                player['rank'] = result['rank'];
+                get_user_places(user_id, function (places) {
+                    player['places'] = places;
+
+                    let profile_modal = $('#profile_modal');
+                    profile_modal.modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%', // Ending top style attribute
+                        ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                            $("#input_profile_modal_pseudo").val(player["pseudo"]);
+                            $("#input_profile_modal_quote").val(player["quote"]);
+                            $("#input_profile_modal_bio").val(player['bio']);
+
+                            $("#profile_modal_pseudo").html(player['pseudo']);
+                            $("#profile_modal_places").html(player['places'].length);
+                            $("#profile_modal_quote").html('"' + player['quote'] + '"');
+                            $("#profile_modal_bio").html(player['bio']);
+                            $("#profile_modal_rank").html(player['rank']);
+
+                            if (player['id'] !== PlayerData['id']) {
+                                $("#profile_modal_save_button").addClass("hide");
+                            }
+                        },
+                        complete: function (modal, trigger) {
+                            $("#profile_modal_pseudo").html("");
+                            $("#profile_modal_places").html("");
+                            $("#profile_modal_quote").html("");
+                            $("#profile_modal_bio").html("");
+                            $("#profile_modal_rank").html("");
+                            $("#profile_modal_save_button").removeClass("hide");
+                        }
+                    });
+
+                    profile_modal.modal('open');
+                })
+            });
+        });
+    }
+
+    function refreshCredits() {
+        get_user(PlayerData['id'], function (player) {
+            PlayerData['credits'] = player['credits'];
+            $('#player_credits_footer').text(player['credits']);
+        });
+    }
+
+    function refreshRanking() {
+        $.getJSON( "getUserRank/" + PlayerData['id'], "", function( result ) {
+            PlayerData['rank'] = result['rank'];
+            $('#player_rank_footer').text(result['rank']);
+        });
+    }
+
+    function logout() {
+        $.ajax({url: "logout/"}
+        ).done(function () {
+            location.reload();
+        });
+    }
+
+
+    //listAllUsers => fonction qui retourne les joueurs triés avec le classement....
+    // envoyer ces données dans le datatable
+
+
 //@TODO : afficher la ligne du joueur connecté d'une autre couleur
     const users_detail_modal = $("#ranking_modal");
     users_detail_modal.modal({
@@ -828,8 +904,6 @@ function check_form(value) {
 
 
 </script>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
 
 </body>
 </html>
