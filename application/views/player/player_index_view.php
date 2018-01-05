@@ -326,7 +326,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>" type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_API_KEY ?>&libraries=geometry" type="text/javascript"></script>
 
 <!-- Custom local scripts -->
 <script type="text/javascript">
@@ -339,6 +339,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             lng: 1.44   // Placeholder
         }
     };
+
+    let markers = [];
 
     const PlayerMarkerIcon = {
         url: "<?php echo base_url(); ?>static/img/pin.svg",
@@ -592,84 +594,102 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
     }
 
+    function stopAllBouncingMarkers() {
+        $.each(markers, function (i, marker) {
+            markers[i].setAnimation(null);
+        })
+    }
+
     function refreshMarkers(map) {
-        let markers = [];
         let infowindow = new google.maps.InfoWindow();
 
         $.getJSON( "getPlace", "", function( result ) {
-                $.each(result, function(i, places) {
-                    $.each(places, function(j, place) {
-                        // Apply the correct marker icon
-                        let marker_icon = "";
-                        if (place.id_User === null) {
-                            marker_icon = FreeMarkerIcon;
-                        } else if (place.id_User === PlayerData['id']) {
-                            marker_icon = PlayerMarkerIcon;
-                        } else {
-                            marker_icon = OthersMarkerIcon;
+            $.each(result, function(i, places) {
+                $.each(places, function(j, place) {
+                    // Apply the correct marker icon
+                    let marker_icon = "";
+                    if (place.id_User === null) {
+                        marker_icon = FreeMarkerIcon;
+                    } else if (place.id_User === PlayerData['id']) {
+                        marker_icon = PlayerMarkerIcon;
+                    } else {
+                        marker_icon = OthersMarkerIcon;
+                    }
+
+                    // Create the marker
+                    markers[j] = new google.maps.Marker (
+                        {
+                            position: new google.maps.LatLng(place.lat, place.lng),
+                            title:'Nom du lieu : ' + place.name,
+                            icon: marker_icon
                         }
-
-                        // Create the marker
-                        markers[j] = new google.maps.Marker (
-                            {
-                                position: new google.maps.LatLng(place.lat, place.lng),
-                                title:'Nom du lieu : ' + place.name,
-                                icon: marker_icon
-                            }
-                        );
-                        markers[j].setMap(map);
+                    );
+                    markers[j].setMap(map);
 
 
-                            // Closure => création de la function au moment de la création du marqueur
-                            let openMarkerInfowindow = function (ev) {
-                                let action = "";
-                                get_user(place.id_User, function (owner) {
-                                    get_user(PlayerData['id'], function (player) {
-                                        if (true) {
+                    // Closure => création de la function au moment de la création du marqueur
+                    let openMarkerInfowindow = function (ev) {
+                        let action = "";
+                        get_user(place.id_User, function (owner) {
+                            get_user(PlayerData['id'], function (player) {
+                                // Determine the action on this place
+                                if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                    action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                } else if (PlayerData['id'] === place.id_User) {
+                                    action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
+                                }
 
-                                            // Determine the action on this place
-                                            if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                                action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
-                                            } else if (PlayerData['id'] === place.id_User) {
-                                                action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
-                                            }
+                                const contentString =
+                                    '<div id="content">' +
+                                    '<div class="row">' +
+                                    '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
+                                    '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
+                                    '</div>' +
+                                    '<div class="row">' +
+                                    (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
+                                    '</div>' +
+                                    '<div class="row"> ' +
+                                    '<div class="col s6">' +
+                                    '<p style="font-weight: bold" class="orange-text text-accent-4"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
+                                    '<p>' + action + '</p>' +
+                                    '</div>' +
+                                    '<div class="col s6">' +
+                                    '<img class="infowindow_place_picture" src="https://maps.googleapis.com/maps/api/streetview?size=100x150&fov=70&location=' + place.lat + ',' + place.lng + '&key=<?php echo GOOGLE_API_KEY ?>" style="width: 100px;">' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>';
 
-                                            const contentString =
-                                                '<div id="content">' +
-                                                '<div class="row">' +
-                                                '<div class="col s12"><p><span style="font-weight: bold; font-size: large">' + place.name + '</span><br/>' +
-                                                '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
-                                                '</div>' +
-                                                '<div class="row">' +
-                                                (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') +
-                                                '</div>' +
-                                                '<div class="row"> ' +
-                                                '<div class="col s6">' +
-                                                '<p style="font-weight: bold" class="orange-text text-accent-4"><span class="credit_symbol prefix">¢</span>' + place.value + '</p>' +
-                                                '<p>' + action + '</p>' +
-                                                '</div>' +
-                                                '<div class="col s6">' +
-                                                '<img class="infowindow_place_picture" src="https://maps.googleapis.com/maps/api/streetview?size=100x150&fov=70&location=' + place.lat + ',' + place.lng + '&key=<?php echo GOOGLE_API_KEY ?>" style="width: 100px;">' +
-                                                '</div>' +
-                                                '</div>' +
-                                                '</div>';
+                                infowindow.setContent(contentString);
+                                infowindow.open(map, markers[j]);
+                            });
+                        });
+                    };
 
-                                            infowindow.setContent(contentString);
-                                            infowindow.open(map, markers[j]);
-                                        }
-                                    });
-                                });
-                            };
-
-                            // creation de listener qui apelle la function
-                            google.maps.event.addListener(
-                                markers[j], "click", openMarkerInfowindow
-                            );
-                        }
-                    )
+                    let closeMarkerInfowindow = function (ev) {
+                        markers[j].setAnimation(null);
+                        infowindow.close();
+                    };
+                    // creation de listener qui apelle la function
+                    google.maps.event.addListener(
+                        markers[j], "click", openMarkerInfowindow
+                    );
+                    google.maps.event.addListener(
+                        map, "click", closeMarkerInfowindow
+                    );
                 })
+            })
+        })
+    }
+
+    function updateBouncingMarkers() {
+        const playerLoc = new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]);
+        $.each(markers, function (i, marker) {
+            if (google.maps.geometry.spherical.computeDistanceBetween(markers[i].position, playerLoc) <= 50) {
+                markers[i].setAnimation(google.maps.Animation.BOUNCE);
+            } else {
+                markers[i].setAnimation(null);
             }
-        )
+        })
     }
 
     function refreshLocation() {
@@ -681,8 +701,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     lng: position.coords.longitude
                 };
                 PlayerData["marker"].setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+                updateBouncingMarkers();
 
-                //setTimeout(refreshLocation, 1000);
+                setTimeout(refreshLocation, 1000);
             }, function() {
                 handleLocationError(true);
             });
