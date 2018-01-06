@@ -339,43 +339,43 @@ class Geomarcheur extends CI_Controller
             $this->redirect_after_login($_SESSION['is_admin']);
         }
 
-        // The run function will fail if there's no data to validate
-        // (i.e., the form has not been filled out yet, or not correctly)
-        if ($this->form_validation->run() == FALSE) {
-            if (isset($_SESSION['logged_in'])) {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            // The run function will fail if there's no data to validate
+            // (i.e., the form has not been filled out yet, or not correctly)
+            if ($this->form_validation->run() == FALSE) {
                 http_response_code(400);
-                $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with invalid credentials.");
+                $this->logger(LogType::WARNING, __FUNCTION__ . ": Someone attempted to log in with invalid credentials.");
                 echo "L'identifiant ou mot de passe est invalide.";
                 exit();
             } else {
-                $this->load->view('login_view');
+                // Retrieve the data from the POST array
+                $data = array(
+                    'username' => $this->input->post('username'),
+                    'password' => $this->input->post('password')
+                );
+
+                // Call to the login model function
+                // Assuming the data received is safe (TODO: Assume it is not)
+                $is_login_valid = $this->geomarcheur_db->login($data);
+
+                if ($is_login_valid) {
+                    http_response_code(200);
+                    // Add user data in session
+                    $this->session->set_userdata('logged_in', true);
+                    $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
+                    $this->session->set_userdata('user_id', $is_login_valid[0]->id);
+                    $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
+
+                    $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $data['username'] . " logged in successfully.");
+                    $this->redirect_after_login($_SESSION['is_admin']);
+                } else {
+                    $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
+                    http_response_code(401);
+                    echo "L'identifiant ou mot de passe est erroné.";
+                }
             }
         } else {
-            // Retrieve the data from the POST array
-            $data = array(
-                'username' => $this->input->post('username'),
-                'password' => $this->input->post('password')
-            );
-
-            // Call to the login model function
-            // Assuming the data received is safe (TODO: Assume it is not)
-            $is_login_valid = $this->geomarcheur_db->login($data);
-
-            if ($is_login_valid) {
-                http_response_code(200);
-                // Add user data in session
-                $this->session->set_userdata('logged_in', true);
-                $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
-                $this->session->set_userdata('user_id', $is_login_valid[0]->id);
-                $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
-
-                $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $data['username'] . " logged in successfully.");
-                $this->redirect_after_login($_SESSION['is_admin']);
-            } else {
-                $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
-                http_response_code(401);
-                echo "L'identifiant ou mot de passe est erroné.";
-            }
+            $this->load->view('login_view');
         }
     }
 
