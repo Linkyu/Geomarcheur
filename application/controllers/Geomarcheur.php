@@ -5,6 +5,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Geomarcheur extends CI_Controller
 {
+    function __construct()
+    {
+        parent:: __construct();
+        // Load helpers
+        $this->load->helper('form');
+        $this->load->library('form_validation');
+        $this->load->library('session');
+
+        // Load database
+        $this->load->model('geomarcheur_db');
+    }
 
     /**
      * Index Page for this controller.
@@ -21,18 +32,6 @@ class Geomarcheur extends CI_Controller
      * map to /index.php/welcome/<method_name>
      * @see https://codeigniter.com/user_guide/general/urls.html
      */
-    function __construct()
-    {
-        parent:: __construct();
-        // Load helpers
-        $this->load->helper('form');
-        $this->load->library('form_validation');
-        $this->load->library('session');
-
-        // Load database
-        $this->load->model('geomarcheur_db');
-    }
-
     public function index()
     {
         $this->login();
@@ -112,6 +111,7 @@ class Geomarcheur extends CI_Controller
         header("Content-Type: application/json");
         echo json_encode($rank);
     }
+
     private function getUserPosition($user_id, $list) {
         foreach ($list as $position => $user) {
             // TODO: Handle ties
@@ -247,6 +247,56 @@ class Geomarcheur extends CI_Controller
         echo "Profile modified.";
     }
 
+    public function givePoint() {
+        if ($this->input->server('REQUEST_METHOD') != 'POST') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
+            http_response_code(400);
+            echo "Wrong method. Please use POST.";
+            exit();
+        }
+
+        $data['placeId'] = $this->input->post('placeId');
+        $data['userId'] = $this->input->post('userId');
+
+        if ($data['placeId'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no placeId parameter.");
+            http_response_code(401);
+            echo "Missing parameter: placeId.";
+            exit();
+        }
+        if ($data['userId'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no userId parameter.");
+            http_response_code(401);
+            echo "Missing parameter: userId.";
+            exit();
+        }
+
+        // Check when was the last passage in this place; if never, then it is now
+        $last_passage = $this->geomarcheur_db->get_last_passage($data);
+        $passage_date = $last_passage != null ? DateTime::CreateFromFormat('Y-m-d H:i:s', $last_passage) : new DateTime();
+        $passage_date = $passage_date->getTimestamp();
+
+        $now_date = new DateTime();
+        $now_date = $now_date->getTimestamp();
+        $max_passage_delay = 30 * 60;
+        $current_passage_delay = $now_date - $passage_date;
+
+        // TODO: Change the second half of the condition for better sustainability
+        if ($current_passage_delay > $max_passage_delay or $current_passage_delay == 0){
+            $result = $this->geomarcheur_db->give_point($data);
+            // TODO: Add more infos in these logs
+            $this->logger(LogType::DEBUG, __FUNCTION__ . ": User " . $data['userId'] . " gave a point to the owner of place #" . $data["placeId"] . ".");
+            http_response_code(200);
+            echo "Point given.";
+            exit();
+        }
+
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": User " . $data['userId'] . " passed by place #" . $data["placeId"] . " but didn't give a point to the owner because the delay has not yet expired [" . $current_passage_delay . "s restantes]");
+        http_response_code(200);
+        echo "Point already given.";
+        exit();
+    }
+
     // Identification functions
     public function login()
     {
@@ -326,6 +376,9 @@ class Geomarcheur extends CI_Controller
     */
 
 
+    /**
+     * @deprecated See editProfile()
+     */
     public function modify_profile() {
 
         $aDatas['id'] = $this->input->post('id');
