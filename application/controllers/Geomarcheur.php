@@ -64,11 +64,6 @@ class Geomarcheur extends CI_Controller
     }
 
 
-
-
-
-
-
     public function getPlace()
     {
         $place_id = $this->uri->segment(3);
@@ -118,7 +113,8 @@ class Geomarcheur extends CI_Controller
         echo json_encode($rank);
     }
 
-    private function getUserPosition($user_id, $list) {
+    private function getUserPosition($user_id, $list)
+    {
         foreach ($list as $position => $user) {
             // TODO: Handle ties
             if ($user['id'] === $user_id) {
@@ -149,8 +145,8 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-
-    public function manage_ban()
+    // TODO: Log this
+    public function toggleBan()
     {
         $user_id = $this->input->get('idUser');
 
@@ -159,34 +155,28 @@ class Geomarcheur extends CI_Controller
             $is_banned = $value['is_banned'];
         }
         $datas['user_id'] = $user_id;
-               if ($is_banned == 1) {
-                $datas['is_banned'] = 0;
-                   $this->geomarcheur_db->manage_ban($datas);
-                   return $is_banned = 0;
-               } else {
-                   $datas['is_banned'] = 1;
-                   $this->geomarcheur_db->manage_ban($datas);
-                   return $is_banned = 1;
-               }
+        if ($is_banned == 1) {
+            $datas['is_banned'] = 0;
+            $this->geomarcheur_db->toggleBan($datas);
+            return $is_banned = 0;
+        } else {
+            $datas['is_banned'] = 1;
+            $this->geomarcheur_db->toggleBan($datas);
+            return $is_banned = 1;
+        }
 
     }
 
-
-
-
-
-
-
-
-
-    public function disablePlace() {
+    public function disablePlace()
+    {
         // TODO: Switch this to use POST instead
         // TODO: Log this
         $place_id = $this->input->get('id');
         $this->geomarcheur_db->disable_place($place_id);
     }
 
-    public function editPlace() {
+    public function editPlace()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -225,7 +215,8 @@ class Geomarcheur extends CI_Controller
     }
 
     // TODO: Polymorph this with editPlace, or at least DRY it up a little
-    public function createPlace() {
+    public function createPlace()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -258,7 +249,8 @@ class Geomarcheur extends CI_Controller
         echo "Place created.";
     }
 
-    public function editProfile() {
+    public function editProfile()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -283,7 +275,8 @@ class Geomarcheur extends CI_Controller
         echo "Profile modified.";
     }
 
-    public function givePoint() {
+    public function givePoint()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -318,7 +311,7 @@ class Geomarcheur extends CI_Controller
         $current_passage_delay = $now_date - $passage_date;
 
         // TODO: Change the second half of the condition for better sustainability
-        if ($current_passage_delay > $max_passage_delay or $current_passage_delay == 0){
+        if ($current_passage_delay > $max_passage_delay or $current_passage_delay == 0) {
             $result = $this->geomarcheur_db->give_point($data);
             // TODO: Add more infos in these logs
             $this->logger(LogType::DEBUG, __FUNCTION__ . ": User " . $data['userId'] . " gave a point to the owner of place #" . $data["placeId"] . ".");
@@ -384,7 +377,8 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    private function redirect_after_login($is_admin) {
+    private function redirect_after_login($is_admin)
+    {
         if ($is_admin) {
             $this->dashboard();
         } else {
@@ -392,7 +386,8 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    public function logout () {
+    public function logout()
+    {
         $username = $_SESSION['user'];
         // Removing session data
         session_destroy();
@@ -403,19 +398,20 @@ class Geomarcheur extends CI_Controller
     }
 
 
-/*
-    public function disablePlace() {
+    /*
+        public function disablePlace() {
 
-        $place_id = $this->input->get('id');
-        $this->geomarcheur_db->disable_place($place_id);
-    }
-    */
+            $place_id = $this->input->get('id');
+            $this->geomarcheur_db->disable_place($place_id);
+        }
+        */
 
 
     /**
      * @deprecated See editProfile()
      */
-    public function modify_profile() {
+    public function modify_profile()
+    {
 
         $aDatas['id'] = $this->input->post('id');
         $aDatas['pseudo'] = $this->input->post('pseudo');
@@ -434,10 +430,11 @@ class Geomarcheur extends CI_Controller
      * WARNING messages are when there is a non-blocking error.<br />
      * ERROR messages are ONLY for blocking errors that prevent the server from performing its given task.
      *
-     * @param $type: The log type determined in @class LogType
-     * @param $message: The message to write in the log
+     * @param $type : The log type determined in @class LogType
+     * @param $message : The message to write in the log
      */
-    private function logger($type, $message){
+    private function logger($type, $message)
+    {
         $log_dir = "./application/logs/" . date("Y-m-d") . "/";
         $handler = null;
 
@@ -451,25 +448,25 @@ class Geomarcheur extends CI_Controller
         if ($type === LogType::DEBUG) {
             $filename = $log_dir . date("Y-m-d") . "_DEBUG.log";
             if (!file_exists($filename)) {
-                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+                $handler = fopen($filename, 'w') or die('Cannot create file: ' . $filename); //implicitly creates file
             }
-            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $handler = fopen($filename, 'a') or die('Cannot open file: ' . $filename);
             $data = $this->log_format($type, $message);
             fwrite($handler, $data);
         } elseif ($type === LogType::WARNING) {
             $filename = $log_dir . date("Y-m-d") . "_WARNING.log";
             if (!file_exists($filename)) {
-                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+                $handler = fopen($filename, 'w') or die('Cannot create file: ' . $filename); //implicitly creates file
             }
-            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $handler = fopen($filename, 'a') or die('Cannot open file: ' . $filename);
             $data = $this->log_format($type, $message);
             fwrite($handler, $data);
         } elseif ($type === LogType::ERROR) {
             $filename = $log_dir . date("Y-m-d") . "_ERROR.log";
             if (!file_exists($filename)) {
-                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+                $handler = fopen($filename, 'w') or die('Cannot create file: ' . $filename); //implicitly creates file
             }
-            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $handler = fopen($filename, 'a') or die('Cannot open file: ' . $filename);
             $data = $this->log_format($type, $message);
             fwrite($handler, $data);
         } else {
@@ -483,7 +480,8 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    private function log_format($type, $message) {
+    private function log_format($type, $message)
+    {
         if ($type === LogType::DEBUG) {
             return date("[h:i:s] ") . "[DEBUG] " . $message . "\r\n";
         } elseif ($type === LogType::WARNING) {
@@ -501,8 +499,8 @@ class Geomarcheur extends CI_Controller
 }
 
 
-
-abstract class LogType {
+abstract class LogType
+{
     const DEBUG = 0;
     const WARNING = 1;
     const ERROR = 2;
