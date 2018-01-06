@@ -387,7 +387,7 @@
         <div class="modal-footer">
             <a class="waves-effect waves-light btn-large btn-flat indigo-text text-darken-4" onclick="editProfile()"><i
                         class="material-icons">edit</i> Sauvegarder les changements</a>
-            <a class="waves-effect waves-light btn-large red">Bannir</a>
+            <a class="waves-effect waves-light btn-large red" onclick="manage_ban()" ><span id="ban_button_message"></span></a>
             <a href="#!" class="modal-action modal-close waves-effect btn-large btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
         </div>
@@ -1027,6 +1027,16 @@
                     $("#player_id").html(user.id);
                     // TODO : recupérer la photo des joueurs
 
+                    //si ban = 0
+                    if (user.is_banned === 0) {
+                        $("#ban_button_message").html("Bannir");
+                    } else {
+                        $("#ban_button_message").html("Débannir");
+                    }
+
+
+
+
 
                     //users_detail_modal.append(`
                     //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
@@ -1088,6 +1098,22 @@
             }
         });
     }
+
+    function manage_ban() {
+        // TODO: Change this to POST
+        if (confirm("Voulez vous bannir le joueur ?")) {
+            $.ajax({
+                url: "manage_ban",
+                type: "GET",
+                data: {
+                    idUser: idUser
+                }
+            }).done(function () {
+                users_detail_modal.modal('close');
+            });
+        }
+    }
+
 
 </script>
 

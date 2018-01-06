@@ -100,6 +100,15 @@ class Geomarcheur_db extends CI_Model
         return array($refund_query, $sell_place_query);
     }
 
+    public function manage_ban($datas) {
+        $this->load->database();
+        $ban_management = $this->db->query('UPDATE user SET is_banned = ' . ($datas["is_banned"]) . ' WHERE id=' . ($datas["user_id"]));
+
+
+    }
+
+
+
     public function login($data)
     {
         $username = $data['username'];

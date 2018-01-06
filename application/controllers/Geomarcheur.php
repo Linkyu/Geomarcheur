@@ -63,6 +63,12 @@ class Geomarcheur extends CI_Controller
         echo json_encode($data);
     }
 
+
+
+
+
+
+
     public function getPlace()
     {
         $place_id = $this->uri->segment(3);
@@ -142,6 +148,36 @@ class Geomarcheur extends CI_Controller
             exit();
         }
     }
+
+
+    public function manage_ban()
+    {
+        $user_id = $this->input->get('idUser');
+
+        $datas['resultat'] = $this->geomarcheur_db->listUser($user_id);
+        foreach ($datas['resultat'] as $key => $value) {
+            $is_banned = $value['is_banned'];
+        }
+        $datas['user_id'] = $user_id;
+               if ($is_banned == 1) {
+                $datas['is_banned'] = 0;
+                   $this->geomarcheur_db->manage_ban($datas);
+                   return $is_banned = 0;
+               } else {
+                   $datas['is_banned'] = 1;
+                   $this->geomarcheur_db->manage_ban($datas);
+                   return $is_banned = 1;
+               }
+
+    }
+
+
+
+
+
+
+
+
 
     public function disablePlace() {
         // TODO: Switch this to use POST instead
