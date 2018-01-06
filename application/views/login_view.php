@@ -107,24 +107,29 @@ $temp_user_id = 2;
         let pass_input = $("#password");
         pass_input.attr('type', (pass_input.attr('type') === "password" ? "text" : "password"));
     }
-    function login(event) {
+
+    function login() {
         let error_bar = $("#error_bar");
         error_bar.find(".text").html("");
         error_bar.addClass("hide");
 
-        if ($("#username").val() == "" || $("#password").val() == "") {
-            alert("Veuillez remplir les deux champs.");
+        const username_input = $("#password").val();
+        const password_input = $("#username").val();
+
+        if (username_input === "" || password_input === "") {
+            error_bar.find(".text").html("Veuillez remplir les deux champs.");
+            error_bar.removeClass("hide");
         } else {
 
              $.ajax({
                  type: "POST",
                  url: "login/",
                  data: {
-                     username: $("#username").val(),
-                     password: $("#password").val()
+                     username: username_input,
+                     password: password_input
                  },
                  statusCode: {
-                     200: function (data) {
+                     200: function () {
                          // TODO: Find a cleaner way?
                          location.reload();
                          // $("html").html(data); // much quicker but breaks the next page because document.ready is not called
