@@ -113,8 +113,8 @@ $temp_user_id = 2;
         error_bar.find(".text").html("");
         error_bar.addClass("hide");
 
-        const username_input = $("#password").val();
-        const password_input = $("#username").val();
+        const username_input = $("#username").val();
+        const password_input = $("#password").val();
 
         if (username_input === "" || password_input === "") {
             error_bar.find(".text").html("Veuillez remplir les deux champs.");

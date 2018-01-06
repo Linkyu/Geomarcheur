@@ -34,7 +34,11 @@ class Geomarcheur extends CI_Controller
      */
     public function index()
     {
-        $this->login();
+        if (isset($_SESSION['logged_in'])) {
+            $this->redirect_after_login($_SESSION['is_admin']);
+        } else {
+            $this->login();
+        }
     }
 
     public function player()
