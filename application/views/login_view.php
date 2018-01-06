@@ -107,35 +107,40 @@ $temp_user_id = 2;
         let pass_input = $("#password");
         pass_input.attr('type', (pass_input.attr('type') === "password" ? "text" : "password"));
     }
-    function login() {
+    function login(event) {
         let error_bar = $("#error_bar");
         error_bar.find(".text").html("");
         error_bar.addClass("hide");
 
-        $.ajax({
-            type: "POST",
-            url: "login/",
-            data: {
-                username: $("#username").val(),
-                password: $("#password").val()
-            },
-            statusCode: {
-                200: function (data) {
-                    // TODO: Find a cleaner way?
-                    location.reload();
-                    // $("html").html(data); // much quicker but breaks the next page because document.ready is not called
-                    // document.write(data) // breaks it less but still not quite functional
-                },
-                400: function (data) {
-                    error_bar.find(".text").html(data.responseText);
-                    error_bar.removeClass("hide");
-                },
-                401: function (data) {
-                    error_bar.find(".text").html(data.responseText);
-                    error_bar.removeClass("hide");
-                }
-            }
-        });
+        if ($("#username").val() == "" || $("#password").val() == "") {
+            alert("Veuillez remplir les deux champs.");
+        } else {
+
+             $.ajax({
+                 type: "POST",
+                 url: "login/",
+                 data: {
+                     username: $("#username").val(),
+                     password: $("#password").val()
+                 },
+                 statusCode: {
+                     200: function (data) {
+                         // TODO: Find a cleaner way?
+                         location.reload();
+                         // $("html").html(data); // much quicker but breaks the next page because document.ready is not called
+                         // document.write(data) // breaks it less but still not quite functional
+                     },
+                     400: function (data) {
+                         error_bar.find(".text").html(data.responseText);
+                         error_bar.removeClass("hide");
+                     },
+                     401: function (data) {
+                         error_bar.find(".text").html(data.responseText);
+                         error_bar.removeClass("hide");
+                     }
+                 }
+             })
+        }
     }
 
     $("form").on('keypress', 'input', function(event) {

@@ -173,12 +173,6 @@ class Geomarcheur extends CI_Controller
 
 
 
-
-
-
-
-
-
     public function disablePlace() {
         // TODO: Switch this to use POST instead
         // TODO: Log this
@@ -300,8 +294,10 @@ class Geomarcheur extends CI_Controller
         // (i.e., the form has not been filled out yet, or not correctly)
         if ($this->form_validation->run() == FALSE) {
             if (isset($_SESSION['logged_in'])) {
-                // TODO: This part of the logic doesn't make sense (cf. #68)
-                echo validation_errors();
+                http_response_code(400);
+                $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with invalid credentials.");
+                echo "L'identifiant ou mot de passe est invalide.";
+                exit();
             } else {
                 $this->load->view('login_view');
             }
