@@ -645,7 +645,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     // No point in creating markers if they are out of scope (be it range, ownership, or value)
                     const placeLoc = new google.maps.LatLng(place.lat, place.lng);
                     const markerDistance = google.maps.geometry.spherical.computeDistanceBetween(placeLoc, playerLoc);
-                    console.log("distance to " + place.name + ": " + markerDistance);
+                    //console.log("distance to " + place.name + ": " + markerDistance);
 
                     if (place.id_User === PlayerData['id'] ||
                         ((place.id_User !== null || (place.id_User === null && Number(place.value) <= Number(PlayerData["credits"]))) && markerDistance < 30000)) {
