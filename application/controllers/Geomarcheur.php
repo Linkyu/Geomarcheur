@@ -5,6 +5,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Geomarcheur extends CI_Controller
 {
+    function __construct()
+    {
+        parent:: __construct();
+        // Load helpers
+        $this->load->helper('form');
+        $this->load->library('form_validation');
+        $this->load->library('session');
+
+        // Load database
+        $this->load->model('geomarcheur_db');
+    }
 
     /**
      * Index Page for this controller.
@@ -21,18 +32,6 @@ class Geomarcheur extends CI_Controller
      * map to /index.php/welcome/<method_name>
      * @see https://codeigniter.com/user_guide/general/urls.html
      */
-    function __construct()
-    {
-        parent:: __construct();
-        // Load helpers
-        $this->load->helper('form');
-        $this->load->library('form_validation');
-        $this->load->library('session');
-
-        // Load database
-        $this->load->model('geomarcheur_db');
-    }
-
     public function index()
     {
         $this->login();
@@ -63,6 +62,7 @@ class Geomarcheur extends CI_Controller
         header("Content-Type: application/json");
         echo json_encode($data);
     }
+
 
     public function getPlace()
     {
@@ -112,7 +112,9 @@ class Geomarcheur extends CI_Controller
         header("Content-Type: application/json");
         echo json_encode($rank);
     }
-    private function getUserPosition($user_id, $list) {
+
+    private function getUserPosition($user_id, $list)
+    {
         foreach ($list as $position => $user) {
             // TODO: Handle ties
             if ($user['id'] === $user_id) {
@@ -143,14 +145,38 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    public function disablePlace() {
+    // TODO: Log this
+    public function toggleBan()
+    {
+        $user_id = $this->input->get('idUser');
+
+        $datas['resultat'] = $this->geomarcheur_db->listUser($user_id);
+        foreach ($datas['resultat'] as $key => $value) {
+            $is_banned = $value['is_banned'];
+        }
+        $datas['user_id'] = $user_id;
+        if ($is_banned == 1) {
+            $datas['is_banned'] = 0;
+            $this->geomarcheur_db->toggleBan($datas);
+            return $is_banned = 0;
+        } else {
+            $datas['is_banned'] = 1;
+            $this->geomarcheur_db->toggleBan($datas);
+            return $is_banned = 1;
+        }
+
+    }
+
+    public function disablePlace()
+    {
         // TODO: Switch this to use POST instead
         // TODO: Log this
         $place_id = $this->input->get('id');
         $this->geomarcheur_db->disable_place($place_id);
     }
 
-    public function editPlace() {
+    public function editPlace()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -189,7 +215,8 @@ class Geomarcheur extends CI_Controller
     }
 
     // TODO: Polymorph this with editPlace, or at least DRY it up a little
-    public function createPlace() {
+    public function createPlace()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -222,7 +249,8 @@ class Geomarcheur extends CI_Controller
         echo "Place created.";
     }
 
-    public function editProfile() {
+    public function editProfile()
+    {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
             $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
             http_response_code(400);
@@ -247,6 +275,57 @@ class Geomarcheur extends CI_Controller
         echo "Profile modified.";
     }
 
+    public function givePoint()
+    {
+        if ($this->input->server('REQUEST_METHOD') != 'POST') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with wrong method (POST was expected).");
+            http_response_code(400);
+            echo "Wrong method. Please use POST.";
+            exit();
+        }
+
+        $data['placeId'] = $this->input->post('placeId');
+        $data['userId'] = $this->input->post('userId');
+
+        if ($data['placeId'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no placeId parameter.");
+            http_response_code(401);
+            echo "Missing parameter: placeId.";
+            exit();
+        }
+        if ($data['userId'] == '') {
+            $this->logger(LogType::ERROR, __FUNCTION__ . ": Was called with no userId parameter.");
+            http_response_code(401);
+            echo "Missing parameter: userId.";
+            exit();
+        }
+
+        // Check when was the last passage in this place; if never, then it is now
+        $last_passage = $this->geomarcheur_db->get_last_passage($data);
+        $passage_date = $last_passage != null ? DateTime::CreateFromFormat('Y-m-d H:i:s', $last_passage) : new DateTime();
+        $passage_date = $passage_date->getTimestamp();
+
+        $now_date = new DateTime();
+        $now_date = $now_date->getTimestamp();
+        $max_passage_delay = 30 * 60;
+        $current_passage_delay = $now_date - $passage_date;
+
+        // TODO: Change the second half of the condition for better sustainability
+        if ($current_passage_delay > $max_passage_delay or $current_passage_delay == 0) {
+            $result = $this->geomarcheur_db->give_point($data);
+            // TODO: Add more infos in these logs
+            $this->logger(LogType::DEBUG, __FUNCTION__ . ": User " . $data['userId'] . " gave a point to the owner of place #" . $data["placeId"] . ".");
+            http_response_code(200);
+            echo "Point given.";
+            exit();
+        }
+
+        $this->logger(LogType::DEBUG, __FUNCTION__ . ": User " . $data['userId'] . " passed by place #" . $data["placeId"] . " but didn't give a point to the owner because the delay has not yet expired [" . $current_passage_delay . "s restantes]");
+        http_response_code(200);
+        echo "Point already given.";
+        exit();
+    }
+
     // Identification functions
     public function login()
     {
@@ -260,45 +339,48 @@ class Geomarcheur extends CI_Controller
             $this->redirect_after_login($_SESSION['is_admin']);
         }
 
-        // The run function will fail if there's no data to validate
-        // (i.e., the form has not been filled out yet, or not correctly)
-        if ($this->form_validation->run() == FALSE) {
-            if (isset($_SESSION['logged_in'])) {
-                // TODO: This part of the logic doesn't make sense (cf. #68)
-                echo validation_errors();
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            // The run function will fail if there's no data to validate
+            // (i.e., the form has not been filled out yet, or not correctly)
+            if ($this->form_validation->run() == FALSE) {
+                http_response_code(400);
+                $this->logger(LogType::WARNING, __FUNCTION__ . ": Someone attempted to log in with invalid credentials.");
+                echo "L'identifiant ou mot de passe est invalide.";
+                exit();
             } else {
-                $this->load->view('login_view');
+                // Retrieve the data from the POST array
+                $data = array(
+                    'username' => $this->input->post('username'),
+                    'password' => $this->input->post('password')
+                );
+
+                // Call to the login model function
+                // Assuming the data received is safe (TODO: Assume it is not)
+                $is_login_valid = $this->geomarcheur_db->login($data);
+
+                if ($is_login_valid) {
+                    http_response_code(200);
+                    // Add user data in session
+                    $this->session->set_userdata('logged_in', true);
+                    $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
+                    $this->session->set_userdata('user_id', $is_login_valid[0]->id);
+                    $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
+
+                    $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $data['username'] . " logged in successfully.");
+                    $this->redirect_after_login($_SESSION['is_admin']);
+                } else {
+                    $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
+                    http_response_code(401);
+                    echo "L'identifiant ou mot de passe est erroné.";
+                }
             }
         } else {
-            // Retrieve the data from the POST array
-            $data = array(
-                'username' => $this->input->post('username'),
-                'password' => $this->input->post('password')
-            );
-
-            // Call to the login model function
-            // Assuming the data received is safe (TODO: Assume it is not)
-            $is_login_valid = $this->geomarcheur_db->login($data);
-
-            if ($is_login_valid) {
-                http_response_code(200);
-                // Add user data in session
-                $this->session->set_userdata('logged_in', true);
-                $this->session->set_userdata('user', $is_login_valid[0]->pseudo);
-                $this->session->set_userdata('user_id', $is_login_valid[0]->id);
-                $this->session->set_userdata('is_admin', $is_login_valid[0]->is_admin);
-
-                $this->logger(LogType::DEBUG, __FUNCTION__ . ": " . $data['username'] . " logged in successfully.");
-                $this->redirect_after_login($_SESSION['is_admin']);
-            } else {
-                $this->logger(LogType::WARNING, __FUNCTION__ . ": " . $data['username'] . " attempted to log in with erroneous credentials.");
-                http_response_code(401);
-                echo "L'identifiant ou mot de passe est erroné.";
-            }
+            $this->load->view('login_view');
         }
     }
 
-    private function redirect_after_login($is_admin) {
+    private function redirect_after_login($is_admin)
+    {
         if ($is_admin) {
             $this->dashboard();
         } else {
@@ -306,7 +388,8 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    public function logout () {
+    public function logout()
+    {
         $username = $_SESSION['user'];
         // Removing session data
         session_destroy();
@@ -317,16 +400,20 @@ class Geomarcheur extends CI_Controller
     }
 
 
-/*
-    public function disablePlace() {
+    /*
+        public function disablePlace() {
 
-        $place_id = $this->input->get('id');
-        $this->geomarcheur_db->disable_place($place_id);
-    }
-    */
+            $place_id = $this->input->get('id');
+            $this->geomarcheur_db->disable_place($place_id);
+        }
+        */
 
 
-    public function modify_profile() {
+    /**
+     * @deprecated See editProfile()
+     */
+    public function modify_profile()
+    {
 
         $aDatas['id'] = $this->input->post('id');
         $aDatas['pseudo'] = $this->input->post('pseudo');
@@ -345,10 +432,11 @@ class Geomarcheur extends CI_Controller
      * WARNING messages are when there is a non-blocking error.<br />
      * ERROR messages are ONLY for blocking errors that prevent the server from performing its given task.
      *
-     * @param $type: The log type determined in @class LogType
-     * @param $message: The message to write in the log
+     * @param $type : The log type determined in @class LogType
+     * @param $message : The message to write in the log
      */
-    private function logger($type, $message){
+    private function logger($type, $message)
+    {
         $log_dir = "./application/logs/" . date("Y-m-d") . "/";
         $handler = null;
 
@@ -362,25 +450,25 @@ class Geomarcheur extends CI_Controller
         if ($type === LogType::DEBUG) {
             $filename = $log_dir . date("Y-m-d") . "_DEBUG.log";
             if (!file_exists($filename)) {
-                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+                $handler = fopen($filename, 'w') or die('Cannot create file: ' . $filename); //implicitly creates file
             }
-            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $handler = fopen($filename, 'a') or die('Cannot open file: ' . $filename);
             $data = $this->log_format($type, $message);
             fwrite($handler, $data);
         } elseif ($type === LogType::WARNING) {
             $filename = $log_dir . date("Y-m-d") . "_WARNING.log";
             if (!file_exists($filename)) {
-                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+                $handler = fopen($filename, 'w') or die('Cannot create file: ' . $filename); //implicitly creates file
             }
-            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $handler = fopen($filename, 'a') or die('Cannot open file: ' . $filename);
             $data = $this->log_format($type, $message);
             fwrite($handler, $data);
         } elseif ($type === LogType::ERROR) {
             $filename = $log_dir . date("Y-m-d") . "_ERROR.log";
             if (!file_exists($filename)) {
-                $handler = fopen($filename, 'w') or die('Cannot create file: '.$filename); //implicitly creates file
+                $handler = fopen($filename, 'w') or die('Cannot create file: ' . $filename); //implicitly creates file
             }
-            $handler = fopen($filename, 'a') or die('Cannot open file: '.$filename);
+            $handler = fopen($filename, 'a') or die('Cannot open file: ' . $filename);
             $data = $this->log_format($type, $message);
             fwrite($handler, $data);
         } else {
@@ -394,7 +482,8 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    private function log_format($type, $message) {
+    private function log_format($type, $message)
+    {
         if ($type === LogType::DEBUG) {
             return date("[h:i:s] ") . "[DEBUG] " . $message . "\r\n";
         } elseif ($type === LogType::WARNING) {
@@ -412,8 +501,8 @@ class Geomarcheur extends CI_Controller
 }
 
 
-
-abstract class LogType {
+abstract class LogType
+{
     const DEBUG = 0;
     const WARNING = 1;
     const ERROR = 2;

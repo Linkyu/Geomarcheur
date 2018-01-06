@@ -387,7 +387,8 @@
         <div class="modal-footer">
             <a class="waves-effect waves-light btn-large btn-flat indigo-text text-darken-4" onclick="editProfile()"><i
                         class="material-icons">edit</i> Sauvegarder les changements</a>
-            <a class="waves-effect waves-light btn-large red">Bannir</a>
+            <a class="waves-effect waves-light btn-large red" onclick="toggleBan()"><span
+                        id="ban_button_message"></span></a>
             <a href="#!" class="modal-action modal-close waves-effect btn-large btn-flat pink-text text-darken-3"
                onclick="idPlace = '';">Retour</a>
         </div>
@@ -425,7 +426,8 @@
 
 <script src="<?php echo base_url(); ?>static/js/materialize.min.js"></script>
 <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?language=fr-FR&key=<?php echo GOOGLE_API_KEY ?>&libraries=places" type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?language=fr-FR&key=<?php echo GOOGLE_API_KEY ?>&libraries=places"
+        type="text/javascript"></script>
 
 <!-- Snazzy plugin -->
 <script src="<?php echo base_url(); ?>static/js/snazzy-info-window/snazzy-info-window.min.js"></script>
@@ -477,11 +479,11 @@
     }
 </script>
 
-    <!-- DataTables API -->
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+<!-- DataTables API -->
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
 
-    <!-- Custom tools -->
-    <script src="<?php echo base_url(); ?>static/js/utils.js"></script>
+<!-- Custom tools -->
+<script src="<?php echo base_url(); ?>static/js/utils.js"></script>
 
 <!-- Custom local scripts -->
 <script>
@@ -657,8 +659,8 @@
     //let infowindow = new SnazzyInfoWindow();
     const marker_icon = {
         url: "<?php echo base_url(); ?>static/img/pin.svg",
-        anchor: new google.maps.Point(25,50),
-        scaledSize: new google.maps.Size(50,50)
+        anchor: new google.maps.Point(25, 50),
+        scaledSize: new google.maps.Size(50, 50)
     };
 
     // Set the place markers on the map
@@ -699,19 +701,19 @@
     dashboard_map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
     // Bias the SearchBox results towards current map's viewport.
-    dashboard_map.addListener('bounds_changed', function() {
+    dashboard_map.addListener('bounds_changed', function () {
         searchBox.setBounds(dashboard_map.getBounds());
     });
 
     let search_markers = [];
     const search_marker_icon = {
         url: "<?php echo base_url(); ?>static/img/search_pin.svg",
-        anchor: new google.maps.Point(25,50),
-        scaledSize: new google.maps.Size(50,50)
+        anchor: new google.maps.Point(25, 50),
+        scaledSize: new google.maps.Size(50, 50)
     };
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
-    searchBox.addListener('places_changed', function() {
+    searchBox.addListener('places_changed', function () {
         let places = searchBox.getPlaces();
 
         if (places.length === 0) {
@@ -719,14 +721,14 @@
         }
 
         // Clear out the old markers.
-        search_markers.forEach(function(marker) {
+        search_markers.forEach(function (marker) {
             marker.setMap(null);
         });
         search_markers = [];
 
         // For each place, get the icon, name and location.
         let bounds = new google.maps.LatLngBounds();
-        places.forEach(function(place, i) {
+        places.forEach(function (place, i) {
             if (!place.geometry) {
                 console.log("Returned place contains no geometry");
                 return;
@@ -774,8 +776,6 @@
         });
         dashboard_map.fitBounds(bounds);
     });
-
-
 
 
     function createPlace(place_id) {
@@ -838,7 +838,7 @@
     }
 
     // Place details display
-    function display_place(id, create=false) {
+    function display_place(id, create = false) {
         // TODO: Solve "TypeError: document.getElementById(...) is null". See issue #48
         const place_modal = $("#place_modal");
 
@@ -999,7 +999,7 @@
             {data: "credits"},
             {data: "is_admin"}    // TODO: Change this to display the actual amount of places owned (probably a callback)
         ],
-            "order": [[ 2, "desc" ]]
+        "order": [[2, "desc"]]
 
     });
 
@@ -1027,6 +1027,13 @@
                     $("#player_id").html(user.id);
                     // TODO : recupérer la photo des joueurs
 
+                    //si ban = 0
+                    if (user.is_banned === '0') {
+                        $("#ban_button_message").html("Bannir");
+                    } else {
+                        $("#ban_button_message").html("Débannir");
+                    }
+
 
                     //users_detail_modal.append(`
                     //<p>Nom de l'utilisateur : ` + user.pseudo + ` </p>
@@ -1049,9 +1056,9 @@
                             texte = "Aucun lieu."
                         });
 
-                            texte += "</ul>";
-                            $("#player_places").html(texte);
-                            $("#player_number_place").html(result.length);
+                        texte += "</ul>";
+                        $("#player_places").html(texte);
+                        $("#player_number_place").html(result.length);
 
                     });
                     users_detail_modal.modal('open');
@@ -1088,6 +1095,24 @@
             }
         });
     }
+
+    function toggleBan() {
+        // TODO: Change this to POST
+        // TODO: Adapt the message for both banning and unbanning
+        // TODO: Refresh leaderboard
+        if (confirm("Voulez vous bannir " + $("#player_name").text() + " ?")) {
+            $.ajax({
+                url: "toggleBan",
+                type: "GET",
+                data: {
+                    idUser: idUser
+                }
+            }).done(function () {
+                users_detail_modal.modal('close');
+            });
+        }
+    }
+
 
 </script>
 
