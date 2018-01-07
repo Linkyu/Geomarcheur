@@ -239,7 +239,7 @@
         <!-- Stats -->
         <div class="col s6">
             <div class="card-panel hoverable">
-                <canvas id="linechart_material"></canvas>
+                <canvas id="dashboard_chart"></canvas>
             </div>
         </div>
     </div>
@@ -490,42 +490,44 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js" integrity="sha256-vyehT44mCOPZg7SbqfOZ0HNYXjPKgBCaqxBkW3lh6bg=" crossorigin="anonymous"></script>
 <!-- Main -->
 <script>
-    let ctx = $("#linechart_material");
-    let main_chart = myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
+    let ctx = $("#dashboard_chart");
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        let chart1_players = [];
+        let chart1_player_credit_count = [];
+        let chart1_player_color = [];
+        let chart1_player_color_border = [];
+        $.each(data.resultat, function (i, player) {
+            chart1_players.push(player["pseudo"]);
+            chart1_player_credit_count.push(player["credits"]);
+            chart1_player_color.push(stringToHSL(player["pseudo"], .4));
+            chart1_player_color_border.push(stringToHSL(player["pseudo"]));
+        });
+
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chart1_players,
+                datasets: [{
+                    label: '# of credits',
+                    data: chart1_player_credit_count,
+                    backgroundColor: chart1_player_color,
+                    borderColor: chart1_player_color_border,
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
             }
-        }
+        });
     });
 </script>
 <!-- Headers -->
@@ -565,87 +567,99 @@
 <!-- 1 -->
 <script>
     let ctx1 = $("#dashboard_chart_1");
-    let chart1 = myChart = new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        let chart1_players = [];
+        let chart1_player_credit_count = [];
+        let chart1_player_color = [];
+        let chart1_player_color_border = [];
+        $.each(data.resultat, function (i, player) {
+            chart1_players.push(player["pseudo"]);
+            chart1_player_credit_count.push(player["credits"]);
+            chart1_player_color.push(stringToHSL(player["pseudo"], .4));
+            chart1_player_color_border.push(stringToHSL(player["pseudo"]));
+        });
+
+        let chart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: chart1_players,
+                datasets: [{
+                    label: '# of credits',
+                    data: chart1_player_credit_count,
+                    backgroundColor: chart1_player_color,
+                    borderColor: chart1_player_color_border,
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
             }
-        }
+        });
     });
 </script>
 <!-- 2 -->
 <script>
     let ctx2 = $("#dashboard_chart_2");
-    let chart2 = myChart = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        let chart2_player_place_count = [];
+        $.each(data.resultat, function (player) {
+            chart2_player_place_count[player["pseudo"]] = player["places"];
+        });
+
+        let chart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
             }
-        }
+        });
     });
 </script>
 <!-- 3 -->
 <script>
     let ctx3 = $("#dashboard_chart_3");
-    let chart3 = myChart = new Chart(ctx3, {
+    let chart3 = new Chart(ctx3, {
         type: 'bar',
         data: {
             labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
