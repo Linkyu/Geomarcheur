@@ -413,7 +413,7 @@
 <div id="statistics">
     <nav>
         <div class="nav-wrapper pink darken-3 row" id="stat_navbar">
-            <span class="col s4 center" ><span id="stat_global_places">X/Y</span> lieux</span>
+            <span class="col s4 center" ><span id="stat_global_places">X/Y</span> lieux possédés</span>
             <span class="col s4 center" ><span id="stat_global_credits">xxx</span> crédits en jeu</span>
             <span class="col s4 center" ><span id="stat_global_players">XY</span> joueurs</span>
         </div>
@@ -552,6 +552,14 @@
         type: "GET"
     }).done(function (data) {
         $("#stat_global_credits").text(data);
+    });
+
+    // Player counter
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        $("#stat_global_players").text(data.resultat.length);
     });
 </script>
 <!-- 1 -->
