@@ -690,7 +690,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 get_user(PlayerData['id'], function (player) {
                                     // Determine the action on this place
                                     if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                        action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                        action = "<a href='#' id='buy-button' onclick='buyplace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
+
                                     } else if (PlayerData['id'] === place.id_User) {
                                         action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
                                     }
@@ -714,7 +715,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         '</div>' +
                                         '</div>' +
                                         '</div>';
-
                                     map.panTo(markers[place.place_id].position);
                                     infowindow.setContent(contentString);
                                     infowindow.open(map, markers[place.place_id]);
@@ -971,13 +971,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }).done(function () {
 
             let profile_modal = $('#profile_modal');
-
             profile_modal.modal('close');
         });
     }
 
-    function check_form(value) {
-        console.log(value);
+    function buyplace(idPlace) {
+        if (confirm("Êtes-vous sûr?")) {
+            let idUser = '<?php echo $_SESSION['user_id'] ?>';
+
+             $.ajax({
+                url: "buyPlace/",
+                type: "GET",
+                data: {
+                    idUser: idUser, idPlace: idPlace
+                },
+                success: function () {
+                    alert("Achat effectué !");
+                },
+                error: function () {
+                    alert("Erreur de l'achat !");
+                }
+            }).done(function () {
+                 //marker[0].infowindow.close();
+
+
+                 //refreshMarkers(player_map);
+                 //refreshRanking();
+                 //refreshCredits();
+                 //logguer l'action
+            });
+
+
+        }
     }
 
 

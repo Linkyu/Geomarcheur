@@ -403,6 +403,16 @@ class Geomarcheur extends CI_Controller
         $this->load->view('login_view', $data);   // TODO: Process the exit message
     }
 
+    public function buyPlace() {
+        $user_id = $this->input->get('idUser');
+        $place_id = $this->input->get('idPlace');
+
+        $this->logger(DEBUG, "Joueur '$user_id' à acheté le lieu '$place_id'");
+
+
+        $this->geomarcheur_db->buy_place($user_id, $place_id);
+    }
+
 
     /*
         public function disablePlace() {
