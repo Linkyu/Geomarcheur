@@ -690,7 +690,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 get_user(PlayerData['id'], function (player) {
                                     // Determine the action on this place
                                     if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                        action = "<a href='#' class='btn waves-effect pink darken-3'>Acheter</a>";
+                                        action = "<a href='#' id='buy-button' onclick='buyPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
+
                                     } else if (PlayerData['id'] === place.id_User) {
                                         action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
                                     }
@@ -714,7 +715,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         '</div>' +
                                         '</div>' +
                                         '</div>';
-
                                     map.panTo(markers[place.place_id].position);
                                     infowindow.setContent(contentString);
                                     infowindow.open(map, markers[place.place_id]);
@@ -971,13 +971,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }).done(function () {
 
             let profile_modal = $('#profile_modal');
-
             profile_modal.modal('close');
         });
     }
 
-    function check_form(value) {
-        console.log(value);
+    function buyPlace(idPlace) {
+        if (confirm("Êtes-vous sûr?")) {
+             $.ajax({
+                url: "buyPlace/",
+                type: "GET",
+                data: {
+                    idUser: PlayerData["id"],
+                    idPlace: idPlace
+                },
+                success: function () {
+                    alert("Achat effectué !");
+                },
+                error: function () {
+                    alert("Erreur lors de l'achat !");
+                }
+            });
+        }
     }
 
 

@@ -182,6 +182,24 @@ class Geomarcheur_db extends CI_Model
         $query = $this->db->query("UPDATE place SET name=" . $name . ", address=" . $address . ", value=" . $value . " WHERE id=" . $place['id']);
     }
 
+
+
+
+    public function buy_place($user_id, $place_id)
+    {
+        $this->load->database();
+
+        $query = $this->db->query("UPDATE place SET id_User = ". $user_id ." WHERE id = " . $place_id ) ;
+
+        $query = $this->db->query("SELECT value FROM place WHERE id='" . $place_id . "'");
+        $row = $query->row();
+        $value = $row->value;
+
+        $query = $this->db->query("UPDATE user SET credits = credits - '" . $value . "'  WHERE id=" . $user_id);
+
+    }
+
+
     public function create_place($place)
     {
         $this->load->database();
