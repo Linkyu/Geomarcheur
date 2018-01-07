@@ -587,7 +587,7 @@
             data: {
                 labels: chart1_players,
                 datasets: [{
-                    label: '# of credits',
+                    label: '# de crédits',
                     data: chart1_player_credit_count,
                     backgroundColor: chart1_player_color,
                     borderColor: chart1_player_color_border,
@@ -617,7 +617,6 @@
         let chart2_player_place_count = [];
         let chart2_player_color = [];
         let chart2_player_color_border = [];
-        let chart2_queries = [];
         $.each(data, function a(i, player) {
             chart2_players.push(player["pseudo"]);
             chart2_player_color.push(stringToHSLA(player["pseudo"], .4));
@@ -626,110 +625,114 @@
         });
 
 
-        $.when(chart2_queries).done(function () {
-            let chart2 = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: chart2_players,
-                    datasets: [{
-                        label: '# of places',
-                        data: chart2_player_place_count,
-                        backgroundColor: chart2_player_color,
-                        borderColor: chart2_player_color_border,
-                        borderWidth: 1
+        let chart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: chart2_players,
+                datasets: [{
+                    label: '# de lieux',
+                    data: chart2_player_place_count,
+                    backgroundColor: chart2_player_color,
+                    borderColor: chart2_player_color_border,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
                     }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero:true
-                            }
-                        }]
-                    }
                 }
-            })
-        });
+            }
+        })
     });
 </script>
 <!-- 3 -->
 <script>
     let ctx3 = $("#dashboard_chart_3");
+    $.ajax({
+        url: "getPlacesPassages",
+        type: "GET"
+    }).done(function (data) {
+        let chart3_places = [];
+        let chart3_place_place_count = [];
+        let chart3_place_color = [];
+        let chart3_place_color_border = [];
+        $.each(data, function a(i, place) {
+            chart3_places.push(place["name"]);
+            chart3_place_color.push(stringToHSLA(place["name"], .4));
+            chart3_place_color_border.push(stringToHSLA(place["name"]));
+            chart3_place_place_count.push(place["passages"]);
+        });
+
+
     let chart3 = new Chart(ctx3, {
-        type: 'bar',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
+            type: 'bar',
+            data: {
+                labels: chart3_places,
+                datasets: [{
+                    label: '# de passages par lieu',
+                    data: chart3_place_place_count,
+                    backgroundColor: chart3_place_color,
+                    borderColor: chart3_place_color_border,
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
             }
-        }
+        })
     });
 </script>
 <!-- 4 -->
 <script>
     let ctx4 = $("#dashboard_chart_4");
-    let chart4 = myChart = new Chart(ctx4, {
-        type: 'bar',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
+    $.ajax({
+        url: "getPlayersPassages",
+        type: "GET"
+    }).done(function (data) {
+        let chart4_players = [];
+        let chart4_player_passage_count = [];
+        let chart4_player_color = [];
+        let chart4_player_color_border = [];
+        $.each(data, function a(i, place) {
+            chart4_players.push(place["pseudo"]);
+            chart4_player_color.push(stringToHSLA(place["pseudo"], .4));
+            chart4_player_color_border.push(stringToHSLA(place["pseudo"]));
+            chart4_player_passage_count.push(place["passages"]);
+        });
+
+
+        let chart4 = new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: chart4_players,
+                datasets: [{
+                    label: '# de passages par joueur',
+                    data: chart4_player_passage_count,
+                    backgroundColor: chart4_player_color,
+                    borderColor: chart4_player_color_border,
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
             }
-        }
+        })
     });
 </script>
 

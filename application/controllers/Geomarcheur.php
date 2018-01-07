@@ -111,6 +111,22 @@ class Geomarcheur extends CI_Controller
         echo json_encode($data);
     }
 
+    public function getPlacesPassages()
+    {
+        $data = $this->geomarcheur_db->listPlacePassages();
+
+        header("Content-Type: application/json");
+        echo json_encode($data);
+    }
+
+    public function getPlayersPassages()
+    {
+        $data = $this->geomarcheur_db->listPlayerPassages();
+
+        header("Content-Type: application/json");
+        echo json_encode($data);
+    }
+
     public function getUserRank()
     {
         $user_id = $this->uri->segment(3);

@@ -60,6 +60,20 @@ class Geomarcheur_db extends CI_Model
         return $query->result_array();
     }
 
+    public function listPlacePassages()
+    {
+        $this->load->database();
+        $query = $this->db->query("SELECT name, COUNT(event_type) as passages FROM place, log WHERE place.id = log.id_Place AND event_type = '2' GROUP BY name");
+        return $query->result_array();
+    }
+
+    public function listPlayerPassages()
+    {
+        $this->load->database();
+        $query = $this->db->query("SELECT pseudo, COUNT(event_type) as passages FROM log, user WHERE user.id = log.id_User AND event_type = '2' GROUP BY pseudo");
+        return $query->result_array();
+    }
+
     public function get_last_passage($data)
     {
         $this->load->database();
