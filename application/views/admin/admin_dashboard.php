@@ -502,8 +502,8 @@
         $.each(data.resultat, function (i, player) {
             chart1_players.push(player["pseudo"]);
             chart1_player_credit_count.push(player["credits"]);
-            chart1_player_color.push(stringToHSL(player["pseudo"], .4));
-            chart1_player_color_border.push(stringToHSL(player["pseudo"]));
+            chart1_player_color.push(stringToHSLA(player["pseudo"], .4));
+            chart1_player_color_border.push(stringToHSLA(player["pseudo"]));
         });
 
         let chart = new Chart(ctx, {
@@ -578,8 +578,8 @@
         $.each(data.resultat, function (i, player) {
             chart1_players.push(player["pseudo"]);
             chart1_player_credit_count.push(player["credits"]);
-            chart1_player_color.push(stringToHSL(player["pseudo"], .4));
-            chart1_player_color_border.push(stringToHSL(player["pseudo"]));
+            chart1_player_color.push(stringToHSLA(player["pseudo"], .4));
+            chart1_player_color_border.push(stringToHSLA(player["pseudo"]));
         });
 
         let chart1 = new Chart(ctx1, {
@@ -610,49 +610,45 @@
 <script>
     let ctx2 = $("#dashboard_chart_2");
     $.ajax({
-        url: "getUser",
+        url: "getUsersPlaceCount",
         type: "GET"
     }).done(function (data) {
+        let chart2_players = [];
         let chart2_player_place_count = [];
-        $.each(data.resultat, function (player) {
-            chart2_player_place_count[player["pseudo"]] = player["places"];
+        let chart2_player_color = [];
+        let chart2_player_color_border = [];
+        let chart2_queries = [];
+        $.each(data, function a(i, player) {
+            chart2_players.push(player["pseudo"]);
+            chart2_player_color.push(stringToHSLA(player["pseudo"], .4));
+            chart2_player_color_border.push(stringToHSLA(player["pseudo"]));
+            chart2_player_place_count.push(player["place_count"]);
         });
 
-        let chart2 = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
+
+        $.when(chart2_queries).done(function () {
+            let chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: chart2_players,
+                    datasets: [{
+                        label: '# of places',
+                        data: chart2_player_place_count,
+                        backgroundColor: chart2_player_color,
+                        borderColor: chart2_player_color_border,
+                        borderWidth: 1
                     }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    }
                 }
-            }
+            })
         });
     });
 </script>

@@ -46,6 +46,13 @@ class Geomarcheur_db extends CI_Model
         return $query->result_array();
     }
 
+    public function listUserWithPlaceCount()
+    {
+        $this->load->database();
+        $query = $this->db->query("SELECT pseudo, COUNT(place.id) AS place_count FROM place, user WHERE place.id_User = user.id GROUP BY pseudo");
+        return $query->result_array();
+    }
+
     public function listPlace($id)
     {
         $this->load->database();
@@ -75,7 +82,7 @@ class Geomarcheur_db extends CI_Model
     {
         $this->load->database();
 
-        $query = $this->db->query("SELECT SUM(credits) as credit_count FROM user");
+        $query = $this->db->query("SELECT SUM(credits) AS credit_count FROM user");
         $query_array = $query->result_array();
 
         return $query_array[0];
@@ -193,13 +200,11 @@ class Geomarcheur_db extends CI_Model
     }
 
 
-
-
     public function buy_place($user_id, $place_id)
     {
         $this->load->database();
 
-        $query = $this->db->query("UPDATE place SET id_User = ". $user_id ." WHERE id = " . $place_id ) ;
+        $query = $this->db->query("UPDATE place SET id_User = " . $user_id . " WHERE id = " . $place_id);
 
         $query = $this->db->query("SELECT value FROM place WHERE id='" . $place_id . "'");
         $row = $query->row();
