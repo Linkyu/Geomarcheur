@@ -690,8 +690,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         // Closure => création de la function au moment de la création du marqueur
                         let openMarkerInfowindow = function (ev) {
                             let action = "";
+
                             get_user(place.id_User, function (owner) {
                                 get_user(PlayerData['id'], function (player) {
+                                    let ownerId = '';
+                                    let ownerPseudo = '';
+                                    if (owner === undefined || owner === null) {
+                                        ownerId = '';
+                                        ownerPseudo = '';
+                                    } else {
+                                        ownerId = owner.id;
+                                        ownerPseudo = owner.pseudo;
+                                    }
+
                                     // Determine the action on this place
                                     if (place.id_User === null && Number(player["credits"]) >= Number(place.value) && markerDistance < 50) {
                                         action = "<a href='#' id='buy-button' onclick='buyPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
@@ -707,7 +718,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
                                         '</div>' +
                                         '<div class="row">' +
-                                        (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') + // TODO: Rewrite this; owner is still parsed by the checker at runtime
+                                        (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + ownerId + ')">' + ownerPseudo + '</span></p></div>') +
                                         '</div>' +
                                         '<div class="row"> ' +
                                         '<div class="col s6">' +
