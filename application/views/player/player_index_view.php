@@ -350,7 +350,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
     };
 
-    let markers = [];
+    let markers = {};
     let places_ids = [];
     let mapClickListenerSet = false;
 
@@ -667,19 +667,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         }
 
                         // Create the marker if it doesn't already exist
-                        if (places_ids.find(function(item){return item === place.place_id}) === undefined) {
-                            markers[place.place_id] = new google.maps.Marker(
+                        //if (places_ids.find(function(item){return item === place.place_id}) === undefined) {
+                        if (markers[place.id] === undefined) {
+                            markers[place.id] = new google.maps.Marker(
                                 {
                                     position: new google.maps.LatLng(place.lat, place.lng),
                                     title: 'Nom du lieu : ' + place.name,
                                     icon: marker_icon
                                 }
                             );
-                            markers[place.place_id].setMap(map);
-                            places_ids.push(place.place_id);
+                            markers[place.id].setMap(map);
+                            places_ids.push(place.id);
                         } else {
                             // Update the marker
-                            markers[place.place_id].setIcon(marker_icon);
+                            markers[place.id].setIcon(marker_icon);
                         }
 
 
@@ -715,21 +716,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         '</div>' +
                                         '</div>' +
                                         '</div>';
-                                    map.panTo(markers[place.place_id].position);
+                                    map.panTo(markers[place.id].position);
                                     infowindow.setContent(contentString);
-                                    infowindow.open(map, markers[place.place_id]);
+                                    infowindow.open(map, markers[place.id]);
                                 });
                             });
                         };
 
                         let closeMarkerInfowindow = function (ev) {
-                            markers[place.place_id].setAnimation(null);
+                            markers[place.id].setAnimation(null);
                             infowindow.close();
                         };
 
                         // creation de listener qui apelle la function
                         google.maps.event.addListener(
-                            markers[place.place_id], "click", openMarkerInfowindow
+                            markers[place.id], "click", openMarkerInfowindow
                         );
                         if (!mapClickListenerSet) {
                             google.maps.event.addListener(
@@ -738,8 +739,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             mapClickListenerSet = true;
                         }
                     } else {
-                        google.maps.event.clearInstanceListeners(markers[place.place_id]);
-                        eraseMarker(place.place_id);
+                        if (markers[place.id] !== undefined) {
+                            google.maps.event.clearInstanceListeners(markers[place.id]);
+                            eraseMarker(place.id);
+                        }
                     }
                 })
             })
@@ -751,6 +754,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     function updateBouncingMarkers() {
         const playerLoc = new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]);
         $.each(markers, function (i, marker) {
+            console.log(markers[i]);
+            console.log(marker);
             if (google.maps.geometry.spherical.computeDistanceBetween(markers[i].position, playerLoc) <= 50) {
                 markers[i].setAnimation(google.maps.Animation.BOUNCE);
             } else {
