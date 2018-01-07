@@ -952,10 +952,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         let quote = $("#input_profile_modal_quote").val();
         let bio = $("#input_profile_modal_bio").val();
 
-        console.log(pseudo);
-        console.log(quote);
-        console.log(bio);
-
         $.ajax({
             url: "editProfile/",
             type: "POST",

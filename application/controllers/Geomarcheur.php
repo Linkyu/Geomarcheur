@@ -383,6 +383,33 @@ class Geomarcheur extends CI_Controller
         }
     }
 
+public function check_pseudo() {
+
+    $pseudo = $this->input->post('newUsername');
+    $pseudo_exists = $this->geomarcheur_db->check_pseudo($pseudo);
+
+    if (!empty($pseudo_exists)) {
+
+    http_response_code(401);
+        echo "Le pseudo existe déjà.";
+
+    } else {
+        $password = $this->input->post('pass1');
+        $query = $this->geomarcheur_db->inscription($pseudo, $password);
+        $this->logger(LogType::DEBUG, "Joueur '$pseudo' vient de s'inscrire.");
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
     private function redirect_after_login($is_admin)
     {
         if ($is_admin) {

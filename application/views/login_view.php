@@ -57,6 +57,7 @@ $temp_user_id = 2;
             <h1 class="col m12 white-text center-align full hide-on-small-only">Géomarcheur</h1>    <!-- Desktop -->
             <h2 class="col s12 white-text center-align full hide-on-med-and-up">Géomarcheur</h2>    <!-- Mobile -->
         </div>
+
         <div class="row aanimated fadeInUp">
             <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="login/">
                 <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="error_bar">
@@ -89,9 +90,71 @@ $temp_user_id = 2;
                 </div>
             </form>
             <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" onclick="login()" class="btn right indigo darken-4 waves-effect waves-light ">Connection</a></p>
-            <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#" class="white-text underline">S'inscrire</a></p>
+            <p class="col s12 m8 l6 offset-m2 offset-l3"><a href="#inscription_modal" onclick="inscription();" class="btn right indigo darken-4 waves-effect waves-light ">S'inscrire</a></p>
+
+
+            <!-- Modal Structure -->
+            <div id="inscription_modal" class="modal">
+                <div class="modal-content">
+
+
+
+                    <main class="valign-wrapper pink darken-3">
+                        <div class="container">
+                            <div class="row">
+                                <form class="col s12 m8 l6 offset-m2 offset-l3" method="post" action="login/">
+                                    <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="error_bar_inscription">
+                                        <i class="material-icons">warning</i>
+                                        <div class="text"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-field col s12 white-text">
+                                            <i class="material-icons prefix">account_circle</i>
+                                            <input id="new_username" type="text" class="validate" autofocus>
+                                            <label for="new_username">Pseudo</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-field col s12  white-text">
+                                            <i class="material-icons prefix">lock</i>
+                                            <input id="new_password" type="password" class="validate">
+                                            <label for="new_password">Password</label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="input-field col s12  white-text">
+                                            <i class="material-icons prefix">lock</i>
+                                            <input id="new_password_confirm" type="password" class="validate">
+                                            <label for="new_password_confirm">Confirm password</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="switch col s12 white-text">
+                                            <input type="checkbox" id="showPassword" class="white-text" onclick="displayPassword()"/>
+                                            <label for="showPassword">Afficher le mot de passe</label>
+                                        </div>
+                                    </div>
+                                    <div class="warning-alert valign-wrapper z-depth-2 orange white-text row hide" id="capslock_warning">
+                                        <i class="material-icons">keyboard_capslock</i>
+                                        <div class="text">La touche Verr. Maj. est active.</div>
+                                    </div>
+                                </form>
+                                <p class="col s12 m8 l6 offset-m2"><a href="#" onclick="user_inscription()" class="btn right indigo darken-4 waves-effect waves-light ">S'inscrire</a></p>
+                                <p class="col s12 m8 l6 offset-m2"><a href="#inscription_modal" onclick="user_inscription(this.value);" class="btn right indigo darken-4 waves-effect waves-light ">Annuler</a></p>
+
+                            </div>
+                        </div>
+
+                    </main>
+
+                </div>
+            </div>
+
         </div>
     </div>
+
 </main>
 
 <!--Import jQuery before materialize.js-->
@@ -115,6 +178,7 @@ $temp_user_id = 2;
 
         const username_input = $("#username").val();
         const password_input = $("#password").val();
+
 
         if (username_input === "" || password_input === "") {
             error_bar.find(".text").html("Veuillez remplir les deux champs.");
@@ -147,13 +211,100 @@ $temp_user_id = 2;
              })
         }
     }
-
     $("form").on('keypress', 'input', function(event) {
         if (event.which === 13) {
             event.preventDefault();
             login();
         }
     });
+
+
+        function inscription() {
+            // @TODO: corriger class "aanimated" buguée
+            // @TODO: fonction de verification du password sur le second formulaire
+
+       const inscription_modal = $("#inscription_modal");
+       inscription_modal.modal({
+            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+            opacity: .5, // Opacity of modal background
+            inDuration: 300, // Transition in duration
+            outDuration: 200, // Transition out duration
+            startingTop: '4%', // Starting top style attribute
+            endingTop: '10%'
+        });
+            inscription_modal.modal('open');
+
+        };
+
+    function user_inscription(pseudo) {
+    let error_bar_inscription = $("#error_bar_inscription");
+        error_bar_inscription.find(".text").html("");
+        error_bar_inscription.addClass("hide");
+
+    let pass1 = $("#new_password").val();
+    let pass2 = $("#new_password_confirm").val();
+    let newUsername = $("#new_username").val();
+
+    if (pass1 == pass2 && newUsername != "" ) {
+
+        console.log("ok");
+            $.ajax({
+                type: "POST",
+                url: "check_pseudo/",
+                data: {
+                    newUsername: newUsername, pass1: pass1
+                },
+                statusCode: {
+                    200: function () {
+                        $.ajax({
+                            type: "POST",
+                            url: "login/",
+                            data: {
+                                username: newUsername,
+                                password: pass1
+                            },
+                            statusCode: {
+                                200: function () {
+                                    // TODO: Find a cleaner way?
+                                    location.reload();
+                                }
+                            }
+                        })
+                    },
+                    401: function (data) {
+                        error_bar_inscription.find(".text").html("Le pseudonyme existe déjà.");
+                        error_bar_inscription.removeClass("hide");
+                }
+            }
+        })
+    } else {
+        error_bar_inscription.find(".text").html("Les mots de passe ne coïncident pas.");
+        error_bar_inscription.removeClass("hide");
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
