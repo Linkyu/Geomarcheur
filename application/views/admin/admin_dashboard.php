@@ -129,7 +129,7 @@
             outline: none;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
             background-color: #fff;
-            font-family: Roboto;
+            font-family: Roboto, sans-serif;
         }
 
         #pac-container {
@@ -159,6 +159,10 @@
         #pac-input:focus {
             border-color: #4d90fe;
         }
+
+        #stat_navbar {
+            margin-top: 16px;
+        }
     </style>
 </head>
 <body>
@@ -185,7 +189,6 @@
 </header>
 
 <div id="dashboard" class="container">
-
     <!-- The 4 dashboard cards -->
     <div class="row">
         <!-- MAP -->
@@ -236,7 +239,7 @@
         <!-- Stats -->
         <div class="col s6">
             <div class="card-panel hoverable">
-                <div id="linechart_material"></div>
+                <canvas id="dashboard_chart"></canvas>
             </div>
         </div>
     </div>
@@ -406,29 +409,68 @@
         </div>
     </div>
 </div>
+
+<div id="statistics">
+    <nav>
+        <div class="nav-wrapper pink darken-3 row" id="stat_navbar">
+            <span class="col s4 center" ><span id="stat_global_places">X/Y</span> lieux possédés</span>
+            <span class="col s4 center" ><span id="stat_global_credits">xxx</span> crédits en jeu</span>
+            <span class="col s4 center" ><span id="stat_global_players">XY</span> joueurs</span>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <!-- 1 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_1"></canvas>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_2"></canvas>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_3"></canvas>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_4"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <footer class="page-footer pink darken-3">
     <div class="container">
         <div class="row">
             <div class="col l6 s12">
-                <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
-                    content.</p>
+                <h5 class="grey-text text-lighten-5">Tableau de bord</h5>
+                <p class="grey-text text-lighten-4">Espace d'administration.</p>
             </div>
             <div class="col l4 offset-l2 s12">
-                <h5 class="grey-text text-lighten-5">Links</h5>
+                <h5 class="grey-text text-lighten-5">Liens</h5>
                 <ul>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Aide</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Forum</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Mentions légales</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <div class="footer-copyright">
         <div class="container">
-            © 2017 Kiantic
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            © 2018 Kiantic
+            <a class="grey-text text-lighten-4 right" href="#!">À propos</a>
         </div>
     </div>
 </footer>
@@ -444,51 +486,254 @@
 <!-- Snazzy plugin -->
 <script src="<?php echo base_url(); ?>static/js/snazzy-info-window/snazzy-info-window.min.js"></script>
 
-<!-- Charts API + placeholder data -->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
+<!-- Charts API + data -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js" integrity="sha256-vyehT44mCOPZg7SbqfOZ0HNYXjPKgBCaqxBkW3lh6bg=" crossorigin="anonymous"></script>
+<!-- Main -->
+<script>
+    let ctx = $("#dashboard_chart");
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        let chart1_players = [];
+        let chart1_player_credit_count = [];
+        let chart1_player_color = [];
+        let chart1_player_color_border = [];
+        $.each(data.resultat, function (i, player) {
+            chart1_players.push(player["pseudo"]);
+            chart1_player_credit_count.push(player["credits"]);
+            chart1_player_color.push(stringToHSLA(player["pseudo"], .4));
+            chart1_player_color_border.push(stringToHSLA(player["pseudo"]));
+        });
 
-    google.charts.load('current', {'packages': ['line']});
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-
-        let data = new google.visualization.DataTable();
-        data.addColumn('number', 'Day');
-        data.addColumn('number', 'Dave Grohl');
-        data.addColumn('number', 'Eric Clapman');
-        data.addColumn('number', 'Bob Dylan');
-
-        data.addRows([
-            [1, 37.8, 80.8, 41.8],
-            [2, 30.9, 69.5, 32.4],
-            [3, 25.4, 57, 25.7],
-            [4, 11.7, 18.8, 10.5],
-            [5, 11.9, 17.6, 10.4],
-            [6, 8.8, 13.6, 7.7],
-            [7, 42, 12.3, 9.6],
-            [8, 342, 29.2, 10.6],
-            [9, 5342, 42.9, 14.8],
-            [10, 85342, 30.9, 25],
-            [11, 985342, 342, 50],
-            [12, 1985342, 5342, 500],
-            [13, 3920342, 85342, 400],
-            [14, 6985342, 985342, 420]
-        ]);
-
-        const options = {
-            chart: {
-                title: 'Crédits des 3 meilleurs joueurs',
-                subtitle: 'en crédits'
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chart1_players,
+                datasets: [{
+                    label: '# of credits',
+                    data: chart1_player_credit_count,
+                    backgroundColor: chart1_player_color,
+                    borderColor: chart1_player_color_border,
+                    borderWidth: 1
+                }]
             },
-            width: '100%',
-            height: 'auto'
-        };
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    });
+</script>
+<!-- Headers -->
+<script>
+    // Place counter
+    let place_count = 0;
+    let place_bought_count = 0;
+    $.getJSON("getPlace/asc", "", function (result) {
+        $.each(result, function (i, places) {
+            $.each(places, function (j, place) {
+                place_count++;
+                if (place.id_User !== null) {
+                    place_bought_count++;
+                }
+            })
+        });
 
-        let chart = new google.charts.Line(document.getElementById('linechart_material'));
+        $("#stat_global_places").text(place_bought_count + "/" + place_count);
+    });
 
-        chart.draw(data, google.charts.Line.convertOptions(options));
-    }
+    // Credit counter
+    $.ajax({
+        url: "getAllcredits",
+        type: "GET"
+    }).done(function (data) {
+        $("#stat_global_credits").text(data);
+    });
+
+    // Player counter
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        $("#stat_global_players").text(data.resultat.length);
+    });
+</script>
+<!-- 1 -->
+<script>
+    let ctx1 = $("#dashboard_chart_1");
+    $.ajax({
+        url: "getUser",
+        type: "GET"
+    }).done(function (data) {
+        let chart1_players = [];
+        let chart1_player_credit_count = [];
+        let chart1_player_color = [];
+        let chart1_player_color_border = [];
+        $.each(data.resultat, function (i, player) {
+            chart1_players.push(player["pseudo"]);
+            chart1_player_credit_count.push(player["credits"]);
+            chart1_player_color.push(stringToHSLA(player["pseudo"], .4));
+            chart1_player_color_border.push(stringToHSLA(player["pseudo"]));
+        });
+
+        let chart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: chart1_players,
+                datasets: [{
+                    label: '# de crédits',
+                    data: chart1_player_credit_count,
+                    backgroundColor: chart1_player_color,
+                    borderColor: chart1_player_color_border,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    });
+</script>
+<!-- 2 -->
+<script>
+    let ctx2 = $("#dashboard_chart_2");
+    $.ajax({
+        url: "getUsersPlaceCount",
+        type: "GET"
+    }).done(function (data) {
+        let chart2_players = [];
+        let chart2_player_place_count = [];
+        let chart2_player_color = [];
+        let chart2_player_color_border = [];
+        $.each(data, function a(i, player) {
+            chart2_players.push(player["pseudo"]);
+            chart2_player_color.push(stringToHSLA(player["pseudo"], .4));
+            chart2_player_color_border.push(stringToHSLA(player["pseudo"]));
+            chart2_player_place_count.push(player["place_count"]);
+        });
+
+
+        let chart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: chart2_players,
+                datasets: [{
+                    label: '# de lieux',
+                    data: chart2_player_place_count,
+                    backgroundColor: chart2_player_color,
+                    borderColor: chart2_player_color_border,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        })
+    });
+</script>
+<!-- 3 -->
+<script>
+    let ctx3 = $("#dashboard_chart_3");
+    $.ajax({
+        url: "getPlacesPassages",
+        type: "GET"
+    }).done(function (data) {
+        let chart3_places = [];
+        let chart3_place_place_count = [];
+        let chart3_place_color = [];
+        let chart3_place_color_border = [];
+        $.each(data, function a(i, place) {
+            chart3_places.push(place["name"]);
+            chart3_place_color.push(stringToHSLA(place["name"], .4));
+            chart3_place_color_border.push(stringToHSLA(place["name"]));
+            chart3_place_place_count.push(place["passages"]);
+        });
+
+
+    let chart3 = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: chart3_places,
+                datasets: [{
+                    label: '# de passages par lieu',
+                    data: chart3_place_place_count,
+                    backgroundColor: chart3_place_color,
+                    borderColor: chart3_place_color_border,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        })
+    });
+</script>
+<!-- 4 -->
+<script>
+    let ctx4 = $("#dashboard_chart_4");
+    $.ajax({
+        url: "getPlayersPassages",
+        type: "GET"
+    }).done(function (data) {
+        let chart4_players = [];
+        let chart4_player_passage_count = [];
+        let chart4_player_color = [];
+        let chart4_player_color_border = [];
+        $.each(data, function a(i, place) {
+            chart4_players.push(place["pseudo"]);
+            chart4_player_color.push(stringToHSLA(place["pseudo"], .4));
+            chart4_player_color_border.push(stringToHSLA(place["pseudo"]));
+            chart4_player_passage_count.push(place["passages"]);
+        });
+
+
+        let chart4 = new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: chart4_players,
+                datasets: [{
+                    label: '# de passages par joueur',
+                    data: chart4_player_passage_count,
+                    backgroundColor: chart4_player_color,
+                    borderColor: chart4_player_color_border,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        })
+    });
 </script>
 
 <!-- DataTables API -->
@@ -520,7 +765,7 @@
                        <tr>
                        <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
                        <td class="leaderboard_pseudo">` + user["pseudo"] + `</td>
-                       <td class="leaderboard_credits">¢ ` + user["credits"] + `</td>
+                       <td class="leaderboard_credits"><span class="credit_symbol">¢</span> ` + user["credits"] + `</td>
                        <td class="leaderboard_is_admin">` + user["is_admin"] + `</td>
                        </tr>
                        `;
@@ -919,7 +1164,7 @@
         let id = document.getElementById('idPlace').value;
         if (confirm("Vous désirez vraiment supprimer?")) {
             $.ajax({
-                url: "<?php echo base_url(); ?>disablePlace",
+                url: "disablePlace",
                 type: "GET",
                 data: {
                     id: id

@@ -103,6 +103,30 @@ class Geomarcheur extends CI_Controller
         echo json_encode($data);
     }
 
+    public function getUsersPlaceCount()
+    {
+        $data = $this->geomarcheur_db->listUserWithPlaceCount();
+
+        header("Content-Type: application/json");
+        echo json_encode($data);
+    }
+
+    public function getPlacesPassages()
+    {
+        $data = $this->geomarcheur_db->listPlacePassages();
+
+        header("Content-Type: application/json");
+        echo json_encode($data);
+    }
+
+    public function getPlayersPassages()
+    {
+        $data = $this->geomarcheur_db->listPlayerPassages();
+
+        header("Content-Type: application/json");
+        echo json_encode($data);
+    }
+
     public function getUserRank()
     {
         $user_id = $this->uri->segment(3);
@@ -126,6 +150,12 @@ class Geomarcheur extends CI_Controller
             }
         }
         return -1;
+    }
+
+    public function getAllcredits()
+    {
+        $credits = $this->geomarcheur_db->getAllCredits();
+        echo $credits["credit_count"];
     }
 
     // Operational functions

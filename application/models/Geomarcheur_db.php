@@ -46,10 +46,31 @@ class Geomarcheur_db extends CI_Model
         return $query->result_array();
     }
 
+    public function listUserWithPlaceCount()
+    {
+        $this->load->database();
+        $query = $this->db->query("SELECT pseudo, COUNT(place.id) AS place_count FROM place, user WHERE place.id_User = user.id GROUP BY pseudo");
+        return $query->result_array();
+    }
+
     public function listPlace($id)
     {
         $this->load->database();
         $query = $this->db->query('SELECT * FROM place WHERE id=' . $id);
+        return $query->result_array();
+    }
+
+    public function listPlacePassages()
+    {
+        $this->load->database();
+        $query = $this->db->query("SELECT name, COUNT(event_type) as passages FROM place, log WHERE place.id = log.id_Place AND event_type = '2' GROUP BY name");
+        return $query->result_array();
+    }
+
+    public function listPlayerPassages()
+    {
+        $this->load->database();
+        $query = $this->db->query("SELECT pseudo, COUNT(event_type) as passages FROM log, user WHERE user.id = log.id_User AND event_type = '2' GROUP BY pseudo");
         return $query->result_array();
     }
 
@@ -69,6 +90,16 @@ class Geomarcheur_db extends CI_Model
         }
 
         return $result;
+    }
+
+    public function getAllCredits()
+    {
+        $this->load->database();
+
+        $query = $this->db->query("SELECT SUM(credits) AS credit_count FROM user");
+        $query_array = $query->result_array();
+
+        return $query_array[0];
     }
 
     // Operational functions
@@ -183,13 +214,11 @@ class Geomarcheur_db extends CI_Model
     }
 
 
-
-
     public function buy_place($user_id, $place_id)
     {
         $this->load->database();
 
-        $query = $this->db->query("UPDATE place SET id_User = ". $user_id ." WHERE id = " . $place_id ) ;
+        $query = $this->db->query("UPDATE place SET id_User = " . $user_id . " WHERE id = " . $place_id);
 
         $query = $this->db->query("SELECT value FROM place WHERE id='" . $place_id . "'");
         $row = $query->row();

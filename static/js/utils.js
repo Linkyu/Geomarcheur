@@ -33,3 +33,14 @@ function get_user_places(id, callback) {
         });
     });
 }
+
+// Adapted by Joe Freeman from Christian Sanchez's port, 2010-2013
+// Made compliant to ECMAScript6 by Kévin Guiraud, 2017
+function stringToHSLA(str, alpha=1) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    return "hsl(" + hash % 360 + ", 100%, 40%, " + alpha + ")";
+}
