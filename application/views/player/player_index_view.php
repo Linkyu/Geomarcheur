@@ -350,9 +350,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
     };
 
+    let PlayerMap = undefined;
+
     let markers = {};
     let places_ids = [];
     let mapClickListenerSet = false;
+    let infowindow = new google.maps.InfoWindow();
 
     const PlayerMarkerIcon = {
         url: "<?php echo base_url(); ?>static/img/pin.svg",
@@ -435,13 +438,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
             ]
         };
-        let player_map = new google.maps.Map(document.getElementById("map"), options);
+        PlayerMap = new google.maps.Map(document.getElementById("map"), options);
 
         // Initialise player marker
         PlayerData["marker"] = new google.maps.Marker(
             {
                 position: new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]),
-                map: player_map,
+                map: PlayerMap,
                 icon: {
                     url: "<?php echo base_url(); ?>static/img/located.svg",
                     anchor: new google.maps.Point(50, 50),
@@ -449,7 +452,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
             });
 
-        refreshMarkers(player_map);
+        refreshMarkers(PlayerMap);
 
         refreshRanking();
 
@@ -599,8 +602,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 url: "sellPlace/" + id,
                 success: function () {
                     alert("Vendu!");
+                    infowindow.close();
+                    refreshMarkers();
                     // TODO: Display these with modals? See issue #57
-                    // TODO: Update infowindow bubble. See issue #58
                 }
             });
         }
@@ -635,8 +639,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         markers = [];
     }
 
-    function refreshMarkers(map) {
-        let infowindow = new google.maps.InfoWindow();
+    function refreshMarkers(map = PlayerMap) {
         const playerLoc = new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]);
 
         $.getJSON("getPlace", "", function (result) {
@@ -690,7 +693,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             get_user(place.id_User, function (owner) {
                                 get_user(PlayerData['id'], function (player) {
                                     // Determine the action on this place
-                                    if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                    if (place.id_User === null && Number(player["credits"]) >= Number(place.value) && markerDistance < 50) {
                                         action = "<a href='#' id='buy-button' onclick='buyPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
 
                                     } else if (PlayerData['id'] === place.id_User) {
@@ -754,8 +757,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     function updateBouncingMarkers() {
         const playerLoc = new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]);
         $.each(markers, function (i, marker) {
-            console.log(markers[i]);
-            console.log(marker);
             if (google.maps.geometry.spherical.computeDistanceBetween(markers[i].position, playerLoc) <= 50) {
                 markers[i].setAnimation(google.maps.Animation.BOUNCE);
             } else {
@@ -991,6 +992,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 },
                 success: function () {
                     alert("Achat effectué !");
+                    infowindow.close();
+                    refreshMarkers();
                 },
                 error: function () {
                     alert("Erreur lors de l'achat !");
