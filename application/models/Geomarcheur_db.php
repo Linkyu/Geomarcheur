@@ -195,13 +195,7 @@ class Geomarcheur_db extends CI_Model
         $row = $query->row();
         $value = $row->value;
 
-        $query = $this->db->query("SELECT credits FROM user WHERE id='" . $user_id . "'");
-        $row = $query->row();
-        $credits = $row->credits;
-
-        $new_credits = $credits - $value;
-
-        $query = $this->db->query("UPDATE user SET credits = '" . $new_credits . "'  WHERE id=" . $user_id);
+        $query = $this->db->query("UPDATE user SET credits = credits - '" . $value . "'  WHERE id=" . $user_id);
 
     }
 

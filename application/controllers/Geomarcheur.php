@@ -407,10 +407,8 @@ class Geomarcheur extends CI_Controller
         $user_id = $this->input->get('idUser');
         $place_id = $this->input->get('idPlace');
 
-        $this->logger(DEBUG, "Joueur '$user_id' à acheté le lieu '$place_id'");
-
-
         $this->geomarcheur_db->buy_place($user_id, $place_id);
+        $this->logger(LogType::DEBUG, "Joueur '$user_id' à acheté le lieu '$place_id'");
     }
 
 

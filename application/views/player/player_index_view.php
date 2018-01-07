@@ -690,7 +690,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 get_user(PlayerData['id'], function (player) {
                                     // Determine the action on this place
                                     if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
-                                        action = "<a href='#' id='buy-button' onclick='buyplace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
+                                        action = "<a href='#' id='buy-button' onclick='buyPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
 
                                     } else if (PlayerData['id'] === place.id_User) {
                                         action = "<a href='#' id='sell-button' onclick='sellPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Vendre</a> ";
@@ -975,33 +975,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         });
     }
 
-    function buyplace(idPlace) {
+    function buyPlace(idPlace) {
         if (confirm("Êtes-vous sûr?")) {
-            let idUser = '<?php echo $_SESSION['user_id'] ?>';
-
              $.ajax({
                 url: "buyPlace/",
                 type: "GET",
                 data: {
-                    idUser: idUser, idPlace: idPlace
+                    idUser: PlayerData["id"],
+                    idPlace: idPlace
                 },
                 success: function () {
                     alert("Achat effectué !");
                 },
                 error: function () {
-                    alert("Erreur de l'achat !");
+                    alert("Erreur lors de l'achat !");
                 }
-            }).done(function () {
-                 //marker[0].infowindow.close();
-
-
-                 //refreshMarkers(player_map);
-                 //refreshRanking();
-                 //refreshCredits();
-                 //logguer l'action
             });
-
-
         }
     }
 
