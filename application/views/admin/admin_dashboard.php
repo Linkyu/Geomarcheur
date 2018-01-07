@@ -129,7 +129,7 @@
             outline: none;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
             background-color: #fff;
-            font-family: Roboto;
+            font-family: Roboto, sans-serif;
         }
 
         #pac-container {
@@ -159,6 +159,10 @@
         #pac-input:focus {
             border-color: #4d90fe;
         }
+
+        #stat_navbar {
+            margin-top: 16px;
+        }
     </style>
 </head>
 <body>
@@ -185,7 +189,6 @@
 </header>
 
 <div id="dashboard" class="container">
-
     <!-- The 4 dashboard cards -->
     <div class="row">
         <!-- MAP -->
@@ -236,7 +239,7 @@
         <!-- Stats -->
         <div class="col s6">
             <div class="card-panel hoverable">
-                <div id="linechart_material"></div>
+                <canvas id="linechart_material"></canvas>
             </div>
         </div>
     </div>
@@ -406,29 +409,68 @@
         </div>
     </div>
 </div>
+
+<div id="statistics">
+    <nav>
+        <div class="nav-wrapper pink darken-3 row" id="stat_navbar">
+            <span class="col s4 center" ><span id="stat_global_places">X/Y</span> lieux</span>
+            <span class="col s4 center" ><span id="stat_global_credits">xxx</span> crédits en jeu</span>
+            <span class="col s4 center" ><span id="stat_global_players">XY</span> joueurs</span>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <!-- 1 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_1"></canvas>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_2"></canvas>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_3"></canvas>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="col s6">
+                <div class="card-panel hoverable">
+                    <canvas id="dashboard_chart_4"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <footer class="page-footer pink darken-3">
     <div class="container">
         <div class="row">
             <div class="col l6 s12">
-                <h5 class="grey-text text-lighten-5">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
-                    content.</p>
+                <h5 class="grey-text text-lighten-5">Tableau de bord</h5>
+                <p class="grey-text text-lighten-4">Espace d'administration.</p>
             </div>
             <div class="col l4 offset-l2 s12">
-                <h5 class="grey-text text-lighten-5">Links</h5>
+                <h5 class="grey-text text-lighten-5">Liens</h5>
                 <ul>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Aide</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Forum</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Mentions légales</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <div class="footer-copyright">
         <div class="container">
-            © 2017 Kiantic
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            © 2018 Kiantic
+            <a class="grey-text text-lighten-4 right" href="#!">À propos</a>
         </div>
     </div>
 </footer>
@@ -444,51 +486,224 @@
 <!-- Snazzy plugin -->
 <script src="<?php echo base_url(); ?>static/js/snazzy-info-window/snazzy-info-window.min.js"></script>
 
-<!-- Charts API + placeholder data -->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
+<!-- Charts API + data -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js" integrity="sha256-vyehT44mCOPZg7SbqfOZ0HNYXjPKgBCaqxBkW3lh6bg=" crossorigin="anonymous"></script>
+<!-- Main -->
+<script>
+    let ctx = $("#linechart_material");
+    let main_chart = myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<!-- Headers -->
+<script>
+    let place_count = 0;
+    let place_bought_count = 0;
+    $.getJSON("getPlace/asc", "", function (result) {
+        $.each(result, function (i, places) {
+            $.each(places, function (j, place) {
+                place_count++;
+                if (place.id_User !== null) {
+                    place_bought_count++;
+                }
+            })
+        });
 
-    google.charts.load('current', {'packages': ['line']});
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-
-        let data = new google.visualization.DataTable();
-        data.addColumn('number', 'Day');
-        data.addColumn('number', 'Dave Grohl');
-        data.addColumn('number', 'Eric Clapman');
-        data.addColumn('number', 'Bob Dylan');
-
-        data.addRows([
-            [1, 37.8, 80.8, 41.8],
-            [2, 30.9, 69.5, 32.4],
-            [3, 25.4, 57, 25.7],
-            [4, 11.7, 18.8, 10.5],
-            [5, 11.9, 17.6, 10.4],
-            [6, 8.8, 13.6, 7.7],
-            [7, 42, 12.3, 9.6],
-            [8, 342, 29.2, 10.6],
-            [9, 5342, 42.9, 14.8],
-            [10, 85342, 30.9, 25],
-            [11, 985342, 342, 50],
-            [12, 1985342, 5342, 500],
-            [13, 3920342, 85342, 400],
-            [14, 6985342, 985342, 420]
-        ]);
-
-        const options = {
-            chart: {
-                title: 'Crédits des 3 meilleurs joueurs',
-                subtitle: 'en crédits'
-            },
-            width: '100%',
-            height: 'auto'
-        };
-
-        let chart = new google.charts.Line(document.getElementById('linechart_material'));
-
-        chart.draw(data, google.charts.Line.convertOptions(options));
-    }
+        $("#stat_global_places").text(place_bought_count + "/" + place_count);
+    });
+</script>
+<!-- 1 -->
+<script>
+    let ctx1 = $("#dashboard_chart_1");
+    let chart1 = myChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<!-- 2 -->
+<script>
+    let ctx2 = $("#dashboard_chart_2");
+    let chart2 = myChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<!-- 3 -->
+<script>
+    let ctx3 = $("#dashboard_chart_3");
+    let chart3 = myChart = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<!-- 4 -->
+<script>
+    let ctx4 = $("#dashboard_chart_4");
+    let chart4 = myChart = new Chart(ctx4, {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
 </script>
 
 <!-- DataTables API -->
@@ -520,7 +735,7 @@
                        <tr>
                        <td class="leaderboard_id"><i class="material-icons circle orange accent-4 grey-text text-lighten-5">account_circle</i></td>
                        <td class="leaderboard_pseudo">` + user["pseudo"] + `</td>
-                       <td class="leaderboard_credits">¢ ` + user["credits"] + `</td>
+                       <td class="leaderboard_credits"><span class="credit_symbol">¢</span> ` + user["credits"] + `</td>
                        <td class="leaderboard_is_admin">` + user["is_admin"] + `</td>
                        </tr>
                        `;
