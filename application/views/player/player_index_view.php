@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <meta charset="utf-8">
     <title>Géomarcheur</title>
 
-    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link rel="icon" type="image/png" href="<?php echo base_url(); ?>static/img/icon.png">
 
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -107,7 +107,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal"
                    id="place_list_button">
-                    <sup><i class="material-icons">place</i></sup>3
+                    <sup><i class="material-icons">place</i></sup> <!-- TODO: Display amount of places owned. -->
                 </a>
             </div>
             <div class="col s3 center-align">
@@ -350,9 +350,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
     };
 
-    let markers = [];
+    let PlayerMap = undefined;
+
+    let markers = {};
     let places_ids = [];
     let mapClickListenerSet = false;
+    let infowindow = new google.maps.InfoWindow();
 
     const PlayerMarkerIcon = {
         url: "<?php echo base_url(); ?>static/img/pin.svg",
@@ -435,13 +438,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
             ]
         };
-        let player_map = new google.maps.Map(document.getElementById("map"), options);
+        PlayerMap = new google.maps.Map(document.getElementById("map"), options);
 
         // Initialise player marker
         PlayerData["marker"] = new google.maps.Marker(
             {
                 position: new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]),
-                map: player_map,
+                map: PlayerMap,
                 icon: {
                     url: "<?php echo base_url(); ?>static/img/located.svg",
                     anchor: new google.maps.Point(50, 50),
@@ -449,7 +452,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
             });
 
-        refreshMarkers(player_map);
+        refreshMarkers(PlayerMap);
 
         refreshRanking();
 
@@ -465,7 +468,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             startingTop: '4%', // Starting top style attribute
             endingTop: '10%', // Ending top style attribute
             ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                $.getJSON("getPlace", "", function (result) {
+                $.getJSON("getUserPlaces/" + PlayerData["id"], "", function (result) {
                     $.each(result, function (i, places) {
                         console.log("lieu" + places);
                         // TODO: Find a way to keep the image at a consistent size => normaliser le fichier d'entrée pour le wrapper dans un div
@@ -488,7 +491,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             		<p class="place_value">¢` + place["value"] + `</p>
                             		</div>
                             		<div class="card-action right-align">
-                            		<a href="#" class="waves-effect btn-flat pink-text text-darken-3">Vendre</a>
+                            		<a href="#" class="waves-effect btn-flat pink-text text-darken-3" onclick="sellPlace(` + place["id"] + `)">Vendre</a>
                             		</div>
                             		</div>
                             		</div>`);
@@ -599,8 +602,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 url: "sellPlace/" + id,
                 success: function () {
                     alert("Vendu!");
+                    infowindow.close();
+                    $("#place_list_modal").modal('close');
+                    refreshMarkers();
+                    refreshCredits();
+                    refreshRanking();
                     // TODO: Display these with modals? See issue #57
-                    // TODO: Update infowindow bubble. See issue #58
                 }
             });
         }
@@ -635,8 +642,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         markers = [];
     }
 
-    function refreshMarkers(map) {
-        let infowindow = new google.maps.InfoWindow();
+    function refreshMarkers(map = PlayerMap) {
         const playerLoc = new google.maps.LatLng(PlayerData["loc"]["lat"], PlayerData["loc"]["lng"]);
 
         $.getJSON("getPlace", "", function (result) {
@@ -667,29 +673,41 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         }
 
                         // Create the marker if it doesn't already exist
-                        if (places_ids.find(function(item){return item === place.place_id}) === undefined) {
-                            markers[place.place_id] = new google.maps.Marker(
+                        //if (places_ids.find(function(item){return item === place.place_id}) === undefined) {
+                        if (markers[place.id] === undefined) {
+                            markers[place.id] = new google.maps.Marker(
                                 {
                                     position: new google.maps.LatLng(place.lat, place.lng),
                                     title: 'Nom du lieu : ' + place.name,
                                     icon: marker_icon
                                 }
                             );
-                            markers[place.place_id].setMap(map);
-                            places_ids.push(place.place_id);
+                            markers[place.id].setMap(map);
+                            places_ids.push(place.id);
                         } else {
                             // Update the marker
-                            markers[place.place_id].setIcon(marker_icon);
+                            markers[place.id].setIcon(marker_icon);
                         }
 
 
                         // Closure => création de la function au moment de la création du marqueur
                         let openMarkerInfowindow = function (ev) {
                             let action = "";
+
                             get_user(place.id_User, function (owner) {
                                 get_user(PlayerData['id'], function (player) {
+                                    let ownerId = '';
+                                    let ownerPseudo = '';
+                                    if (owner === undefined || owner === null) {
+                                        ownerId = '';
+                                        ownerPseudo = '';
+                                    } else {
+                                        ownerId = owner.id;
+                                        ownerPseudo = owner.pseudo;
+                                    }
+
                                     // Determine the action on this place
-                                    if (place.id_User === null && Number(player["credits"]) >= Number(place.value)) {
+                                    if (place.id_User === null && Number(player["credits"]) >= Number(place.value) && markerDistance < 50) {
                                         action = "<a href='#' id='buy-button' onclick='buyPlace(" + place.id + ")' class='btn waves-effect pink darken-3'>Acheter</a> ";
 
                                     } else if (PlayerData['id'] === place.id_User) {
@@ -703,7 +721,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         '<span style="font-style: italic; color: grey;">' + (place.address === null ? '' : place.address) + '</span></p></div>' +
                                         '</div>' +
                                         '<div class="row">' +
-                                        (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + owner.id + ')">' + owner.pseudo + '</span></p></div>') + // TODO: Rewrite this; owner is still parsed by the checker at runtime
+                                        (owner === null ? '' : '<div class="col s12"><p><i class="material-icons prefix pink-text text-darken-4">account_circle</i> <span class="pink-text text-darken-4" style="font-weight: bold;" onclick="display_profile(' + ownerId + ')">' + ownerPseudo + '</span></p></div>') +
                                         '</div>' +
                                         '<div class="row"> ' +
                                         '<div class="col s6">' +
@@ -715,21 +733,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         '</div>' +
                                         '</div>' +
                                         '</div>';
-                                    map.panTo(markers[place.place_id].position);
+                                    map.panTo(markers[place.id].position);
                                     infowindow.setContent(contentString);
-                                    infowindow.open(map, markers[place.place_id]);
+                                    infowindow.open(map, markers[place.id]);
                                 });
                             });
                         };
 
                         let closeMarkerInfowindow = function (ev) {
-                            markers[place.place_id].setAnimation(null);
+                            markers[place.id].setAnimation(null);
                             infowindow.close();
                         };
 
                         // creation de listener qui apelle la function
                         google.maps.event.addListener(
-                            markers[place.place_id], "click", openMarkerInfowindow
+                            markers[place.id], "click", openMarkerInfowindow
                         );
                         if (!mapClickListenerSet) {
                             google.maps.event.addListener(
@@ -738,8 +756,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             mapClickListenerSet = true;
                         }
                     } else {
-                        google.maps.event.clearInstanceListeners(markers[place.place_id]);
-                        eraseMarker(place.place_id);
+                        if (markers[place.id] !== undefined) {
+                            google.maps.event.clearInstanceListeners(markers[place.id]);
+                            eraseMarker(place.id);
+                        }
                     }
                 })
             })
@@ -986,6 +1006,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 },
                 success: function () {
                     alert("Achat effectué !");
+                    infowindow.close();
+                    refreshMarkers();
                 },
                 error: function () {
                     alert("Erreur lors de l'achat !");

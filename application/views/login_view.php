@@ -8,6 +8,8 @@ $temp_user_id = 2;
     <meta charset="utf-8">
     <title>Géomarcheur</title>
 
+    <link rel="icon" type="image/png" href="<?php echo base_url(); ?>static/img/icon.png">
+
     <!-- TODO: Include all these from a separate file to prevent missing links. See issue #54 -->
 
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
