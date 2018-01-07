@@ -214,6 +214,32 @@ class Geomarcheur_db extends CI_Model
     }
 
 
+    public function check_pseudo($pseudo)
+    {
+        $this->load->database();
+
+        if (!empty($pseudo)) {
+            //je le compare avec ceux de la BDD
+            $check_pseudo = $this->db->query("SELECT pseudo FROM user WHERE pseudo='" . $pseudo . "'");
+            $row = $check_pseudo->row();
+            // si la ligne est remplie ça veux dire qu'il y a déjà le pseudo dans la BDD
+            if (!empty($row)) {
+                $pseudo_db = $row->pseudo;
+                if ($pseudo_db == $pseudo) {
+                    return $pseudo_exists = 1;
+                }
+            }
+        }
+    }
+
+public function inscription($pseudo, $password) {
+    $this->load->database();
+    $query = $this->db->query("INSERT INTO user (pseudo, password, credits, inscription_date, is_banned, is_admin)VALUES ('" . $pseudo . "', '" . $password . "', 30 , " .  date('Y-m-d') . ", 0, 0)");
+
+}
+
+
+
     public function buy_place($user_id, $place_id)
     {
         $this->load->database();

@@ -654,7 +654,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     //console.log("distance to " + place.name + ": " + markerDistance);
 
                     if (place.id_User === PlayerData['id'] ||
-                        ((place.id_User !== null || (place.id_User === null && Number(place.value) <= Number(PlayerData["credits"]))) && markerDistance < 30000)) {
+                        ((place.id_User !== null ||
+                            (place.id_User === null
+                                && place.status === '1'
+                                    && Number(place.value) <= Number(PlayerData["credits"]))) && markerDistance < 30000)) {
 
                         // Give a point to the owner
                         if (place.id_User !== PlayerData['id'] && place.id_User !== null && markerDistance < 50) {
@@ -971,10 +974,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         let pseudo = $("#input_profile_modal_pseudo").val();
         let quote = $("#input_profile_modal_quote").val();
         let bio = $("#input_profile_modal_bio").val();
-
-        console.log(pseudo);
-        console.log(quote);
-        console.log(bio);
 
         $.ajax({
             url: "editProfile/",
