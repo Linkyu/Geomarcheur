@@ -124,7 +124,7 @@ class Geomarcheur_db extends CI_Model
     }
 
 
-    public function disable_place($id_place)
+    public function disable_place($id_place, $status)
     {
         $this->load->database();
         // recupere l'ID du proprietaire du lieu + la valeur du lieu

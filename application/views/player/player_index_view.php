@@ -599,6 +599,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 url: "sellPlace/" + id,
                 success: function () {
                     alert("Vendu!");
+
+
                     // TODO: Display these with modals? See issue #57
                     // TODO: Update infowindow bubble. See issue #58
                 }
@@ -648,7 +650,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     //console.log("distance to " + place.name + ": " + markerDistance);
 
                     if (place.id_User === PlayerData['id'] ||
-                        ((place.id_User !== null || (place.id_User === null && Number(place.value) <= Number(PlayerData["credits"]))) && markerDistance < 30000)) {
+                        ((place.id_User !== null ||
+                            (place.id_User === null
+                                && place.status == 1
+                                    && Number(place.value) <= Number(PlayerData["credits"]))) && markerDistance < 30000)) {
 
                         // Give a point to the owner
                         if (place.id_User !== PlayerData['id'] && place.id_User !== null && markerDistance < 50) {
@@ -982,6 +987,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 },
                 success: function () {
                     alert("Achat effectué !");
+                    //refreshCredits();
+                    //refreshMarkers();
+                    //refreshRanking();
+                    //infowindow.close();
                 },
                 error: function () {
                     alert("Erreur lors de l'achat !");

@@ -171,13 +171,31 @@ class Geomarcheur extends CI_Controller
 
     }
 
-    public function disablePlace()
+    public function managePlace()
     {
-        // TODO: Switch this to use POST instead
         // TODO: Log this
-        $place_id = $this->input->get('id');
-        $this->geomarcheur_db->disable_place($place_id);
+        $place_id = $this->input->POST('id');
+        $status = $this->input->POST('status');
+
+        $this->geomarcheur_db->disable_place($place_id, $status);
+
     }
+
+    public function placeStatus()
+    {
+        $place_id = $this->input->POST('id');
+        $data['resultat'] = $this->geomarcheur_db->listPlace($place_id);
+
+        foreach ($data['resultat'] as $key => $value) {
+            $place_status = $value['status'];
+        }
+        echo $place_status;
+
+   }
+
+
+
+
 
     public function editPlace()
     {
@@ -402,15 +420,7 @@ public function check_pseudo() {
 
 }
 
-
-
-
-
-
-
-
-
-    private function redirect_after_login($is_admin)
+private function redirect_after_login($is_admin)
     {
         if ($is_admin) {
             $this->dashboard();

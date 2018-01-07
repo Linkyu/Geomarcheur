@@ -168,9 +168,6 @@
             <a href="#" class="brand-logo">Géomarcheur</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="#">Tableau de bord</a></li>
-                <li><a href="#">Classement</a></li>
-                <li><a href="#">Statistiques</a></li>
                 <li><a href="#" onclick="logout()">Se déconnecter</a></li>
             </ul>
         </div>
@@ -270,6 +267,8 @@
 
                     <!-- TODO: Refactor this so that it actually looks like it belongs in there -->
                     <input type="hidden" id="idPlace" value="">
+                    <input type="hidden" id="idPlace" value="">
+
 
                     <div class="input-field">
                         <i class="material-icons prefix">account_circle</i>
@@ -915,24 +914,39 @@
     // TODO: Handle the reactivation
     function managePlace() {
         const place_modal = $("#place_modal");
-
         let id = document.getElementById('idPlace').value;
-        if (confirm("Vous désirez vraiment supprimer?")) {
-            $.ajax({
-                url: "<?php echo base_url(); ?>disablePlace",
-                type: "GET",
-                data: {
-                    id: id
+        $.ajax({
+            url: "<?php echo base_url(); ?>placeStatus",
+            type: "POST",
+            data: {id: id},
+            success: function (data) {
+                if (data == '0') {
+                    if (confirm("Vous désirez vraiment réactiver le lieu ?")) {
+                        $.ajax({
+                            // url: "<?php echo base_url(); ?>disablePlace",
+                            type: "POST",
+                            data: {id: id, status: 1}
+                        }).done(function () {
+                            // place_modal.modal('close');
+                        });
+                    } else {
+                        if (confirm("Vous désirez vraiment désactiver le lieu ?")) {
+                            $.ajax({
+                                // url: "<?php echo base_url(); ?>disablePlace",
+                                type: "POST",
+                                data: {id: id, status: 0}
+                            }).done(function () {
+                                // place_modal.modal('close');
+                            });
+                        }
+                    }
                 }
-            }).done(function () {
-                place_modal.modal('close');
-            });
-        }
+            }
+        })
     }
 
-    // TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+
     // TODO : supprimer le moche "input text hidden"
-    // si le lieu est supprimé => class deleted
 
     function savePlace() {
         const place_create = $("#modal_place_create_input").val();
