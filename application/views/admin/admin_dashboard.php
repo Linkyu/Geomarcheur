@@ -92,7 +92,19 @@
 
         .editable:hover {
             cursor: pointer;
+            background-color: #f9c2f6;
+
         }
+
+        .editable {
+            background-color: #f5d9f4;
+            border:1px solid gray;
+            padding:5px;
+            box-shadow:2px 2px 10px gray;
+            -moz-box-shadow:2px 2px 10px gray;
+            -webkit-box-shadow:2px 2px 10px gray;
+        }
+
 
         .editable:focus {
             background-color: #fff;
@@ -1093,7 +1105,9 @@
                     Materialize.toast("An error was encountered. Error code: 401", 3000, 'red rounded');
                 }
             }
-        });
+        }).done(function () {
+            users_detail_modal.modal('close');
+        });;
     }
 
     function toggleBan() {
