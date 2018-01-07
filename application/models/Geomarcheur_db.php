@@ -196,7 +196,7 @@ class Geomarcheur_db extends CI_Model
         $value = $row->value;
 
         $query = $this->db->query("UPDATE user SET credits = credits - '" . $value . "'  WHERE id=" . $user_id);
-
+        $log_query = $this->db->query('INSERT INTO log (event_type, event_date, id_User, id_Place) VALUES (' . EventType::BUY . ', \'' . date('Y-m-d H:i:s') . '\', ' . $user_id . ', ' . $place_id . ')');
     }
 
 
