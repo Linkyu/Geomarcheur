@@ -71,6 +71,16 @@ class Geomarcheur_db extends CI_Model
         return $result;
     }
 
+    public function getAllCredits()
+    {
+        $this->load->database();
+
+        $query = $this->db->query("SELECT SUM(credits) as credit_count FROM user");
+        $query_array = $query->result_array();
+
+        return $query_array[0];
+    }
+
     // Operational functions
     public function sellPlace($id)
     {

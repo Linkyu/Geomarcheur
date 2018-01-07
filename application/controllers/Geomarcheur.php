@@ -128,6 +128,12 @@ class Geomarcheur extends CI_Controller
         return -1;
     }
 
+    public function getAllcredits()
+    {
+        $credits = $this->geomarcheur_db->getAllCredits();
+        echo $credits["credit_count"];
+    }
+
     // Operational functions
     public function sellPlace()
     {

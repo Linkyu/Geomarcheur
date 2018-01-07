@@ -530,6 +530,7 @@
 </script>
 <!-- Headers -->
 <script>
+    // Place counter
     let place_count = 0;
     let place_bought_count = 0;
     $.getJSON("getPlace/asc", "", function (result) {
@@ -543,6 +544,14 @@
         });
 
         $("#stat_global_places").text(place_bought_count + "/" + place_count);
+    });
+
+    // Credit counter
+    $.ajax({
+        url: "getAllcredits",
+        type: "GET"
+    }).done(function (data) {
+        $("#stat_global_credits").text(data);
     });
 </script>
 <!-- 1 -->
@@ -1134,7 +1143,7 @@
         let id = document.getElementById('idPlace').value;
         if (confirm("Vous désirez vraiment supprimer?")) {
             $.ajax({
-                url: "<?php echo base_url(); ?>disablePlace",
+                url: "disablePlace",
                 type: "GET",
                 data: {
                     id: id
