@@ -107,7 +107,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <div class="col s3 center-align">
                 <a class="waves-effect waves-light btn-flat modal-trigger white-text" href="#place_list_modal"
                    id="place_list_button">
-                    <sup><i class="material-icons">place</i></sup>3
+                    <sup><i class="material-icons">place</i></sup> <!-- TODO: Display amount of places owned. -->
                 </a>
             </div>
             <div class="col s3 center-align">
@@ -468,7 +468,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             startingTop: '4%', // Starting top style attribute
             endingTop: '10%', // Ending top style attribute
             ready: function (modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-                $.getJSON("getPlace", "", function (result) {
+                $.getJSON("getUserPlaces/" + PlayerData["id"], "", function (result) {
                     $.each(result, function (i, places) {
                         console.log("lieu" + places);
                         // TODO: Find a way to keep the image at a consistent size => normaliser le fichier d'entrée pour le wrapper dans un div
@@ -491,7 +491,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             		<p class="place_value">¢` + place["value"] + `</p>
                             		</div>
                             		<div class="card-action right-align">
-                            		<a href="#" class="waves-effect btn-flat pink-text text-darken-3">Vendre</a>
+                            		<a href="#" class="waves-effect btn-flat pink-text text-darken-3" onclick="sellPlace(` + place["id"] + `)">Vendre</a>
                             		</div>
                             		</div>
                             		</div>`);
@@ -603,7 +603,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 success: function () {
                     alert("Vendu!");
                     infowindow.close();
+                    $("#place_list_modal").modal('close');
                     refreshMarkers();
+                    refreshCredits();
+                    refreshRanking();
                     // TODO: Display these with modals? See issue #57
                 }
             });
