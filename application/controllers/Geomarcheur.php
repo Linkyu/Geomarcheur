@@ -201,14 +201,12 @@ class Geomarcheur extends CI_Controller
 
     }
 
-    public function managePlace()
+    public function disablePlace()
     {
+        // TODO: Switch this to use POST instead
         // TODO: Log this
-        $place_id = $this->input->POST('id');
-        $status = $this->input->POST('status');
-
-        $this->geomarcheur_db->disable_place($place_id, $status);
-
+        $place_id = $this->input->get('id');
+        $this->geomarcheur_db->disable_place($place_id);
     }
 
     public function placeStatus()

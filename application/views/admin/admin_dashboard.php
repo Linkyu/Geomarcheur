@@ -1157,35 +1157,19 @@
     // TODO: Handle the reactivation
     function managePlace() {
         const place_modal = $("#place_modal");
+
         let id = document.getElementById('idPlace').value;
-        $.ajax({
-            url: "placeStatus",
-            type: "POST",
-            data: {id: id},
-            success: function (data) {
-                if (data === '0') {
-                    if (confirm("Vous désirez vraiment réactiver le lieu ?")) {
-                        $.ajax({
-                            // url: "<?php echo base_url(); ?>disablePlace",
-                            type: "POST",
-                            data: {id: id, status: 1}
-                        }).done(function () {
-                            // place_modal.modal('close');
-                        });
-                    } else {
-                        if (confirm("Vous désirez vraiment désactiver le lieu ?")) {
-                            $.ajax({
-                                // url: "<?php echo base_url(); ?>disablePlace",
-                                type: "POST",
-                                data: {id: id, status: 0}
-                            }).done(function () {
-                                // place_modal.modal('close');
-                            });
-                        }
-                    }
+        if (confirm("Vous désirez vraiment supprimer?")) {
+            $.ajax({
+                url: "disablePlace",
+                type: "GET",
+                data: {
+                    id: id
                 }
-            }
-        })
+            }).done(function () {
+                place_modal.modal('close');
+            });
+        }
     }
 
 
