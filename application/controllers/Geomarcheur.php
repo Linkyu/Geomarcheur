@@ -209,6 +209,22 @@ class Geomarcheur extends CI_Controller
         $this->geomarcheur_db->disable_place($place_id);
     }
 
+    public function placeStatus()
+    {
+        $place_id = $this->input->POST('id');
+        $data['resultat'] = $this->geomarcheur_db->listPlace($place_id);
+
+        foreach ($data['resultat'] as $key => $value) {
+            $place_status = $value['status'];
+        }
+        echo $place_status;
+
+   }
+
+
+
+
+
     public function editPlace()
     {
         if ($this->input->server('REQUEST_METHOD') != 'POST') {
@@ -413,7 +429,26 @@ class Geomarcheur extends CI_Controller
         }
     }
 
-    private function redirect_after_login($is_admin)
+public function check_pseudo() {
+
+    $pseudo = $this->input->post('newUsername');
+    $pseudo_exists = $this->geomarcheur_db->check_pseudo($pseudo);
+
+    if (!empty($pseudo_exists)) {
+
+    http_response_code(401);
+        echo "Le pseudo existe déjà.";
+
+    } else {
+        $password = $this->input->post('pass1');
+        $query = $this->geomarcheur_db->inscription($pseudo, $password);
+        $this->logger(LogType::DEBUG, "Joueur '$pseudo' vient de s'inscrire.");
+
+    }
+
+}
+
+private function redirect_after_login($is_admin)
     {
         if ($is_admin) {
             $this->dashboard();

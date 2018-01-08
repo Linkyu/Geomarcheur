@@ -172,9 +172,6 @@
             <a href="#" class="brand-logo">Géomarcheur</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="#">Tableau de bord</a></li>
-                <li><a href="#">Classement</a></li>
-                <li><a href="#">Statistiques</a></li>
                 <li><a href="#" onclick="logout()">Se déconnecter</a></li>
             </ul>
         </div>
@@ -1175,9 +1172,8 @@
         }
     }
 
-    // TODO : modifier la classe du lieu ou mettre un symbole pour signifier sa suppression
+
     // TODO : supprimer le moche "input text hidden"
-    // si le lieu est supprimé => class deleted
 
     function savePlace() {
         const place_create = $("#modal_place_create_input").val();
